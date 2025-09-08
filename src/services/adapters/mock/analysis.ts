@@ -247,48 +247,126 @@ export const reanalyze = async (businessId: string): Promise<AnalysisJob> => {
 export const resetTestData = async (businessId: string): Promise<{ todos: Todo[], impactSummaries: ImpactSummary[] }> => {
   await new Promise(resolve => setTimeout(resolve, 300));
   
-  // Generate 2 new random tasks
+  // Clear existing todos for this business
+  mockTodos = mockTodos.filter(t => t.businessId !== businessId);
+  
+  // BASELINE B CORP REQUIREMENTS - Always included
+  const baselineTodos: Todo[] = [
+    {
+      id: String(nextTodoId++),
+      businessId,
+      impact: 'Governance',
+      requirementCode: 'GOV-001',
+      title: 'Update Articles of Association with mission lock language',
+      descriptionMd: 'Your Articles of Association must include specific B Corp mission lock language to meet certification requirements. This is a legal requirement for all B Corps.',
+      priority: 'P1',
+      effort: 'High',
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: String(nextTodoId++),
+      businessId,
+      impact: 'Governance',
+      requirementCode: 'GOV-002',
+      title: 'Establish stakeholder governance framework',
+      descriptionMd: 'Create formal processes for considering all stakeholders (employees, customers, community, environment) in business decisions.',
+      priority: 'P1',
+      effort: 'Medium',
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: String(nextTodoId++),
+      businessId,
+      impact: 'Workers',
+      requirementCode: 'WOR-001',
+      title: 'Implement fair compensation policy',
+      descriptionMd: 'Establish and document fair wage policies, including living wage considerations and equitable compensation across all roles.',
+      priority: 'P1',
+      effort: 'Medium',
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: String(nextTodoId++),
+      businessId,
+      impact: 'Environment',
+      requirementCode: 'ENV-001',
+      title: 'Establish environmental management system',
+      descriptionMd: 'Create formal environmental policies and begin tracking key environmental metrics like energy use and waste.',
+      priority: 'P2',
+      effort: 'Medium',
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: String(nextTodoId++),
+      businessId,
+      impact: 'Community',
+      requirementCode: 'COM-001',
+      title: 'Document community impact initiatives',
+      descriptionMd: 'Formally document your community involvement, local sourcing, and social impact programs.',
+      priority: 'P2',
+      effort: 'Low',
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    },
+    {
+      id: String(nextTodoId++),
+      businessId,
+      impact: 'Customers',
+      requirementCode: 'CUS-001',
+      title: 'Implement customer feedback and data protection systems',
+      descriptionMd: 'Establish customer feedback collection processes and ensure GDPR-compliant data protection policies.',
+      priority: 'P2',
+      effort: 'Medium',
+      status: 'todo',
+      createdAt: new Date().toISOString()
+    }
+  ];
+  
+  // ADDITIONAL RANDOM TASKS - Generate 2 random tasks
   const impactAreas: ImpactArea[] = ['Governance', 'Workers', 'Community', 'Environment', 'Customers'];
   const priorities: TodoPriority[] = ['P1', 'P2', 'P3'];
   const efforts: TodoEffort[] = ['Low', 'Medium', 'High'];
   const statuses: Todo['status'][] = ['todo', 'in_progress', 'done'];
   
-  const taskTemplates = [
-    { impact: 'Governance', titles: ['Update board structure', 'Implement stakeholder governance', 'Create transparency policy', 'Establish mission accountability'] },
-    { impact: 'Workers', titles: ['Develop training program', 'Implement flexible work policy', 'Create wellness initiative', 'Establish feedback system'] },
-    { impact: 'Community', titles: ['Launch community program', 'Partner with local nonprofits', 'Create supplier diversity policy', 'Implement volunteering program'] },
-    { impact: 'Environment', titles: ['Reduce energy consumption', 'Implement recycling program', 'Create sustainability policy', 'Track environmental metrics'] },
-    { impact: 'Customers', titles: ['Improve customer service', 'Enhance product quality', 'Create feedback system', 'Implement data protection'] }
+  const additionalTaskTemplates = [
+    { impact: 'Governance', titles: ['Create board diversity policy', 'Implement transparency reporting', 'Establish ethics committee', 'Develop stakeholder engagement plan'] },
+    { impact: 'Workers', titles: ['Launch professional development program', 'Create flexible work arrangements', 'Implement employee wellness initiative', 'Establish mentorship program'] },
+    { impact: 'Community', titles: ['Partner with local suppliers', 'Launch volunteering program', 'Create scholarship fund', 'Establish community advisory board'] },
+    { impact: 'Environment', titles: ['Implement renewable energy sourcing', 'Create waste reduction program', 'Launch carbon offset initiative', 'Establish green office practices'] },
+    { impact: 'Customers', titles: ['Enhance product accessibility', 'Create customer education program', 'Implement quality assurance system', 'Launch customer co-creation initiative'] }
   ];
   
-  // Clear existing todos for this business
-  mockTodos = mockTodos.filter(t => t.businessId !== businessId);
-  
-  // Generate 2 new random tasks
-  const newTodos: Todo[] = [];
+  const randomTodos: Todo[] = [];
   for (let i = 0; i < 2; i++) {
     const randomImpact = impactAreas[Math.floor(Math.random() * impactAreas.length)];
-    const impactTemplate = taskTemplates.find(t => t.impact === randomImpact);
-    const randomTitle = impactTemplate?.titles[Math.floor(Math.random() * impactTemplate.titles.length)] || 'Sample task';
+    const impactTemplate = additionalTaskTemplates.find(t => t.impact === randomImpact);
+    const randomTitle = impactTemplate?.titles[Math.floor(Math.random() * impactTemplate.titles.length)] || 'Additional task';
     
-    const newTodo: Todo = {
+    const randomTodo: Todo = {
       id: String(nextTodoId++),
       businessId,
       impact: randomImpact,
-      requirementCode: `${randomImpact.slice(0, 3).toUpperCase()}-${String(Math.floor(Math.random() * 100)).padStart(3, '0')}`,
+      requirementCode: `${randomImpact.slice(0, 3).toUpperCase()}-${String(Math.floor(Math.random() * 900) + 100)}`,
       title: randomTitle,
-      descriptionMd: `This is a randomly generated task for testing purposes in the ${randomImpact} impact area.`,
+      descriptionMd: `This is an additional randomly generated task for enhanced B Corp readiness in the ${randomImpact} impact area.`,
       priority: priorities[Math.floor(Math.random() * priorities.length)],
       effort: efforts[Math.floor(Math.random() * efforts.length)],
       status: statuses[Math.floor(Math.random() * statuses.length)],
       createdAt: new Date().toISOString()
     };
     
-    newTodos.push(newTodo);
+    randomTodos.push(randomTodo);
   }
   
-  // Add new todos to global array
-  mockTodos.push(...newTodos);
+  // Combine baseline + random todos
+  const allNewTodos = [...baselineTodos, ...randomTodos];
+  
+  // Add all new todos to global array
+  mockTodos.push(...allNewTodos);
   
   // Save to localStorage
   saveToStorage(TODOS_STORAGE_KEY, mockTodos);
@@ -296,7 +374,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
   // Generate fresh impact summaries
   const summaries = await impactSummary(businessId);
   
-  return { todos: newTodos, impactSummaries: summaries };
+  return { todos: allNewTodos, impactSummaries: summaries };
 };
 
 // Helper function to simulate job progress
