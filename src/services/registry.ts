@@ -12,13 +12,13 @@ import { IRiskService } from './ports/risk';
 import { ILegalService } from './ports/legal';
 import { IAuthService } from './ports/auth';
 
-// Import mock implementations
+// Import implementations
 import * as MockFiles from './adapters/mock/files';
 import * as MockAnalysis from './adapters/mock/analysis';
 import * as MockBusiness from './adapters/mock/business';
 import * as MockRisk from './adapters/mock/risk';
 import * as MockLegal from './adapters/mock/legal';
-import * as MockAuth from './adapters/mock/auth';
+import * as SupabaseAuth from './adapters/supabase/auth';
 
 /**
  * Service implementations registry
@@ -35,7 +35,7 @@ export const Services = {
   business: MockBusiness as IBusinessService,
   risk: MockRisk as IRiskService,
   legal: MockLegal as ILegalService,
-  auth: MockAuth as IAuthService,
+  auth: SupabaseAuth as IAuthService,
 };
 
 // Future implementation example:
