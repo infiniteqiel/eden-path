@@ -13,7 +13,6 @@ import NotFound from "./pages/NotFound";
 
 // Lazy load heavy components
 const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Home = lazy(() => import("./pages/Home"));
 const HealthCheck = lazy(() => import("./pages/HealthCheck"));
 
 const queryClient = new QueryClient({
@@ -53,7 +52,6 @@ const App = () => {
             <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/home" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/auth/signup" element={<SignUp />} />
                 <Route path="/auth/signin" element={<SignIn />} />
