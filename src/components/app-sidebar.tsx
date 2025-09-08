@@ -93,33 +93,43 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Building2 className="h-4 w-4" />
-                  {!isCollapsed && <span>Governance</span>}
+                <SidebarMenuButton asChild>
+                  <Link to="/impact/governance" className="flex items-center gap-3">
+                    <Building2 className="h-4 w-4" />
+                    {!isCollapsed && <span>Governance</span>}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Users className="h-4 w-4" />
-                  {!isCollapsed && <span>Workers</span>}
+                <SidebarMenuButton asChild>
+                  <Link to="/impact/workers" className="flex items-center gap-3">
+                    <Users className="h-4 w-4" />
+                    {!isCollapsed && <span>Workers</span>}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Target className="h-4 w-4" />
-                  {!isCollapsed && <span>Community</span>}
+                <SidebarMenuButton asChild>
+                  <Link to="/impact/community" className="flex items-center gap-3">
+                    <Target className="h-4 w-4" />
+                    {!isCollapsed && <span>Community</span>}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <Leaf className="h-4 w-4" />
-                  {!isCollapsed && <span>Environment</span>}
+                <SidebarMenuButton asChild>
+                  <Link to="/impact/environment" className="flex items-center gap-3">
+                    <Leaf className="h-4 w-4" />
+                    {!isCollapsed && <span>Environment</span>}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                <SidebarMenuButton>
-                  <CheckSquare2 className="h-4 w-4" />
-                  {!isCollapsed && <span>Customers</span>}
+                <SidebarMenuButton asChild>
+                  <Link to="/impact/customers" className="flex items-center gap-3">
+                    <CheckSquare2 className="h-4 w-4" />
+                    {!isCollapsed && <span>Customers</span>}
+                  </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

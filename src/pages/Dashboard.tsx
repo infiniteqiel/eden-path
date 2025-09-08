@@ -18,7 +18,8 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Upload, FileText, ArrowRight, Building, Leaf, Users } from 'lucide-react';
+import { Upload, FileText, ArrowRight, Building, Leaf, Users, RotateCcw } from 'lucide-react';
+import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Dashboard = () => {
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
@@ -44,6 +45,15 @@ const Dashboard = () => {
     await updateTodoStatus(todoId, status);
     if (currentBusiness) {
       loadImpactSummaries(currentBusiness.id);
+    }
+  };
+
+  const handleTestReset = () => {
+    // Reset progress and add random priority tasks
+    if (currentBusiness) {
+      // This would call mock services to reset data
+      loadImpactSummaries(currentBusiness.id);
+      loadTodos(currentBusiness.id);
     }
   };
 
@@ -75,20 +85,37 @@ const Dashboard = () => {
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
         <div className="flex-1">
-          <header className="h-12 flex items-center border-b px-4">
+          <header 
+            className="h-16 flex items-center border-b px-4 relative overflow-hidden"
+            style={{
+              backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url(${singaporeCityscape})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat'
+            }}
+          >
             <SidebarTrigger />
-            <h1 className="ml-4 font-semibold">Dashboard</h1>
+            <h1 className="ml-4 font-bold text-lg">Dashboard - B Corp Progress</h1>
           </header>
           
-          <main className="flex-1 overflow-auto">
+          <main 
+            className="flex-1 overflow-auto relative"
+            style={{
+              backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.95)), url(${singaporeCityscape})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+              backgroundAttachment: 'fixed'
+            }}
+          >
             <div className="container mx-auto px-4 py-8">
               <div className="space-y-8">
                 {currentBusiness ? (
                   <>
                     {/* Impact Cards - One Row, Square Layout */}
-                    <section>
+                    <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                       <div className="mb-6">
-                        <h2 className="text-2xl font-bold mb-2">B Corp Progress</h2>
+                        <h2 className="text-2xl font-bold mb-2">B Corp Progress Overview</h2>
                         <p className="text-muted-foreground">
                           Track your advancement across the five key impact areas
                         </p>
@@ -109,7 +136,7 @@ const Dashboard = () => {
                     </section>
 
                     {/* Upload Documents Section */}
-                    <section className="bg-muted/30 rounded-xl p-6">
+                    <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                       <div className="mb-6">
                         <h3 className="text-xl font-bold mb-2">Upload Documents</h3>
                         <p className="text-muted-foreground">
@@ -124,27 +151,39 @@ const Dashboard = () => {
                     </section>
 
                     {/* Priority Tasks To Do */}
-                    <section>
-                      <div className="mb-6">
-                        <h3 className="text-xl font-bold mb-2">Priority Tasks</h3>
-                        <p className="text-muted-foreground">
-                          Top priority items to advance your B Corp readiness
-                        </p>
+                    <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-6">
+                        <div>
+                          <h3 className="text-xl font-bold mb-2">Priority Tasks</h3>
+                          <p className="text-muted-foreground">
+                            Top priority items to advance your B Corp readiness
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={handleTestReset}
+                          className="shrink-0"
+                        >
+                          <RotateCcw className="h-4 w-4 mr-2" />
+                          Test Reset
+                        </Button>
                       </div>
                       
                       <div className="space-y-3">
                         {quickTodos.length > 0 ? (
                           quickTodos.map((todo) => (
-                            <TodoItem
-                              key={todo.id}
-                              todo={todo}
-                              onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                            />
+                            <div key={todo.id} className="bg-white/60 rounded-lg p-4">
+                              <TodoItem
+                                todo={todo}
+                                onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
+                              />
+                            </div>
                           ))
                         ) : (
-                          <Card className="p-6 text-center">
+                          <div className="bg-white/60 rounded-lg p-6 text-center">
                             <p className="text-muted-foreground">No priority tasks at the moment</p>
-                          </Card>
+                          </div>
                         )}
                       </div>
                       
