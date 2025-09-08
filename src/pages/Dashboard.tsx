@@ -78,7 +78,7 @@ const Dashboard = () => {
           <AppHeader mode="auth" />
           <MissionSnippet />
 
-          <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-full overflow-x-hidden">
+          <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-full overflow-x-hidden w-full">
         <div className="space-y-4 sm:space-y-8">
           {/* Dashboard Header */}
           <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row sm:items-center justify-between">
@@ -103,7 +103,7 @@ const Dashboard = () => {
               {/* Progress Overview */}
               <section className="w-full">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Progress Overview</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4 w-full">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4 w-full max-w-none">
                     {impactSummaries.map((summary) => (
                       <ImpactCard
                         key={summary.impact}

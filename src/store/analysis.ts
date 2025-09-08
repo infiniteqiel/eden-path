@@ -73,6 +73,10 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
   },
 
   updateTodoStatus: async (todoId: string, status: Todo['status']) => {
+    const { todos } = get();
+    const originalTodo = todos.find(t => t.id === todoId);
+    if (!originalTodo) return;
+
     // Optimistically update UI first
     set(state => ({
       todos: state.todos.map(todo => 
@@ -83,6 +87,7 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
 
     try {
       const updatedTodo = await analysisService.updateTodoStatus(todoId, status);
+      
       // Confirm the update with server response
       set(state => ({
         todos: state.todos.map(todo => 
@@ -90,24 +95,19 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
         )
       }));
 
-      // Refresh impact summaries without reloading todos
-      const { todos } = get();
-      const businessId = todos.find(t => t.id === todoId)?.businessId;
+      // Refresh impact summaries to reflect the change
+      const businessId = originalTodo.businessId;
       if (businessId) {
-        get().loadImpactSummaries(businessId);
+        await get().loadImpactSummaries(businessId);
       }
     } catch (error) {
-      // Revert optimistic update on error - find the original status
-      set(state => {
-        const originalTodo = state.todos.find(t => t.id === todoId);
-        const originalStatus = originalTodo?.status === status ? 'todo' : 'todo'; // revert to todo if update failed
-        return {
-          todos: state.todos.map(todo => 
-            todo.id === todoId ? { ...todo, status: originalStatus } : todo
-          ),
-          error: error instanceof Error ? error.message : 'Failed to update todo'
-        };
-      });
+      // Revert optimistic update on error
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? originalTodo : todo
+        ),
+        error: error instanceof Error ? error.message : 'Failed to update todo'
+      }));
     }
   },
 

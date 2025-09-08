@@ -8,10 +8,13 @@
 import { AnalysisJob, Finding, Todo, ImpactSummary, EvidenceExcerpt, ImpactArea, TodoPriority, TodoEffort } from '@/domain/data-contracts';
 import { IAnalysisService } from '@/services/ports/analysis';
 
-// In-memory storage
-let mockJobs: AnalysisJob[] = [];
-let mockFindings: Finding[] = [];
-let mockTodos: Todo[] = [
+// localStorage keys
+const TODOS_STORAGE_KEY = 'bcstart_todos';
+const JOBS_STORAGE_KEY = 'bcstart_jobs';
+const FINDINGS_STORAGE_KEY = 'bcstart_findings';
+
+// Default todos data
+const defaultTodos: Todo[] = [
   {
     id: '1',
     businessId: '1',
@@ -88,6 +91,29 @@ let mockTodos: Todo[] = [
   }
 ];
 
+// Helper functions for localStorage
+const loadFromStorage = <T>(key: string, defaultValue: T): T => {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : defaultValue;
+  } catch {
+    return defaultValue;
+  }
+};
+
+const saveToStorage = <T>(key: string, data: T): void => {
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (error) {
+    console.warn('Failed to save to localStorage:', error);
+  }
+};
+
+// Initialize storage
+let mockJobs: AnalysisJob[] = loadFromStorage(JOBS_STORAGE_KEY, []);
+let mockFindings: Finding[] = loadFromStorage(FINDINGS_STORAGE_KEY, []);
+let mockTodos: Todo[] = loadFromStorage(TODOS_STORAGE_KEY, defaultTodos);
+
 let nextJobId = 1;
 let nextTodoId = mockTodos.length + 1;
 
@@ -150,6 +176,10 @@ export const updateTodoStatus = async (todoId: string, status: Todo['status']): 
   }
 
   mockTodos[todoIndex] = { ...mockTodos[todoIndex], status };
+  
+  // Save to localStorage
+  saveToStorage(TODOS_STORAGE_KEY, mockTodos);
+  
   return mockTodos[todoIndex];
 };
 

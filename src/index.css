@@ -112,6 +112,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    overflow-x: hidden;
+    width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -153,6 +155,14 @@
   /* B-Corp specific component styles */
   .impact-card {
     @apply bg-card rounded-2xl border border-border p-6 shadow-sm transition-all duration-200 hover:shadow-md;
+    container-type: inline-size;
+    min-width: 0;
+  }
+  
+  /* Container overflow protection */
+  .container {
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   .progress-ring {

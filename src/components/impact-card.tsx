@@ -55,13 +55,13 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
             {impactIcons[impact]}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg truncate leading-tight">{impact}</h3>
+            <h3 className="font-semibold truncate leading-tight" style={{ fontSize: 'clamp(0.75rem, 2vw, 1.125rem)' }}>{impact}</h3>
             <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">
               {done} completed
             </p>
           </div>
         </div>
-        <div className={cn("text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold flex-shrink-0 ml-1", impactColors[impact])}>
+        <div className={cn("font-bold flex-shrink-0 ml-1", impactColors[impact])} style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' }}>
           {pct}%
         </div>
       </div>
