@@ -13,7 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useDataroomStore } from '@/store/dataroom';
-import { FileText, Upload, Folder } from 'lucide-react';
+import { FileText, Upload, Folder, Building, Users, Heart, Leaf, Star } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { ImpactArea } from '@/domain/data-contracts';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Documents = () => {
@@ -34,6 +36,28 @@ const Documents = () => {
       loadFiles(currentBusiness.id);
     }
   };
+
+  // Group files by impact area
+  const filesByImpactArea = files.reduce((acc, file) => {
+    const area = file.impactArea || 'Other';
+    if (!acc[area]) acc[area] = [];
+    acc[area].push(file);
+    return acc;
+  }, {} as Record<string, typeof files>);
+
+  const impactAreas: Array<{ 
+    name: ImpactArea | 'Other'; 
+    icon: any; 
+    color: string;
+    description: string;
+  }> = [
+    { name: 'Governance', icon: Building, color: 'blue', description: 'Corporate governance and mission' },
+    { name: 'Workers', icon: Users, color: 'green', description: 'Employee policies and benefits' },
+    { name: 'Community', icon: Heart, color: 'purple', description: 'Community impact and engagement' },
+    { name: 'Environment', icon: Leaf, color: 'emerald', description: 'Environmental policies and metrics' },
+    { name: 'Customers', icon: Star, color: 'orange', description: 'Customer impact and satisfaction' },
+    { name: 'Other', icon: Folder, color: 'gray', description: 'Uncategorized documents' }
+  ];
 
   return (
     <SidebarProvider>
@@ -133,7 +157,54 @@ const Documents = () => {
                   </div>
                 </section>
 
-                {/* File List */}
+                {/* Documents by Impact Area */}
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                  <h3 className="text-xl font-bold mb-6">Documents by Impact Area</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {impactAreas.map((area) => {
+                      const areaFiles = filesByImpactArea[area.name] || [];
+                      const Icon = area.icon;
+                      
+                      return (
+                        <Card key={area.name} className="bg-white/60">
+                          <CardHeader className="pb-3">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                              <Icon className={`h-5 w-5 text-${area.color}-600`} />
+                              {area.name}
+                            </CardTitle>
+                            <CardDescription className="text-sm">
+                              {area.description}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="text-sm text-muted-foreground mb-3">
+                              {areaFiles.length} files
+                            </div>
+                            
+                            {areaFiles.length > 0 ? (
+                              <ScrollArea className="h-32">
+                                <div className="space-y-2 pr-2">
+                                  {areaFiles.map((file) => (
+                                    <div key={file.id} className="flex items-center gap-2 p-2 rounded border bg-white/40">
+                                      <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
+                                      <span className="text-xs truncate flex-1">{file.originalName}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </ScrollArea>
+                            ) : (
+                              <div className="text-center py-4 text-xs text-muted-foreground">
+                                No files uploaded
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </section>
+
+                {/* All Documents */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-6">All Documents</h3>
                   {files.length > 0 ? (

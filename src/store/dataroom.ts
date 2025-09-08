@@ -5,7 +5,7 @@
  */
 
 import { create } from 'zustand';
-import { DataFile, FileKind, UploadProgress } from '@/domain/data-contracts';
+import { DataFile, UploadProgress, ImpactArea, FileKind } from '@/domain/data-contracts';
 import { fileService } from '@/services/registry';
 
 interface DataroomState {
@@ -16,7 +16,7 @@ interface DataroomState {
 
   // Actions
   loadFiles: (businessId: string) => Promise<void>;
-  uploadFile: (businessId: string, file: File) => Promise<void>;
+  uploadFile: (businessId: string, file: File, impactArea?: ImpactArea) => Promise<void>;
   createVirtualFile: (businessId: string, name: string, text: string, kind?: FileKind) => Promise<void>;
   removeFile: (fileId: string) => Promise<void>;
   updateFileMetadata: (fileId: string, updates: Partial<Pick<DataFile, 'kind' | 'originalName'>>) => Promise<void>;
@@ -44,7 +44,7 @@ export const useDataroomStore = create<DataroomState>((set, get) => ({
     }
   },
 
-  uploadFile: async (businessId: string, file: File) => {
+  uploadFile: async (businessId: string, file: File, impactArea?: ImpactArea) => {
     const uploadId = `upload-${Date.now()}-${Math.random()}`;
     
     // Add upload progress tracking
@@ -69,7 +69,7 @@ export const useDataroomStore = create<DataroomState>((set, get) => ({
         }));
       }, 200);
 
-      const uploadedFile = await fileService.upload(businessId, file);
+      const uploadedFile = await fileService.upload(businessId, file, impactArea);
       clearInterval(progressInterval);
 
       // Update progress to complete

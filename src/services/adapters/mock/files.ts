@@ -5,7 +5,7 @@
  * Will be replaced with Supabase adapter later.
  */
 
-import { DataFile, FileKind } from '@/domain/data-contracts';
+import { DataFile, FileKind, OcrStatus, ImpactArea } from '@/domain/data-contracts';
 import { IFileService } from '@/services/ports/files';
 
 // In-memory storage
@@ -19,7 +19,8 @@ let mockFiles: DataFile[] = [
     contentType: 'application/pdf',
     uploadedAt: '2024-01-15T10:30:00Z',
     ocrStatus: 'done',
-    size: 245760
+    size: 245760,
+    impactArea: 'Governance'
   },
   {
     id: '2',
@@ -30,7 +31,8 @@ let mockFiles: DataFile[] = [
     contentType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     uploadedAt: '2024-01-20T14:22:00Z',
     ocrStatus: 'done',
-    size: 156420
+    size: 156420,
+    impactArea: 'Workers'
   },
   {
     id: '3',
@@ -41,7 +43,8 @@ let mockFiles: DataFile[] = [
     contentType: 'text/plain',
     uploadedAt: '2024-01-25T09:15:00Z',
     ocrStatus: 'done',
-    size: 8920
+    size: 8920,
+    impactArea: 'Environment'
   }
 ];
 
@@ -53,7 +56,7 @@ export const list = async (businessId: string): Promise<DataFile[]> => {
   return mockFiles.filter(f => f.dataroomId === `room-${businessId.split('-')[1] || '1'}`);
 };
 
-export const upload = async (businessId: string, file: File): Promise<DataFile> => {
+export const upload = async (businessId: string, file: File, impactArea?: ImpactArea): Promise<DataFile> => {
   // Simulate upload delay
   await new Promise(resolve => setTimeout(resolve, 1500));
   
@@ -65,8 +68,10 @@ export const upload = async (businessId: string, file: File): Promise<DataFile> 
     storagePath: `/mock/${file.name}`,
     contentType: file.type,
     uploadedAt: new Date().toISOString(),
-    ocrStatus: 'pending',
-    size: file.size
+    ocrStatus: 'pending' as OcrStatus,
+    size: file.size,
+    impactArea,
+    linkedTodoId: undefined
   };
 
   mockFiles.push(newFile);
@@ -193,3 +198,12 @@ function inferFileKind(filename: string): FileKind {
   
   return 'other';
 }
+
+export const mockFileService = {
+  list,
+  upload,
+  createVirtual,
+  remove,
+  updateMetadata,
+  getContent
+};

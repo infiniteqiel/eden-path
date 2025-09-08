@@ -8,7 +8,7 @@ import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { FileText, Eye, Clock, AlertCircle } from 'lucide-react';
+import { FileText, Eye, Clock, AlertCircle, Upload } from 'lucide-react';
 import { Todo, TodoStatus } from '@/domain/data-contracts';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +16,7 @@ interface TodoItemProps {
   todo: Todo;
   onToggleStatus: (status: TodoStatus) => void;
   onViewEvidence?: () => void;
+  onUploadEvidence?: () => void;
   showImpact?: boolean;
   className?: string;
 }
@@ -50,6 +51,7 @@ export function TodoItem({
   todo, 
   onToggleStatus, 
   onViewEvidence,
+  onUploadEvidence,
   showImpact = false,
   className 
 }: TodoItemProps) {
@@ -68,13 +70,17 @@ export function TodoItem({
   };
 
   return (
-    <div className={cn("todo-item", className)}>
+    <div 
+      className={cn("todo-item cursor-pointer", className)}
+      onClick={onUploadEvidence}
+    >
       <div className="flex items-start space-x-3">
         <Checkbox
           checked={isCompleted}
           onCheckedChange={handleStatusToggle}
           disabled={isBlocked}
           className="mt-1"
+          onClick={(e) => e.stopPropagation()}
         />
         
         <div className="flex-1 min-w-0">
@@ -130,17 +136,35 @@ export function TodoItem({
               </Badge>
             </div>
 
-            {hasEvidence && onViewEvidence && (
+            <div className="flex items-center space-x-1">
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onViewEvidence}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUploadEvidence?.();
+                }}
                 className="h-auto p-1 text-muted-foreground hover:text-foreground"
               >
-                <Eye className="h-3 w-3 mr-1" />
+                <Upload className="h-3 w-3 mr-1" />
                 <span className="text-xs">Evidence</span>
               </Button>
-            )}
+              
+              {hasEvidence && onViewEvidence && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onViewEvidence();
+                  }}
+                  className="h-auto p-1 text-muted-foreground hover:text-foreground"
+                >
+                  <Eye className="h-3 w-3 mr-1" />
+                  <span className="text-xs">View</span>
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

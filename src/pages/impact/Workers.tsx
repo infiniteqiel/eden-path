@@ -15,7 +15,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Users, Heart, DollarSign, GraduationCap, CheckSquare2 } from 'lucide-react';
+import { Users, Heart, DollarSign, GraduationCap, CheckSquare2, MessageSquare } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Workers = () => {
@@ -142,6 +142,11 @@ const Workers = () => {
                         value={workersSummary?.pct || 0} 
                         className="mt-4" 
                       />
+                      
+                      <Button variant="outline" size="sm" className="mt-3">
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat
+                      </Button>
                     </div>
                     
                     <div className="bg-white/60 rounded-lg p-4">

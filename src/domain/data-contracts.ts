@@ -57,6 +57,8 @@ export interface DataFile {
   uploadedAt: string;
   ocrStatus: OcrStatus;
   size?: number;
+  impactArea?: ImpactArea;
+  linkedTodoId?: string;
 }
 
 export interface DocChunk {

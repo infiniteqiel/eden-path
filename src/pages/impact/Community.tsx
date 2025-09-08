@@ -8,6 +8,7 @@ import React, { useEffect } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
+import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -15,10 +16,13 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2 } from 'lucide-react';
+import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2, MessageSquare } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Community = () => {
+  const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
+  const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
+  
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
 
@@ -39,6 +43,11 @@ const Community = () => {
       loadImpactSummaries(currentBusiness.id);
       loadTodos(currentBusiness.id);
     }
+  };
+
+  const handleUploadEvidence = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setEvidenceModalOpen(true);
   };
 
   const communityAreas = [
@@ -142,6 +151,11 @@ const Community = () => {
                         value={communitySummary?.pct || 0} 
                         className="mt-4" 
                       />
+                      
+                      <Button variant="outline" size="sm" className="mt-3">
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat
+                      </Button>
                     </div>
                     
                     <div className="bg-white/60 rounded-lg p-4">
@@ -174,10 +188,11 @@ const Community = () => {
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
                                 <div key={task.id} className="bg-white/80 rounded p-3">
-                                  <TodoItem
-                                    todo={task}
-                                    onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                  />
+                                   <TodoItem
+                                     todo={task}
+                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                     onUploadEvidence={() => handleUploadEvidence(task)}
+                                   />
                                 </div>
                               ))
                             ) : (
@@ -198,11 +213,12 @@ const Community = () => {
                     <div className="space-y-4">
                       {communityTodos.map(todo => (
                         <div key={todo.id} className="bg-white/60 rounded-lg p-4">
-                          <TodoItem
-                            todo={todo}
-                            onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                            showImpact={false}
-                          />
+                           <TodoItem
+                             todo={todo}
+                             onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
+                             onUploadEvidence={() => handleUploadEvidence(todo)}
+                             showImpact={false}
+                           />
                         </div>
                       ))}
                     </div>
@@ -257,6 +273,18 @@ const Community = () => {
             </div>
           </main>
         </div>
+        
+        {/* Evidence Upload Modal */}
+        {selectedTodo && (
+          <EvidenceUploadModal
+            isOpen={evidenceModalOpen}
+            onClose={() => {
+              setEvidenceModalOpen(false);
+              setSelectedTodo(null);
+            }}
+            todo={selectedTodo}
+          />
+        )}
       </div>
     </SidebarProvider>
   );

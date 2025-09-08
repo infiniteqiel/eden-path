@@ -5,7 +5,7 @@
  * UI components depend only on this interface.
  */
 
-import { DataFile, FileKind } from '@/domain/data-contracts';
+import { DataFile, FileKind, ImpactArea } from '@/domain/data-contracts';
 
 export interface IFileService {
   /**
@@ -16,7 +16,7 @@ export interface IFileService {
   /**
    * Upload a physical file to the dataroom
    */
-  upload(businessId: string, file: File): Promise<DataFile>;
+  upload(businessId: string, file: File, impactArea?: ImpactArea): Promise<DataFile>;
 
   /**
    * Create a virtual file from text content (e.g., copy-paste)

@@ -12,7 +12,9 @@ import { ImpactCard } from '@/components/impact-card';
 import { TodoItem } from '@/components/todo-item';
 import { EmptyState } from '@/components/empty-state';
 import { UploadDropzone } from '@/components/upload-dropzone';
+import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
@@ -22,6 +24,9 @@ import { Upload, FileText, ArrowRight, Building, Leaf, Users, RotateCcw } from '
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Dashboard = () => {
+  const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
+  const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
+  
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
 
@@ -53,6 +58,11 @@ const Dashboard = () => {
     if (currentBusiness) {
       resetTestData(currentBusiness.id);
     }
+  };
+
+  const handleUploadEvidence = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setEvidenceModalOpen(true);
   };
 
   if (!businesses.length) {
@@ -168,22 +178,25 @@ const Dashboard = () => {
                         </Button>
                       </div>
                       
-                      <div className="space-y-3">
-                        {quickTodos.length > 0 ? (
-                          quickTodos.map((todo) => (
-                            <div key={todo.id} className="bg-white/60 rounded-lg p-4">
-                              <TodoItem
-                                todo={todo}
-                                onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                              />
+                      <ScrollArea className="h-80">
+                        <div className="space-y-3 pr-4">
+                          {quickTodos.length > 0 ? (
+                            quickTodos.map((todo) => (
+                              <div key={todo.id} className="bg-white/60 rounded-lg p-4">
+                                <TodoItem
+                                  todo={todo}
+                                  onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
+                                  onUploadEvidence={() => handleUploadEvidence(todo)}
+                                />
+                              </div>
+                            ))
+                          ) : (
+                            <div className="bg-white/60 rounded-lg p-6 text-center">
+                              <p className="text-muted-foreground">No priority tasks at the moment</p>
                             </div>
-                          ))
-                        ) : (
-                          <div className="bg-white/60 rounded-lg p-6 text-center">
-                            <p className="text-muted-foreground">No priority tasks at the moment</p>
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      </ScrollArea>
                       
                       <div className="mt-6 text-center">
                         <Button asChild variant="outline">
@@ -205,11 +218,23 @@ const Dashboard = () => {
                 )}
               </div>
             </div>
-          </main>
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
-  );
-};
+        
+        {/* Evidence Upload Modal */}
+        {selectedTodo && (
+          <EvidenceUploadModal
+            isOpen={evidenceModalOpen}
+            onClose={() => {
+              setEvidenceModalOpen(false);
+              setSelectedTodo(null);
+            }}
+            todo={selectedTodo}
+          />
+        )}
+      </SidebarProvider>
+    );
+  };
 
 export default Dashboard;
