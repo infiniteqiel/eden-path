@@ -97,13 +97,17 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
         get().loadImpactSummaries(businessId);
       }
     } catch (error) {
-      // Revert optimistic update on error
-      set(state => ({
-        todos: state.todos.map(todo => 
-          todo.id === todoId ? { ...todo, status: todo.id === todoId ? 'todo' : todo.status } : todo
-        ),
-        error: error instanceof Error ? error.message : 'Failed to update todo'
-      }));
+      // Revert optimistic update on error - find the original status
+      set(state => {
+        const originalTodo = state.todos.find(t => t.id === todoId);
+        const originalStatus = originalTodo?.status === status ? 'todo' : 'todo'; // revert to todo if update failed
+        return {
+          todos: state.todos.map(todo => 
+            todo.id === todoId ? { ...todo, status: originalStatus } : todo
+          ),
+          error: error instanceof Error ? error.message : 'Failed to update todo'
+        };
+      });
     }
   },
 

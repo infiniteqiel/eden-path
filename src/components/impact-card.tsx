@@ -48,35 +48,35 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
   );
   
   return (
-    <Card className={cn("impact-card", className)}>
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-3">
-          <div className="text-2xl" role="img" aria-label={impact}>
+    <Card className={cn("impact-card w-full h-full min-h-[140px] p-3 sm:p-4", className)}>
+      <div className="flex items-start justify-between mb-2 sm:mb-4 h-full">
+        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+          <div className="text-lg sm:text-xl md:text-2xl flex-shrink-0" role="img" aria-label={impact}>
             {impactIcons[impact]}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-base lg:text-lg truncate">{impact}</h3>
-            <p className="text-xs lg:text-sm text-muted-foreground">
+            <h3 className="font-semibold text-xs sm:text-sm md:text-base lg:text-lg truncate leading-tight">{impact}</h3>
+            <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">
               {done} completed
             </p>
           </div>
         </div>
-        <div className={cn("text-lg lg:text-xl font-bold flex-shrink-0", impactColors[impact])}>
+        <div className={cn("text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold flex-shrink-0 ml-1", impactColors[impact])}>
           {pct}%
         </div>
       </div>
 
-      <div className="space-y-3">
-        <Progress value={pct} className="h-2" />
+      <div className="space-y-2 sm:space-y-3 flex-1 flex flex-col justify-end">
+        <Progress value={pct} className="h-1.5 sm:h-2" />
         
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => setShowCompletedModal(true)}
-          className="w-full justify-between text-muted-foreground hover:text-foreground"
+          className="w-full justify-between text-muted-foreground hover:text-foreground text-xs sm:text-sm py-1 sm:py-2"
         >
           View tasks
-          <ArrowRight className="h-4 w-4" />
+          <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
         </Button>
         
         <CompletedTasksModal

@@ -65,9 +65,11 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full flex bg-background">
-        {/* Global trigger that is ALWAYS visible */}
-        <div className="fixed top-4 left-4 z-50">
-          <SidebarTrigger />
+        {/* Global trigger that is ALWAYS visible - Arrow on left */}
+        <div className="fixed top-1/2 left-0 transform -translate-y-1/2 z-50">
+          <SidebarTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-r-lg rounded-l-none px-2 py-6 shadow-lg">
+            <div className="text-lg">→</div>
+          </SidebarTrigger>
         </div>
         
         <AppSidebar />
@@ -76,19 +78,19 @@ const Dashboard = () => {
           <AppHeader mode="auth" />
           <MissionSnippet />
 
-          <main className="container mx-auto px-4 py-8">
-        <div className="space-y-8">
+          <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-full overflow-x-hidden">
+        <div className="space-y-4 sm:space-y-8">
           {/* Dashboard Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row sm:items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">Dashboard</h1>
             </div>
             
             {currentBusiness && (
-              <div className="flex gap-3">
-                <Button asChild>
+              <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                <Button asChild className="flex-1 sm:flex-initial text-xs sm:text-sm">
                   <Link to={`/business/${currentBusiness.id}/dataroom`}>
-                    <Upload className="h-4 w-4 mr-2" />
+                    <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     Upload Documents
                   </Link>
                 </Button>
@@ -99,9 +101,9 @@ const Dashboard = () => {
           {currentBusiness ? (
             <>
               {/* Progress Overview */}
-              <section>
-                <h2 className="text-xl font-semibold mb-6">Progress Overview</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              <section className="w-full">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Progress Overview</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4 w-full">
                     {impactSummaries.map((summary) => (
                       <ImpactCard
                         key={summary.impact}
@@ -116,9 +118,9 @@ const Dashboard = () => {
               </section>
 
               {/* Quick To-Dos */}
-              <section>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold">Quick To-Dos</h2>
+              <section className="w-full">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl font-semibold">Quick To-Dos</h2>
                   <Button variant="outline" asChild>
                     <Link to={`/business/${currentBusiness.id}/roadmap`}>
                       View All
