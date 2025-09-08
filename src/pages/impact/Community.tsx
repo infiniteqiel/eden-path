@@ -134,12 +134,12 @@ const Community = () => {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Progress</p>
-                          <p className="text-2xl font-bold">{communitySummary?.completionPercentage || 0}%</p>
+                          <p className="text-2xl font-bold">{communitySummary?.pct || 0}%</p>
                         </div>
                       </div>
                       
                       <Progress 
-                        value={communitySummary?.completionPercentage || 0} 
+                        value={communitySummary?.pct || 0} 
                         className="mt-4" 
                       />
                     </div>

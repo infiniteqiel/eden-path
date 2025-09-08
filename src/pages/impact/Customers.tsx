@@ -134,12 +134,12 @@ const Customers = () => {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Progress</p>
-                          <p className="text-2xl font-bold">{customersSummary?.completionPercentage || 0}%</p>
+                          <p className="text-2xl font-bold">{customersSummary?.pct || 0}%</p>
                         </div>
                       </div>
                       
                       <Progress 
-                        value={customersSummary?.completionPercentage || 0} 
+                        value={customersSummary?.pct || 0} 
                         className="mt-4" 
                       />
                     </div>

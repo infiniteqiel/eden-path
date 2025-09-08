@@ -134,12 +134,12 @@ const Environment = () => {
                         </div>
                         <div>
                           <p className="text-sm text-muted-foreground">Progress</p>
-                          <p className="text-2xl font-bold">{environmentSummary?.completionPercentage || 0}%</p>
+                          <p className="text-2xl font-bold">{environmentSummary?.pct || 0}%</p>
                         </div>
                       </div>
                       
                       <Progress 
-                        value={environmentSummary?.completionPercentage || 0} 
+                        value={environmentSummary?.pct || 0} 
                         className="mt-4" 
                       />
                     </div>
