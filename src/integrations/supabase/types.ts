@@ -14,7 +14,117 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ai_chat_sessions: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          id: string
+          impact_area: string
+          messages: Json | null
+          session_name: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          id?: string
+          impact_area: string
+          messages?: Json | null
+          session_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          id?: string
+          impact_area?: string
+          messages?: Json | null
+          session_name?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      analysis_results: {
+        Row: {
+          analysis_type: string
+          business_id: string
+          confidence_score: number | null
+          created_at: string | null
+          file_id: string | null
+          findings: Json | null
+          id: string
+          impact_area: string | null
+          recommendations: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          analysis_type?: string
+          business_id: string
+          confidence_score?: number | null
+          created_at?: string | null
+          file_id?: string | null
+          findings?: Json | null
+          id?: string
+          impact_area?: string | null
+          recommendations?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          analysis_type?: string
+          business_id?: string
+          confidence_score?: number | null
+          created_at?: string | null
+          file_id?: string | null
+          findings?: Json | null
+          id?: string
+          impact_area?: string | null
+          recommendations?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      knowledge_base_documents: {
+        Row: {
+          content: string
+          created_at: string | null
+          document_type: string
+          embedding: string | null
+          id: string
+          impact_area: string | null
+          metadata: Json | null
+          requirement_codes: string[] | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          document_type: string
+          embedding?: string | null
+          id?: string
+          impact_area?: string | null
+          metadata?: Json | null
+          requirement_codes?: string[] | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          document_type?: string
+          embedding?: string | null
+          id?: string
+          impact_area?: string | null
+          metadata?: Json | null
+          requirement_codes?: string[] | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

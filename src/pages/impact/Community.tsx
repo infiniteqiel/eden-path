@@ -4,10 +4,12 @@
  * Detailed view for Community impact area progress and tasks.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
+import { ImpactFilesSection } from '@/components/impact-files-section';
+import { AIChatModal } from '@/components/ai-chat-modal';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +24,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 const Community = () => {
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
+  const [showAIChat, setShowAIChat] = useState(false);
   
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
@@ -158,13 +161,23 @@ const Community = () => {
                       </Button>
                     </div>
                     
-                    <div className="bg-white/60 rounded-lg p-4">
-                      {communitySummary && (
-                        <ImpactCard
-                          summary={communitySummary}
-                          onViewTasks={() => {}}
-                        />
-                      )}
+                    <div className="space-y-4">
+                      <div className="bg-white/60 rounded-lg p-4">
+                        {communitySummary && (
+                          <ImpactCard
+                            summary={communitySummary}
+                            onViewTasks={() => setShowAIChat(true)}
+                          />
+                        )}
+                      </div>
+                      
+                      <Button 
+                        onClick={() => setShowAIChat(true)}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat
+                      </Button>
                     </div>
                   </div>
                 </section>
@@ -203,6 +216,14 @@ const Community = () => {
                       </Card>
                     ))}
                   </div>
+                </section>
+
+                {/* Community Documents */}
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                  <ImpactFilesSection 
+                    impactArea="Community" 
+                    className="bg-transparent border-0 shadow-none p-0"
+                  />
                 </section>
 
                 {/* All Community Tasks */}
@@ -286,6 +307,12 @@ const Community = () => {
           />
         )}
       </div>
+      
+      <AIChatModal 
+        isOpen={showAIChat}
+        onClose={() => setShowAIChat(false)}
+        impactArea="Community"
+      />
     </SidebarProvider>
   );
 };

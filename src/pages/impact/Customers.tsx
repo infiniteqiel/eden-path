@@ -4,10 +4,12 @@
  * Detailed view for Customers impact area progress and tasks.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
+import { ImpactFilesSection } from '@/components/impact-files-section';
+import { AIChatModal } from '@/components/ai-chat-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -21,6 +23,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 const Customers = () => {
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
+  const [showAIChat, setShowAIChat] = useState(false);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -149,13 +152,23 @@ const Customers = () => {
                       </Button>
                     </div>
                     
-                    <div className="bg-white/60 rounded-lg p-4">
-                      {customersSummary && (
-                        <ImpactCard
-                          summary={customersSummary}
-                          onViewTasks={() => {}}
-                        />
-                      )}
+                    <div className="space-y-4">
+                      <div className="bg-white/60 rounded-lg p-4">
+                        {customersSummary && (
+                          <ImpactCard
+                            summary={customersSummary}
+                            onViewTasks={() => setShowAIChat(true)}
+                          />
+                        )}
+                      </div>
+                      
+                      <Button 
+                        onClick={() => setShowAIChat(true)}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat
+                      </Button>
                     </div>
                   </div>
                 </section>
@@ -263,6 +276,12 @@ const Customers = () => {
           </main>
         </div>
       </div>
+      
+      <AIChatModal 
+        isOpen={showAIChat}
+        onClose={() => setShowAIChat(false)}
+        impactArea="Customers"
+      />
     </SidebarProvider>
   );
 };

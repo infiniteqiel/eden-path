@@ -4,10 +4,12 @@
  * Detailed view for Environment impact area progress and tasks.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
+import { ImpactFilesSection } from '@/components/impact-files-section';
+import { AIChatModal } from '@/components/ai-chat-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -21,6 +23,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 const Environment = () => {
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
+  const [showAIChat, setShowAIChat] = useState(false);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -149,13 +152,23 @@ const Environment = () => {
                       </Button>
                     </div>
                     
-                    <div className="bg-white/60 rounded-lg p-4">
-                      {environmentSummary && (
-                        <ImpactCard
-                          summary={environmentSummary}
-                          onViewTasks={() => {}}
-                        />
-                      )}
+                    <div className="space-y-4">
+                      <div className="bg-white/60 rounded-lg p-4">
+                        {environmentSummary && (
+                          <ImpactCard
+                            summary={environmentSummary}
+                            onViewTasks={() => setShowAIChat(true)}
+                          />
+                        )}
+                      </div>
+                      
+                      <Button 
+                        onClick={() => setShowAIChat(true)}
+                        className="w-full bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat
+                      </Button>
                     </div>
                   </div>
                 </section>
@@ -193,6 +206,14 @@ const Environment = () => {
                       </Card>
                     ))}
                   </div>
+                </section>
+
+                {/* Environment Documents */}
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                  <ImpactFilesSection 
+                    impactArea="Environment" 
+                    className="bg-transparent border-0 shadow-none p-0"
+                  />
                 </section>
 
                 {/* All Environment Tasks */}
@@ -263,6 +284,12 @@ const Environment = () => {
           </main>
         </div>
       </div>
+      
+      <AIChatModal 
+        isOpen={showAIChat}
+        onClose={() => setShowAIChat(false)}
+        impactArea="Environment"
+      />
     </SidebarProvider>
   );
 };

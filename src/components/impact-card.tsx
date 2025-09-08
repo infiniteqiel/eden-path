@@ -72,8 +72,8 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
         <Progress value={pct} className="h-1.5 sm:h-2" />
       </div>
       
-      {/* Bottom section with button */}
-      <div className="mt-auto">
+      {/* Bottom section with buttons */}
+      <div className="mt-auto space-y-1">
         <Button 
           variant="ghost" 
           size="sm" 
@@ -82,6 +82,13 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
         >
           View tasks
           <ArrowRight className="h-3 w-3" />
+        </Button>
+        <Button 
+          size="sm"
+          onClick={onViewTasks}
+          className="w-full bg-green-600 hover:bg-green-700 text-white text-[10px] sm:text-xs py-1.5 sm:py-2 h-auto"
+        >
+          AI Analysis Chat
         </Button>
       </div>
         
