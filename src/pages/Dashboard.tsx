@@ -17,11 +17,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Upload, FileText, ArrowRight, Building, Leaf, Users, Shield, Handshake, Trophy } from 'lucide-react';
+import { Upload, FileText, ArrowRight, Building, Leaf, Users } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
-import legalProtectionImage from '@/assets/legal-protection-singapore.jpg';
-import stakeholderTrustImage from '@/assets/stakeholder-trust-singapore.jpg';
-import competitiveEdgeImage from '@/assets/competitive-edge-singapore.jpg';
 
 const Dashboard = () => {
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
@@ -174,150 +171,39 @@ const Dashboard = () => {
                 </Button>
               </section>
 
-              {/* Benefits Section - Enhanced with Singapore images and detailed info */}
-              <section className="py-16">
-                <div className="text-center mb-16">
-                  <h3 className="text-4xl font-bold mb-6">Why Become a B Corporation?</h3>
-                  <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
-                    Join over 6,000 companies worldwide using business as a force for good. B Corp certification provides measurable benefits across legal protection, stakeholder relationships, and competitive positioning.
+              {/* Benefits Section */}
+              <section className="py-12">
+                <div className="text-center mb-12">
+                  <h3 className="text-3xl font-bold mb-4">Why Become a B Corporation?</h3>
+                  <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                    Join a global movement of companies using business as a force for good
                   </p>
                 </div>
                 
-                <div className="space-y-20">
-                  {/* Legal Protection Section */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4 mb-6">
-                        <Shield className="h-10 w-10 text-primary" />
-                        <h4 className="text-3xl font-bold">Legal Protection</h4>
-                      </div>
-                      <div className="space-y-4 text-lg">
-                        <p className="text-muted-foreground leading-relaxed">
-                          B Corp status provides robust legal protection through stakeholder governance structures that shield directors from shareholder lawsuits when considering broader impacts.
-                        </p>
-                        <ul className="space-y-3 text-muted-foreground">
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Protected decision-making for environmental and social initiatives</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Legal framework supporting long-term stakeholder value over short-term profits</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Fiduciary duty expansion to include all stakeholders, not just shareholders</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Constitutional protection against mission drift during investment or acquisition</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <div 
-                        className="rounded-2xl h-80 bg-cover bg-center shadow-2xl"
-                        style={{
-                          backgroundImage: `url(${legalProtectionImage})`,
-                        }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Stakeholder Trust Section */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div className="relative order-2 lg:order-1">
-                      <div 
-                        className="rounded-2xl h-80 bg-cover bg-center shadow-2xl"
-                        style={{
-                          backgroundImage: `url(${stakeholderTrustImage})`,
-                        }}
-                      />
-                    </div>
-                    <div className="space-y-6 order-1 lg:order-2">
-                      <div className="flex items-center gap-4 mb-6">
-                        <Handshake className="h-10 w-10 text-primary" />
-                        <h4 className="text-3xl font-bold">Stakeholder Trust</h4>
-                      </div>
-                      <div className="space-y-4 text-lg">
-                        <p className="text-muted-foreground leading-relaxed">
-                          Build unparalleled trust with customers, employees, investors, and communities through third-party verification of your social and environmental performance.
-                        </p>
-                        <ul className="space-y-3 text-muted-foreground">
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>73% of consumers willing to pay more for sustainable products from B Corps</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Enhanced employee engagement and 40% lower turnover rates</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Preferred partner status with impact-focused investors and suppliers</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Community recognition as a leader in responsible business practices</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Competitive Edge Section */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div className="space-y-6">
-                      <div className="flex items-center gap-4 mb-6">
-                        <Trophy className="h-10 w-10 text-primary" />
-                        <h4 className="text-3xl font-bold">Competitive Edge</h4>
-                      </div>
-                      <div className="space-y-4 text-lg">
-                        <p className="text-muted-foreground leading-relaxed">
-                          Differentiate your business in crowded markets through verified commitment to positive impact, attracting conscious consumers and top talent.
-                        </p>
-                        <ul className="space-y-3 text-muted-foreground">
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Access to $150+ billion in impact investment capital globally</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Premium positioning in procurement processes for large corporations</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Measurable performance improvements across operational metrics</span>
-                          </li>
-                          <li className="flex items-start gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full mt-3 flex-shrink-0"></div>
-                            <span>Future-proofing against increasing ESG regulations and requirements</span>
-                          </li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="relative">
-                      <div 
-                        className="rounded-2xl h-80 bg-cover bg-center shadow-2xl"
-                        style={{
-                          backgroundImage: `url(${competitiveEdgeImage})`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Call to Action */}
-                <div className="text-center mt-16 p-8 bg-primary/5 rounded-2xl">
-                  <h4 className="text-2xl font-bold mb-4">Ready to Transform Your Business?</h4>
-                  <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
-                    Upload your business documents to receive a personalized roadmap toward B Corp certification and join the global movement of purpose-driven companies.
-                  </p>
-                  <Button size="lg" className="px-8 py-3">
-                    Start Your B Corp Journey
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <Card className="text-center p-6 border-2 hover:border-primary/20 transition-colors">
+                    <Building className="h-12 w-12 mx-auto mb-4 text-primary" />
+                    <h4 className="text-xl font-semibold mb-3">Build Trust</h4>
+                    <p className="text-muted-foreground">
+                      Demonstrate your commitment to purpose and accountability through rigorous third-party verification.
+                    </p>
+                  </Card>
+                  
+                  <Card className="text-center p-6 border-2 hover:border-primary/20 transition-colors">
+                    <Users className="h-12 w-12 mx-auto mb-4 text-primary" />
+                    <h4 className="text-xl font-semibold mb-3">Attract Talent</h4>
+                    <p className="text-muted-foreground">
+                      Top talent increasingly seeks purpose-driven employers. B Corp certification signals your values.
+                    </p>
+                  </Card>
+                  
+                  <Card className="text-center p-6 border-2 hover:border-primary/20 transition-colors">
+                    <Leaf className="h-12 w-12 mx-auto mb-4 text-primary" />
+                    <h4 className="text-xl font-semibold mb-3">Drive Impact</h4>
+                    <p className="text-muted-foreground">
+                      Join 6,000+ companies worldwide committed to balancing profit with positive impact on all stakeholders.
+                    </p>
+                  </Card>
                 </div>
               </section>
             </>
