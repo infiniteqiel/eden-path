@@ -2,57 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* B-Corp Eden Design System - All colors MUST be HSL */
 
 @layer base {
   :root {
+    /* Base colors */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 0 0% 6.7%;
+    
+    /* Eden Green Palette */
+    --eden-50: 152 39% 95%;
+    --eden-100: 152 39% 87%;
+    --eden-200: 152 39% 75%;
+    --eden-300: 152 39% 63%;
+    --eden-400: 152 39% 51%;
+    --eden-500: 152 68% 28%;
+    --eden-600: 152 68% 22%;
+    --eden-700: 152 68% 18%;
+    --eden-800: 152 68% 14%;
+    --eden-900: 152 68% 10%;
 
+    /* Component colors using Eden palette */
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 6.7%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 6.7%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 152 68% 28%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 152 39% 95%;
+    --secondary-foreground: 152 68% 14%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 152 39% 95%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 152 39% 87%;
+    --accent-foreground: 152 68% 14%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 152 39% 87%;
+    --input: 152 39% 87%;
+    --ring: 152 68% 28%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Progress and success states */
+    --success: 152 68% 28%;
+    --success-foreground: 0 0% 98%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 98%;
+    
+    --info: 221 83% 53%;
+    --info-foreground: 0 0% 98%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Focus and interaction states */
+    --focus-ring: 152 68% 28%;
+    --focus-ring-offset: 0 0% 100%;
   }
 
   .dark {
@@ -100,6 +110,107 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 { @apply text-4xl lg:text-5xl; }
+  h2 { @apply text-3xl lg:text-4xl; }
+  h3 { @apply text-2xl lg:text-3xl; }
+  h4 { @apply text-xl lg:text-2xl; }
+  h5 { @apply text-lg lg:text-xl; }
+  h6 { @apply text-base lg:text-lg; }
+
+  /* Focus styles for accessibility */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* B-Corp specific component styles */
+  .impact-card {
+    @apply bg-card rounded-2xl border border-border p-6 shadow-sm transition-all duration-200 hover:shadow-md;
+  }
+
+  .progress-ring {
+    @apply text-primary transition-all duration-500 ease-out;
+  }
+
+  .todo-item {
+    @apply bg-card rounded-xl border border-border p-4 transition-all duration-200 hover:shadow-sm hover:border-primary/20;
+  }
+
+  .file-card {
+    @apply bg-card rounded-xl border border-border p-4 transition-all duration-200 hover:shadow-sm hover:border-primary/20;
+  }
+
+  .upload-zone {
+    @apply border-2 border-dashed border-border rounded-2xl p-8 transition-all duration-200 hover:border-primary/50 hover:bg-muted/50;
+  }
+
+  .stepper-step {
+    @apply rounded-xl border border-border p-4 transition-all duration-200;
+  }
+
+  .stepper-step.active {
+    @apply border-primary bg-primary/5;
+  }
+
+  .stepper-step.completed {
+    @apply border-success bg-success/5;
+  }
+
+  /* Mission snippet styling */
+  .mission-snippet {
+    @apply bg-eden-50 border-l-4 border-l-primary px-6 py-4 text-sm text-foreground/80 rounded-r-xl;
+  }
+
+  /* Priority indicators */
+  .priority-p1 {
+    @apply bg-destructive/10 text-destructive border-destructive/20;
+  }
+
+  .priority-p2 {
+    @apply bg-warning/10 text-warning border-warning/20;
+  }
+
+  .priority-p3 {
+    @apply bg-info/10 text-info border-info/20;
+  }
+
+  /* Effort indicators */
+  .effort-low {
+    @apply bg-success/10 text-success border-success/20;
+  }
+
+  .effort-medium {
+    @apply bg-warning/10 text-warning border-warning/20;
+  }
+
+  .effort-high {
+    @apply bg-destructive/10 text-destructive border-destructive/20;
   }
 }

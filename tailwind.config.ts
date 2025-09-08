@@ -47,6 +47,32 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        /* Eden Green Palette */
+        eden: {
+          50: "hsl(var(--eden-50))",
+          100: "hsl(var(--eden-100))",
+          200: "hsl(var(--eden-200))",
+          300: "hsl(var(--eden-300))",
+          400: "hsl(var(--eden-400))",
+          500: "hsl(var(--eden-500))",
+          600: "hsl(var(--eden-600))",
+          700: "hsl(var(--eden-700))",
+          800: "hsl(var(--eden-800))",
+          900: "hsl(var(--eden-900))",
+        },
+        /* Status colors */
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
