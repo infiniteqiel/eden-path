@@ -13,11 +13,10 @@ import { TodoItem } from '@/components/todo-item';
 import { EmptyState } from '@/components/empty-state';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sidebar, SidebarContent, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Upload, FileText } from 'lucide-react';
+import { Upload, FileText, ArrowRight } from 'lucide-react';
 
 const Dashboard = () => {
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
@@ -63,66 +62,79 @@ const Dashboard = () => {
   }
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen w-full flex bg-background">
-        {/* Global trigger that is ALWAYS visible - Arrow on left */}
-        <div className="fixed top-1/2 left-0 transform -translate-y-1/2 z-50">
-          <SidebarTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-r-lg rounded-l-none px-2 py-6 shadow-lg">
-            <div className="text-lg">→</div>
-          </SidebarTrigger>
-        </div>
-        
-        <AppSidebar />
-        
-        <div className="flex-1">
-          <AppHeader mode="auth" />
-          <MissionSnippet />
-
-          <main className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 max-w-full overflow-x-hidden w-full">
-        <div className="space-y-4 sm:space-y-8">
-          {/* Dashboard Header */}
-          <div className="flex flex-col gap-2 sm:gap-4 sm:flex-row sm:items-center justify-between">
+    <div className="min-h-screen bg-background">
+      <AppHeader mode="auth" />
+      
+      {/* Business Info Section */}
+      <div className="bg-muted/50 border-b">
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-1 sm:mb-2">Dashboard</h1>
+              <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
+                Dashboard
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Track your B Corp journey progress and manage action items
+              </p>
             </div>
-            
-            {currentBusiness && (
-              <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-                <Button asChild className="flex-1 sm:flex-initial text-xs sm:text-sm">
-                  <Link to={`/business/${currentBusiness.id}/dataroom`}>
-                    <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                    Upload Documents
-                  </Link>
-                </Button>
+            {businesses.length > 0 && (
+              <div className="flex-shrink-0">
+                <BusinessSwitcher
+                  businesses={businesses}
+                  currentBusiness={currentBusiness}
+                  onBusinessChange={(business) => selectBusiness(business.id)}
+                />
               </div>
             )}
           </div>
-
+        </div>
+      </div>
+      
+      <main className="container mx-auto px-4 py-8">
+        <div className="space-y-8">
           {currentBusiness ? (
             <>
               {/* Progress Overview */}
-              <section className="w-full">
-                <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Progress Overview</h2>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 w-full">
-                    {impactSummaries.map((summary) => (
-                      <div key={summary.impact} className="w-full aspect-square">
-                        <ImpactCard
-                          summary={summary}
-                          onViewTasks={() => {
-                            // Show completed tasks for this impact area
-                            console.log(`Viewing completed tasks for ${summary.impact}`);
-                          }}
-                          className="h-full"
-                        />
-                      </div>
-                    ))}
+              <section>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold">Progress Overview</h3>
+                  <Button asChild variant="outline">
+                    <Link to={`/business/${currentBusiness.id}/dataroom`}>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload Documents
+                    </Link>
+                  </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                  {impactSummaries.map((summary) => (
+                    <ImpactCard
+                      key={summary.impact}
+                      summary={summary}
+                      onViewTasks={() => {
+                        // Show completed tasks for this impact area
+                        console.log(`Viewing completed tasks for ${summary.impact}`);
+                      }}
+                    />
+                  ))}
+                </div>
+              </section>
+
+              {/* View Tasks Button */}
+              <section>
+                <div className="text-center">
+                  <Button asChild variant="outline" size="lg">
+                    <Link to={`/business/${currentBusiness.id}/roadmap`}>
+                      View All Tasks
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
                 </div>
               </section>
 
               {/* Quick To-Dos */}
-              <section className="w-full">
-                <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className="text-lg sm:text-xl font-semibold">Quick To-Dos</h2>
+              <section>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-semibold">Priority Tasks</h3>
                   <Button variant="outline" asChild>
                     <Link to={`/business/${currentBusiness.id}/roadmap`}>
                       View All
@@ -131,7 +143,7 @@ const Dashboard = () => {
                 </div>
 
                 {quickTodos.length > 0 ? (
-                  <div className="grid gap-3">
+                  <div className="space-y-3">
                     {quickTodos.slice(0, 5).map((todo) => (
                       <TodoItem
                         key={todo.id}
@@ -142,14 +154,14 @@ const Dashboard = () => {
                     ))}
                   </div>
                 ) : (
-                  <Card>
+                  <Card className="p-8 text-center">
                     <CardHeader>
                       <CardTitle>Ready to Begin?</CardTitle>
                       <CardDescription>
                         Start by uploading your business documents to generate personalized action items.
                       </CardDescription>
                     </CardHeader>
-                    <CardContent className="flex flex-col sm:flex-row gap-3">
+                    <CardContent className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button asChild>
                         <Link to={`/business/${currentBusiness.id}/dataroom`}>
                           <FileText className="h-4 w-4 mr-2" />
@@ -174,34 +186,10 @@ const Dashboard = () => {
               onCta={() => {}}
             />
           )}
-          </div>
-          </main>
         </div>
-      </div>
-    </SidebarProvider>
+      </main>
+    </div>
   );
 };
-
-// App Sidebar Component for Dashboard
-function AppSidebar() {
-  const { businesses, currentBusiness, selectBusiness } = useBusinessStore();
-
-  return (
-    <Sidebar className="w-60" collapsible="offcanvas">
-      <SidebarContent>
-        <div className="p-4">
-          <h3 className="font-semibold text-sm text-muted-foreground mb-3">SELECT BUSINESS</h3>
-          {businesses.length > 0 && (
-            <BusinessSwitcher
-              businesses={businesses}
-              currentBusiness={currentBusiness}
-              onBusinessChange={(business) => selectBusiness(business.id)}
-            />
-          )}
-        </div>
-      </SidebarContent>
-    </Sidebar>
-  );
-}
 
 export default Dashboard;
