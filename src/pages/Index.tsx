@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AppHeader, MissionSnippet } from "@/components/app-header";
+import { AppHeader } from "@/components/app-header";
 import { ImpactCard } from "@/components/impact-card";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { BusinessSwitcher } from "@/components/business-switcher";
@@ -9,8 +9,12 @@ import { useAuthStore } from "@/store/auth";
 import { useBusinessStore } from "@/store/business";
 import { useAnalysisStore } from "@/store/analysis";
 import { useDataroomStore } from "@/store/dataroom";
-import { FileText, CheckSquare, Scale, ArrowRight } from "lucide-react";
+import { FileText, CheckSquare, Scale, ArrowRight, Shield, Users, Target, Building, Leaf } from "lucide-react";
 import { useEffect } from "react";
+import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
+import legalProtectionImage from '@/assets/legal-protection-singapore.jpg';
+import stakeholderTrustImage from '@/assets/stakeholder-trust-singapore.jpg';
+import competitiveEdgeImage from '@/assets/competitive-edge-singapore.jpg';
 
 const Index = () => {
   const { user } = useAuthStore();
@@ -45,21 +49,27 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <AppHeader mode="auth" />
         
-        {/* Hero Section with Business Info */}
-        <div className="bg-muted/50 border-b">
-          <div className="container mx-auto px-4 py-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
-                  Get B-Corp Ready,{" "}
-                  <span className="text-primary">the simple way</span>
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                  A UK-only, document-first platform that guides your startup through B Corporation certification
-                </p>
-              </div>
+        {/* Hero Section with Background Image */}
+        <div 
+          className="relative bg-gradient-to-br from-primary/10 to-secondary/10 border-b overflow-hidden"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.8)), url(${singaporeCityscape})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        >
+          <div className="container mx-auto px-4 py-16">
+            <div className="text-center mb-12">
+              <h1 className="text-4xl lg:text-5xl font-bold tracking-tight mb-6">
+                Welcome to Your B Corp Journey,{" "}
+                <span className="text-primary">the simple way</span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                Transform your business into a force for good. Track your progress toward B Corporation certification with our comprehensive readiness platform.
+              </p>
               {businesses.length > 0 && (
-                <div className="flex-shrink-0">
+                <div className="inline-block">
                   <BusinessSwitcher
                     businesses={businesses}
                     currentBusiness={currentBusiness}
@@ -68,71 +78,216 @@ const Index = () => {
                 </div>
               )}
             </div>
-          </div>
-        </div>
-        
-        <main className="container mx-auto px-4 py-8">
-          <div className="space-y-8">
-            {/* Welcome Section */}
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">Welcome back, {user.email}</h2>
-              <p className="text-muted-foreground">Here's a quick glimpse of your B-Corp journey progress</p>
-            </div>
 
+            {/* Progress Overview on Hero */}
             {currentBusiness && (
-              <>
-                {/* Progress Overview */}
-                <section>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-semibold">Progress Overview</h3>
-                    <Button asChild variant="outline">
-                      <Link to="/dashboard">
-                        View Dashboard
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                    {impactSummaries.map((summary) => (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 max-w-6xl mx-auto">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl font-bold">Your Progress Overview</h3>
+                  <Button asChild variant="outline">
+                    <Link to="/dashboard">
+                      View Dashboard
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+                
+                {/* Impact Cards - 3 then 2 layout */}
+                <div className="space-y-6">
+                  {/* First row - 3 cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+                    {impactSummaries.slice(0, 3).map((summary) => (
                       <ImpactCard
                         key={summary.impact}
                         summary={summary}
-                        onViewTasks={() => {}} // Quick view only
+                        onViewTasks={() => {}}
+                        className="w-full max-w-sm"
                       />
                     ))}
                   </div>
-                </section>
-
+                  
+                  {/* Second row - 2 cards centered */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center max-w-2xl mx-auto">
+                    {impactSummaries.slice(3, 5).map((summary) => (
+                      <ImpactCard
+                        key={summary.impact}
+                        summary={summary}
+                        onViewTasks={() => {}}
+                        className="w-full max-w-sm"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        <main className="container mx-auto px-4 py-12">
+          <div className="space-y-16">
+            {currentBusiness && (
+              <>
                 {/* Upload Documents */}
-                <section>
-                  <h3 className="text-xl font-semibold mb-6">Upload Any Documents</h3>
-                  <UploadDropzone onFilesAdd={handleUpload} />
+                <section className="bg-muted/30 rounded-2xl p-8">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold mb-4">Upload Your Business Documents</h3>
+                    <p className="text-muted-foreground max-w-2xl mx-auto">
+                      Share your business plan, policies, and data room documents to receive personalized recommendations for your B Corp journey.
+                    </p>
+                  </div>
+                  <div className="max-w-3xl mx-auto">
+                    <UploadDropzone onFilesAdd={handleUpload} />
+                  </div>
                 </section>
 
-                {/* Key Benefits */}
-                <section className="bg-muted/30 rounded-2xl p-8">
-                  <h3 className="text-xl font-semibold mb-6">Why Choose B-Corp Certification?</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Scale className="h-6 w-6 text-primary" />
+                {/* Enhanced B-Corp Benefits with Images */}
+                <section className="py-12">
+                  <div className="text-center mb-12">
+                    <h3 className="text-3xl font-bold mb-4">Why Become a B Corporation?</h3>
+                    <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+                      Join a global movement of companies using business as a force for good
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-16">
+                    {/* Legal Protection */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                      <div 
+                        className="relative h-80 rounded-2xl overflow-hidden"
+                        style={{
+                          backgroundImage: `url(${legalProtectionImage})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
                       </div>
-                      <h4 className="font-semibold mb-2">Legal Protection</h4>
-                      <p className="text-sm text-muted-foreground">Mission lock protects your company's purpose</p>
+                      <div>
+                        <div className="flex items-center mb-4">
+                          <Shield className="h-8 w-8 text-primary mr-3" />
+                          <h4 className="text-2xl font-bold">Legal Protection</h4>
+                        </div>
+                        <p className="text-lg text-muted-foreground mb-6">
+                          B Corp certification provides legal protection through mission lock clauses in your Articles of Association. This ensures your company's purpose cannot be compromised by future ownership changes or investor pressure.
+                        </p>
+                        <ul className="space-y-2 text-muted-foreground">
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Protected mission and values
+                          </li>
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Legal framework for stakeholder governance
+                          </li>
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Long-term purpose preservation
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <CheckSquare className="h-6 w-6 text-primary" />
+
+                    {/* Stakeholder Trust */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                      <div className="lg:order-2">
+                        <div 
+                          className="relative h-80 rounded-2xl overflow-hidden"
+                          style={{
+                            backgroundImage: `url(${stakeholderTrustImage})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
+                        </div>
                       </div>
-                      <h4 className="font-semibold mb-2">Stakeholder Trust</h4>
-                      <p className="text-sm text-muted-foreground">Build trust with customers, employees, and investors</p>
+                      <div className="lg:order-1">
+                        <div className="flex items-center mb-4">
+                          <Users className="h-8 w-8 text-primary mr-3" />
+                          <h4 className="text-2xl font-bold">Stakeholder Trust</h4>
+                        </div>
+                        <p className="text-lg text-muted-foreground mb-6">
+                          Build unparalleled trust with all stakeholders through rigorous third-party verification. B Corp certification demonstrates genuine commitment to social and environmental performance.
+                        </p>
+                        <ul className="space-y-2 text-muted-foreground">
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Enhanced customer loyalty and trust
+                          </li>
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Increased employee engagement
+                          </li>
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Improved investor confidence
+                          </li>
+                        </ul>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <FileText className="h-6 w-6 text-primary" />
+
+                    {/* Competitive Edge */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                      <div 
+                        className="relative h-80 rounded-2xl overflow-hidden"
+                        style={{
+                          backgroundImage: `url(${competitiveEdgeImage})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      >
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent" />
                       </div>
-                      <h4 className="font-semibold mb-2">Competitive Edge</h4>
-                      <p className="text-sm text-muted-foreground">Stand out in the market with verified impact</p>
+                      <div>
+                        <div className="flex items-center mb-4">
+                          <Target className="h-8 w-8 text-primary mr-3" />
+                          <h4 className="text-2xl font-bold">Competitive Edge</h4>
+                        </div>
+                        <p className="text-lg text-muted-foreground mb-6">
+                          Stand out in the marketplace with verified impact credentials. B Corp certification differentiates your business and opens new opportunities with conscious consumers and partners.
+                        </p>
+                        <ul className="space-y-2 text-muted-foreground">
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Market differentiation and premium positioning
+                          </li>
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Access to B Corp community and networks
+                          </li>
+                          <li className="flex items-center">
+                            <CheckSquare className="h-4 w-4 text-primary mr-2" />
+                            Attraction of top talent and conscious consumers
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Statistics Section */}
+                <section className="bg-primary/5 rounded-2xl p-8">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-bold mb-4">Join the Movement</h3>
+                    <p className="text-muted-foreground">B Corps are leading the way toward a more inclusive and sustainable economy</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
+                    <div>
+                      <div className="text-3xl font-bold text-primary mb-2">6,000+</div>
+                      <p className="text-muted-foreground">Certified B Corps worldwide</p>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-primary mb-2">80+</div>
+                      <p className="text-muted-foreground">Countries represented</p>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-primary mb-2">150+</div>
+                      <p className="text-muted-foreground">Industries covered</p>
+                    </div>
+                    <div>
+                      <div className="text-3xl font-bold text-primary mb-2">300K+</div>
+                      <p className="text-muted-foreground">Workers employed</p>
                     </div>
                   </div>
                 </section>
