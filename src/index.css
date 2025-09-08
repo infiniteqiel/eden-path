@@ -154,9 +154,10 @@
 @layer components {
   /* B-Corp specific component styles */
   .impact-card {
-    @apply bg-card rounded-2xl border border-border p-6 shadow-sm transition-all duration-200 hover:shadow-md;
+    @apply bg-card rounded-lg border border-border/50 shadow-sm transition-all duration-200 hover:shadow-md hover:bg-card/80;
     container-type: inline-size;
     min-width: 0;
+    min-height: 120px;
   }
   
   /* Container overflow protection */

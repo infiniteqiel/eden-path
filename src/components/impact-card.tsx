@@ -48,44 +48,49 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
   );
   
   return (
-    <Card className={cn("impact-card w-full h-full min-h-[140px] p-3 sm:p-4", className)}>
-      <div className="flex items-start justify-between mb-2 sm:mb-4 h-full">
-        <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
-          <div className="text-lg sm:text-xl md:text-2xl flex-shrink-0" role="img" aria-label={impact}>
+    <Card className={cn("impact-card w-full h-full p-2 sm:p-3 flex flex-col", className)}>
+      {/* Header with icon, title and percentage */}
+      <div className="flex items-start justify-between mb-2 sm:mb-3">
+        <div className="flex items-center space-x-1.5 sm:space-x-2 min-w-0 flex-1">
+          <div className="text-base sm:text-lg flex-shrink-0" role="img" aria-label={impact}>
             {impactIcons[impact]}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold truncate leading-tight" style={{ fontSize: 'clamp(0.75rem, 2vw, 1.125rem)' }}>{impact}</h3>
-            <p className="text-[10px] sm:text-xs lg:text-sm text-muted-foreground">
+            <h3 className="font-semibold truncate text-xs sm:text-sm leading-tight">{impact}</h3>
+            <p className="text-[10px] sm:text-xs text-muted-foreground">
               {done} completed
             </p>
           </div>
         </div>
-        <div className={cn("font-bold flex-shrink-0 ml-1", impactColors[impact])} style={{ fontSize: 'clamp(0.875rem, 2.5vw, 1.5rem)' }}>
+        <div className={cn("font-bold flex-shrink-0 ml-1 text-sm sm:text-lg", impactColors[impact])}>
           {pct}%
         </div>
       </div>
 
-      <div className="space-y-2 sm:space-y-3 flex-1 flex flex-col justify-end">
+      {/* Progress bar */}
+      <div className="mb-2 sm:mb-3">
         <Progress value={pct} className="h-1.5 sm:h-2" />
-        
+      </div>
+      
+      {/* Bottom section with button */}
+      <div className="mt-auto">
         <Button 
           variant="ghost" 
           size="sm" 
           onClick={() => setShowCompletedModal(true)}
-          className="w-full justify-between text-muted-foreground hover:text-foreground text-xs sm:text-sm py-1 sm:py-2"
+          className="w-full justify-between text-muted-foreground hover:text-foreground text-[10px] sm:text-xs py-1.5 sm:py-2 h-auto"
         >
           View tasks
-          <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+          <ArrowRight className="h-3 w-3" />
         </Button>
-        
-        <CompletedTasksModal
-          isOpen={showCompletedModal}
-          onClose={() => setShowCompletedModal(false)}
-          completedTasks={completedTasks}
-          impactArea={impact}
-        />
       </div>
+        
+      <CompletedTasksModal
+        isOpen={showCompletedModal}
+        onClose={() => setShowCompletedModal(false)}
+        completedTasks={completedTasks}
+        impactArea={impact}
+      />
     </Card>
   );
 }

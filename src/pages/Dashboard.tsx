@@ -103,16 +103,18 @@ const Dashboard = () => {
               {/* Progress Overview */}
               <section className="w-full">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4 sm:mb-6">Progress Overview</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-2 sm:gap-4 w-full max-w-none">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 w-full">
                     {impactSummaries.map((summary) => (
-                      <ImpactCard
-                        key={summary.impact}
-                        summary={summary}
-                        onViewTasks={() => {
-                          // Show completed tasks for this impact area
-                          console.log(`Viewing completed tasks for ${summary.impact}`);
-                        }}
-                      />
+                      <div key={summary.impact} className="w-full aspect-square">
+                        <ImpactCard
+                          summary={summary}
+                          onViewTasks={() => {
+                            // Show completed tasks for this impact area
+                            console.log(`Viewing completed tasks for ${summary.impact}`);
+                          }}
+                          className="h-full"
+                        />
+                      </div>
                     ))}
                 </div>
               </section>
