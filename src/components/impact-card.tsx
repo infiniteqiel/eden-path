@@ -58,7 +58,7 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold truncate text-xs sm:text-sm leading-tight">{impact}</h3>
             <p className="text-[10px] sm:text-xs text-muted-foreground">
-              {done} completed
+              {done} of {total} Recommended
             </p>
           </div>
         </div>
