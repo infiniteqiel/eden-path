@@ -54,14 +54,14 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
           <div className="text-2xl" role="img" aria-label={impact}>
             {impactIcons[impact]}
           </div>
-          <div>
-            <h3 className="font-semibold text-lg">{impact}</h3>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-base lg:text-lg truncate">{impact}</h3>
+            <p className="text-xs lg:text-sm text-muted-foreground">
               {done} completed
             </p>
           </div>
         </div>
-        <div className={cn("text-xl font-bold", impactColors[impact])}>
+        <div className={cn("text-lg lg:text-xl font-bold flex-shrink-0", impactColors[impact])}>
           {pct}%
         </div>
       </div>

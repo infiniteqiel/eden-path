@@ -73,25 +73,37 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
   },
 
   updateTodoStatus: async (todoId: string, status: Todo['status']) => {
-    set({ error: null });
+    // Optimistically update UI first
+    set(state => ({
+      todos: state.todos.map(todo => 
+        todo.id === todoId ? { ...todo, status } : todo
+      ),
+      error: null
+    }));
+
     try {
       const updatedTodo = await analysisService.updateTodoStatus(todoId, status);
+      // Confirm the update with server response
       set(state => ({
         todos: state.todos.map(todo => 
           todo.id === todoId ? updatedTodo : todo
         )
       }));
 
-      // Refresh impact summaries
+      // Refresh impact summaries without reloading todos
       const { todos } = get();
       const businessId = todos.find(t => t.id === todoId)?.businessId;
       if (businessId) {
         get().loadImpactSummaries(businessId);
       }
     } catch (error) {
-      set({ 
+      // Revert optimistic update on error
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? { ...todo, status: todo.id === todoId ? 'todo' : todo.status } : todo
+        ),
         error: error instanceof Error ? error.message : 'Failed to update todo'
-      });
+      }));
     }
   },
 

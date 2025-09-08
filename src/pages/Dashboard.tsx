@@ -65,6 +65,11 @@ const Dashboard = () => {
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full flex bg-background">
+        {/* Global trigger that is ALWAYS visible */}
+        <div className="fixed top-4 left-4 z-50">
+          <SidebarTrigger />
+        </div>
+        
         <AppSidebar />
         
         <div className="flex-1">
@@ -178,9 +183,7 @@ function AppSidebar() {
   const { businesses, currentBusiness, selectBusiness } = useBusinessStore();
 
   return (
-    <Sidebar className="w-60">
-      <SidebarTrigger className="m-2 self-end" />
-      
+    <Sidebar className="w-60" collapsible="offcanvas">
       <SidebarContent>
         <div className="p-4">
           <h3 className="font-semibold text-sm text-muted-foreground mb-3">SELECT BUSINESS</h3>

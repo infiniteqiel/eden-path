@@ -44,35 +44,60 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-background">
         <AppHeader mode="auth" />
-        <MissionSnippet />
         
-        <main className="container mx-auto px-4 py-8">
-          <div className="space-y-8">
-            {/* Business Switcher */}
+        {/* Hero Section with Business Info */}
+        <div className="bg-muted/50 border-b">
+          <div className="container mx-auto px-4 py-8">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
-                {businesses.length > 0 && (
+                <h1 className="text-3xl lg:text-4xl font-bold tracking-tight mb-2">
+                  Get B-Corp Ready,{" "}
+                  <span className="text-primary">the simple way</span>
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  A UK-only, document-first platform that guides your startup through B Corporation certification
+                </p>
+              </div>
+              {businesses.length > 0 && (
+                <div className="flex-shrink-0">
                   <BusinessSwitcher
                     businesses={businesses}
                     currentBusiness={currentBusiness}
                     onBusinessChange={(business) => selectBusiness(business.id)}
                   />
-                )}
-              </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        
+        <main className="container mx-auto px-4 py-8">
+          <div className="space-y-8">
+            {/* Welcome Section */}
+            <div className="text-center">
+              <h2 className="text-2xl font-bold mb-2">Welcome back, {user.email}</h2>
+              <p className="text-muted-foreground">Here's a quick glimpse of your B-Corp journey progress</p>
             </div>
 
             {currentBusiness && (
               <>
                 {/* Progress Overview */}
                 <section>
-                  <h2 className="text-xl font-semibold mb-6">Progress Overview</h2>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-semibold">Progress Overview</h3>
+                    <Button asChild variant="outline">
+                      <Link to="/dashboard">
+                        View Dashboard
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                     {impactSummaries.map((summary) => (
                       <ImpactCard
                         key={summary.impact}
                         summary={summary}
-                        onViewTasks={() => {}} // TODO: Navigate to roadmap with filter
+                        onViewTasks={() => {}} // Quick view only
                       />
                     ))}
                   </div>
@@ -80,8 +105,36 @@ const Index = () => {
 
                 {/* Upload Documents */}
                 <section>
-                  <h2 className="text-xl font-semibold mb-6">Upload Any Documents</h2>
+                  <h3 className="text-xl font-semibold mb-6">Upload Any Documents</h3>
                   <UploadDropzone onFilesAdd={handleUpload} />
+                </section>
+
+                {/* Key Benefits */}
+                <section className="bg-muted/30 rounded-2xl p-8">
+                  <h3 className="text-xl font-semibold mb-6">Why Choose B-Corp Certification?</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Scale className="h-6 w-6 text-primary" />
+                      </div>
+                      <h4 className="font-semibold mb-2">Legal Protection</h4>
+                      <p className="text-sm text-muted-foreground">Mission lock protects your company's purpose</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <CheckSquare className="h-6 w-6 text-primary" />
+                      </div>
+                      <h4 className="font-semibold mb-2">Stakeholder Trust</h4>
+                      <p className="text-sm text-muted-foreground">Build trust with customers, employees, and investors</p>
+                    </div>
+                    <div className="text-center">
+                      <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <FileText className="h-6 w-6 text-primary" />
+                      </div>
+                      <h4 className="font-semibold mb-2">Competitive Edge</h4>
+                      <p className="text-sm text-muted-foreground">Stand out in the market with verified impact</p>
+                    </div>
+                  </div>
                 </section>
               </>
             )}
