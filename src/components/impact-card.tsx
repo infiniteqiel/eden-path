@@ -4,12 +4,14 @@
  * Displays progress for each B Corp impact area.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { CompletedTasksModal } from '@/components/completed-tasks-modal';
 import { ArrowRight } from 'lucide-react';
 import { ImpactSummary } from '@/domain/data-contracts';
+import { useAnalysisStore } from '@/store/analysis';
 import { cn } from '@/lib/utils';
 
 interface ImpactCardProps {
@@ -38,6 +40,12 @@ const impactColors = {
 
 export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps) {
   const { impact, total, done, pct } = summary;
+  const { todos } = useAnalysisStore();
+  const [showCompletedModal, setShowCompletedModal] = useState(false);
+  
+  const completedTasks = todos.filter(todo => 
+    todo.impact === impact && todo.status === 'done'
+  );
   
   return (
     <Card className={cn("impact-card", className)}>
@@ -49,7 +57,7 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
           <div>
             <h3 className="font-semibold text-lg">{impact}</h3>
             <p className="text-sm text-muted-foreground">
-              {done} of {total} completed
+              {done} completed
             </p>
           </div>
         </div>
@@ -64,12 +72,19 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={onViewTasks}
+          onClick={() => setShowCompletedModal(true)}
           className="w-full justify-between text-muted-foreground hover:text-foreground"
         >
           View tasks
           <ArrowRight className="h-4 w-4" />
         </Button>
+        
+        <CompletedTasksModal
+          isOpen={showCompletedModal}
+          onClose={() => setShowCompletedModal(false)}
+          completedTasks={completedTasks}
+          impactArea={impact}
+        />
       </div>
     </Card>
   );

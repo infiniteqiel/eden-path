@@ -1,10 +1,97 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { AppHeader } from "@/components/app-header";
+import { AppHeader, MissionSnippet } from "@/components/app-header";
+import { ImpactCard } from "@/components/impact-card";
+import { UploadDropzone } from "@/components/upload-dropzone";
+import { BusinessSwitcher } from "@/components/business-switcher";
+import { useAuthStore } from "@/store/auth";
+import { useBusinessStore } from "@/store/business";
+import { useAnalysisStore } from "@/store/analysis";
+import { useDataroomStore } from "@/store/dataroom";
 import { FileText, CheckSquare, Scale, ArrowRight } from "lucide-react";
+import { useEffect } from "react";
 
 const Index = () => {
+  const { user } = useAuthStore();
+  const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
+  const { impactSummaries, loadImpactSummaries } = useAnalysisStore();
+  const { uploadFile } = useDataroomStore();
+
+  useEffect(() => {
+    if (user) {
+      loadBusinesses();
+    }
+  }, [user, loadBusinesses]);
+
+  useEffect(() => {
+    if (currentBusiness) {
+      loadImpactSummaries(currentBusiness.id);
+    }
+  }, [currentBusiness, loadImpactSummaries]);
+
+  const handleUpload = async (files: File[]) => {
+    if (currentBusiness) {
+      // Upload files one by one
+      for (const file of files) {
+        await uploadFile(currentBusiness.id, file);
+      }
+    }
+  };
+
+  // If user is authenticated, show the authenticated home page
+  if (user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader mode="auth" />
+        <MissionSnippet />
+        
+        <main className="container mx-auto px-4 py-8">
+          <div className="space-y-8">
+            {/* Business Switcher */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
+                {businesses.length > 0 && (
+                  <BusinessSwitcher
+                    businesses={businesses}
+                    currentBusiness={currentBusiness}
+                    onBusinessChange={(business) => selectBusiness(business.id)}
+                  />
+                )}
+              </div>
+            </div>
+
+            {currentBusiness && (
+              <>
+                {/* Progress Overview */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-6">Progress Overview</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                    {impactSummaries.map((summary) => (
+                      <ImpactCard
+                        key={summary.impact}
+                        summary={summary}
+                        onViewTasks={() => {}} // TODO: Navigate to roadmap with filter
+                      />
+                    ))}
+                  </div>
+                </section>
+
+                {/* Upload Documents */}
+                <section>
+                  <h2 className="text-xl font-semibold mb-6">Upload Any Documents</h2>
+                  <UploadDropzone onFilesAdd={handleUpload} />
+                </section>
+              </>
+            )}
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Public home page
   return (
     <div className="min-h-screen bg-background">
       <AppHeader mode="public" />

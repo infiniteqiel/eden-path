@@ -6,13 +6,14 @@
 
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { AppHeader } from '@/components/app-header';
+import { AppHeader, MissionSnippet } from '@/components/app-header';
 import { BusinessSwitcher } from '@/components/business-switcher';
 import { ImpactCard } from '@/components/impact-card';
 import { TodoItem } from '@/components/todo-item';
 import { EmptyState } from '@/components/empty-state';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Sidebar, SidebarContent, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
@@ -62,31 +63,20 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <AppHeader mode="auth" />
-      
-      {/* Mission banner */}
-      <div className="bg-eden-50 border-b border-eden-200">
-        <div className="container mx-auto px-4 py-3">
-          <p className="text-sm text-eden-800">
-            <strong>B Corps</strong> are companies that meet high standards of social and environmental performance, 
-            accountability, and transparency. This workspace helps your UK business build those practices step by step — 
-            document-first, with clear actions across Governance, Workers, Community, Environment, and Customers.
-          </p>
-        </div>
-      </div>
+    <SidebarProvider>
+      <div className="min-h-screen w-full flex bg-background">
+        <AppSidebar />
+        
+        <div className="flex-1">
+          <AppHeader mode="auth" />
+          <MissionSnippet />
 
-      <main className="container mx-auto px-4 py-8">
+          <main className="container mx-auto px-4 py-8">
         <div className="space-y-8">
-          {/* Business Switcher */}
+          {/* Dashboard Header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard</h1>
-              <BusinessSwitcher
-                businesses={businesses}
-                currentBusiness={currentBusiness}
-                onBusinessChange={(business) => selectBusiness(business.id)}
-              />
             </div>
             
             {currentBusiness && (
@@ -107,13 +97,16 @@ const Dashboard = () => {
               <section>
                 <h2 className="text-xl font-semibold mb-6">Progress Overview</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                  {impactSummaries.map((summary) => (
-                    <ImpactCard
-                      key={summary.impact}
-                      summary={summary}
-                      onViewTasks={() => {}} // TODO: Navigate to roadmap with filter
-                    />
-                  ))}
+                    {impactSummaries.map((summary) => (
+                      <ImpactCard
+                        key={summary.impact}
+                        summary={summary}
+                        onViewTasks={() => {
+                          // Show completed tasks for this impact area
+                          console.log(`Viewing completed tasks for ${summary.impact}`);
+                        }}
+                      />
+                    ))}
                 </div>
               </section>
 
@@ -172,10 +165,36 @@ const Dashboard = () => {
               onCta={() => {}}
             />
           )}
+          </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </SidebarProvider>
   );
 };
+
+// App Sidebar Component for Dashboard
+function AppSidebar() {
+  const { businesses, currentBusiness, selectBusiness } = useBusinessStore();
+
+  return (
+    <Sidebar className="w-60">
+      <SidebarTrigger className="m-2 self-end" />
+      
+      <SidebarContent>
+        <div className="p-4">
+          <h3 className="font-semibold text-sm text-muted-foreground mb-3">SELECT BUSINESS</h3>
+          {businesses.length > 0 && (
+            <BusinessSwitcher
+              businesses={businesses}
+              currentBusiness={currentBusiness}
+              onBusinessChange={(business) => selectBusiness(business.id)}
+            />
+          )}
+        </div>
+      </SidebarContent>
+    </Sidebar>
+  );
+}
 
 export default Dashboard;

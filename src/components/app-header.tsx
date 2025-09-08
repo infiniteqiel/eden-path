@@ -70,7 +70,7 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
     <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container flex h-16 items-center justify-between px-4">
         <div className="flex items-center space-x-4">
-          <Link to="/dashboard" className="flex items-center space-x-2">
+          <Link to="/" className="flex items-center space-x-2">
             <Building className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">bcstart.ai</span>
           </Link>
@@ -137,12 +137,14 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
  */
 export function MissionSnippet() {
   return (
-    <div className="mission-snippet">
-      <p>
-        <strong>B Corps</strong> are companies that meet high standards of social and environmental performance, 
-        accountability, and transparency. This workspace helps your UK business build those practices step by step — 
-        document-first, with clear actions across Governance, Workers, Community, Environment, and Customers.
-      </p>
+    <div className="bg-eden-50 border-b border-eden-200">
+      <div className="container mx-auto px-4 py-3">
+        <p className="text-sm text-eden-800">
+          <strong>B Corps</strong> are companies that meet high standards of social and environmental performance, 
+          accountability, and transparency. This workspace helps your UK business build those practices step by step — 
+          document-first, with clear actions across Governance, Workers, Community, Environment, and Customers.
+        </p>
+      </div>
     </div>
   );
 }
