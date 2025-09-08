@@ -23,7 +23,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Dashboard = () => {
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
-  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
+  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
 
   // Get quick todos (top 5 priority P1/P2 not done)
   const quickTodos = todos
@@ -51,9 +51,7 @@ const Dashboard = () => {
   const handleTestReset = () => {
     // Reset progress and add random priority tasks
     if (currentBusiness) {
-      // This would call mock services to reset data
-      loadImpactSummaries(currentBusiness.id);
-      loadTodos(currentBusiness.id);
+      resetTestData(currentBusiness.id);
     }
   };
 

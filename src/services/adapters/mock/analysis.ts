@@ -243,6 +243,62 @@ export const reanalyze = async (businessId: string): Promise<AnalysisJob> => {
   return startIngestion(businessId);
 };
 
+// Test Reset function - generates fresh random tasks
+export const resetTestData = async (businessId: string): Promise<{ todos: Todo[], impactSummaries: ImpactSummary[] }> => {
+  await new Promise(resolve => setTimeout(resolve, 300));
+  
+  // Generate 2 new random tasks
+  const impactAreas: ImpactArea[] = ['Governance', 'Workers', 'Community', 'Environment', 'Customers'];
+  const priorities: TodoPriority[] = ['P1', 'P2', 'P3'];
+  const efforts: TodoEffort[] = ['Low', 'Medium', 'High'];
+  const statuses: Todo['status'][] = ['todo', 'in_progress', 'done'];
+  
+  const taskTemplates = [
+    { impact: 'Governance', titles: ['Update board structure', 'Implement stakeholder governance', 'Create transparency policy', 'Establish mission accountability'] },
+    { impact: 'Workers', titles: ['Develop training program', 'Implement flexible work policy', 'Create wellness initiative', 'Establish feedback system'] },
+    { impact: 'Community', titles: ['Launch community program', 'Partner with local nonprofits', 'Create supplier diversity policy', 'Implement volunteering program'] },
+    { impact: 'Environment', titles: ['Reduce energy consumption', 'Implement recycling program', 'Create sustainability policy', 'Track environmental metrics'] },
+    { impact: 'Customers', titles: ['Improve customer service', 'Enhance product quality', 'Create feedback system', 'Implement data protection'] }
+  ];
+  
+  // Clear existing todos for this business
+  mockTodos = mockTodos.filter(t => t.businessId !== businessId);
+  
+  // Generate 2 new random tasks
+  const newTodos: Todo[] = [];
+  for (let i = 0; i < 2; i++) {
+    const randomImpact = impactAreas[Math.floor(Math.random() * impactAreas.length)];
+    const impactTemplate = taskTemplates.find(t => t.impact === randomImpact);
+    const randomTitle = impactTemplate?.titles[Math.floor(Math.random() * impactTemplate.titles.length)] || 'Sample task';
+    
+    const newTodo: Todo = {
+      id: String(nextTodoId++),
+      businessId,
+      impact: randomImpact,
+      requirementCode: `${randomImpact.slice(0, 3).toUpperCase()}-${String(Math.floor(Math.random() * 100)).padStart(3, '0')}`,
+      title: randomTitle,
+      descriptionMd: `This is a randomly generated task for testing purposes in the ${randomImpact} impact area.`,
+      priority: priorities[Math.floor(Math.random() * priorities.length)],
+      effort: efforts[Math.floor(Math.random() * efforts.length)],
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      createdAt: new Date().toISOString()
+    };
+    
+    newTodos.push(newTodo);
+  }
+  
+  // Add new todos to global array
+  mockTodos.push(...newTodos);
+  
+  // Save to localStorage
+  saveToStorage(TODOS_STORAGE_KEY, mockTodos);
+  
+  // Generate fresh impact summaries
+  const summaries = await impactSummary(businessId);
+  
+  return { todos: newTodos, impactSummaries: summaries };
+};
+
 // Helper function to simulate job progress
 function simulateJobProgress(jobId: string) {
   const job = mockJobs.find(j => j.id === jobId);

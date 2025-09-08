@@ -18,7 +18,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Progress = () => {
   const { currentBusiness } = useBusinessStore();
-  const { impactSummaries, todos, loadImpactSummaries, loadTodos } = useAnalysisStore();
+  const { impactSummaries, todos, loadImpactSummaries, loadTodos, resetTestData } = useAnalysisStore();
 
   useEffect(() => {
     if (currentBusiness) {
@@ -29,8 +29,7 @@ const Progress = () => {
 
   const handleTestReset = () => {
     if (currentBusiness) {
-      loadImpactSummaries(currentBusiness.id);
-      loadTodos(currentBusiness.id);
+      resetTestData(currentBusiness.id);
     }
   };
 

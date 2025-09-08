@@ -28,6 +28,7 @@ interface AnalysisState {
   updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<void>;
   startAnalysis: (businessId: string) => Promise<void>;
   generateRoadmap: (businessId: string) => Promise<void>;
+  resetTestData: (businessId: string) => Promise<void>;
   openEvidenceDrawer: (todoId: string) => Promise<void>;
   closeEvidenceDrawer: () => void;
   clearError: () => void;
@@ -158,6 +159,23 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to generate roadmap', 
+        isLoading: false 
+      });
+    }
+  },
+
+  resetTestData: async (businessId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const { todos, impactSummaries } = await analysisService.resetTestData(businessId);
+      set({ 
+        todos, 
+        impactSummaries, 
+        isLoading: false 
+      });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to reset test data', 
         isLoading: false 
       });
     }

@@ -57,4 +57,9 @@ export interface IAnalysisService {
    * Re-analyze documents after changes
    */
   reanalyze(businessId: string): Promise<AnalysisJob>;
+
+  /**
+   * Reset test data with fresh random tasks
+   */
+  resetTestData(businessId: string): Promise<{ todos: Todo[], impactSummaries: ImpactSummary[] }>;
 }

@@ -20,7 +20,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Tasks = () => {
   const { currentBusiness } = useBusinessStore();
-  const { todos, loadTodos, updateTodoStatus } = useAnalysisStore();
+  const { todos, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
 
@@ -39,7 +39,7 @@ const Tasks = () => {
 
   const handleTestReset = () => {
     if (currentBusiness) {
-      loadTodos(currentBusiness.id);
+      resetTestData(currentBusiness.id);
     }
   };
 
