@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
@@ -18,10 +19,11 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2, MessageSquare } from 'lucide-react';
+import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2, MessageSquare, Home } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Community = () => {
+  const navigate = useNavigate();
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
@@ -111,9 +113,20 @@ const Community = () => {
             }}
           >
             <SidebarTrigger />
-            <div className="ml-4 flex items-center gap-3">
-              <Target className="h-6 w-6 text-primary" />
-              <h1 className="font-bold text-lg">Community - Local Impact</h1>
+            <div className="ml-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <Target className="h-6 w-6 text-primary" />
+                <h1 className="font-bold text-lg">Community - Local Impact</h1>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
             </div>
           </header>
           
@@ -127,12 +140,12 @@ const Community = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
               <div className="space-y-8">
                 {/* Overview */}
-                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 min-w-0">
                       <h2 className="text-2xl font-bold mb-4">Community Overview</h2>
                       <p className="text-muted-foreground mb-6">
                         The Community impact area evaluates your company's impact on the communities where it operates, 
@@ -155,9 +168,14 @@ const Community = () => {
                         className="mt-4" 
                       />
                       
-                      <Button variant="outline" size="sm" className="mt-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-3"
+                        onClick={() => setShowAIChat(true)}
+                      >
                         <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat
+                        AI Analysis Chat - Community Specialist
                       </Button>
                     </div>
                     
@@ -171,13 +189,6 @@ const Community = () => {
                         )}
                       </div>
                       
-                      <Button 
-                        onClick={() => setShowAIChat(true)}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat
-                      </Button>
                     </div>
                   </div>
                 </section>

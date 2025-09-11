@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
@@ -16,11 +17,12 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { CheckSquare2, Clock, AlertCircle, Filter, RotateCcw } from 'lucide-react';
+import { CheckSquare2, Clock, AlertCircle, Filter, RotateCcw, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Tasks = () => {
+  const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { todos, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -82,7 +84,18 @@ const Tasks = () => {
             }}
           >
             <SidebarTrigger />
-            <h1 className="ml-4 font-bold text-lg">Tasks - B Corp Roadmap</h1>
+            <div className="ml-4 flex items-center justify-between w-full">
+              <h1 className="font-bold text-lg">Tasks - B Corp Roadmap</h1>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
+            </div>
           </header>
           
           <main 
@@ -95,10 +108,10 @@ const Tasks = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
               <div className="space-y-8">
                 {/* Header with Actions */}
-                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <h2 className="text-2xl font-bold mb-2">Task Management</h2>
@@ -149,7 +162,7 @@ const Tasks = () => {
                 </section>
 
                 {/* Task Views */}
-                <Tabs defaultValue="status" className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                <Tabs defaultValue="status" className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6">
                   <TabsList>
                     <TabsTrigger value="status">By Status</TabsTrigger>
                     <TabsTrigger value="impact">By Impact Area</TabsTrigger>
@@ -170,22 +183,11 @@ const Tasks = () => {
                           <div className="space-y-3">
                             {statusTodos.map(todo => (
                               <div key={todo.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTask(todo)}>
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <TodoItem
-                                      todo={todo}
-                                      onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
-                                      showImpact
-                                    />
-                                  </div>
-                                  <AIChatIcon 
-                                    onClick={() => {
-                                      console.log('AI Chat for task:', todo.id);
-                                    }}
-                                    size="sm"
-                                    className="ml-2"
-                                  />
-                                </div>
+                                <TodoItem
+                                  todo={todo}
+                                  onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
+                                  showImpact
+                                />
                               </div>
                             ))}
                           </div>
@@ -205,21 +207,10 @@ const Tasks = () => {
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {impactTodos.map(todo => (
                               <div key={todo.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTask(todo)}>
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1">
-                                    <TodoItem
-                                      todo={todo}
-                                      onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
-                                    />
-                                  </div>
-                                  <AIChatIcon 
-                                    onClick={() => {
-                                      console.log('AI Chat for task:', todo.id);
-                                    }}
-                                    size="sm"
-                                    className="ml-2"
-                                  />
-                                </div>
+                                <TodoItem
+                                  todo={todo}
+                                  onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
+                                />
                               </div>
                             ))}
                           </div>

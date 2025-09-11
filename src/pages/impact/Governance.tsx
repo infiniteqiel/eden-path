@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
@@ -20,7 +21,6 @@ import { Todo } from '@/domain/data-contracts';
 import { Building2, Users, Scale, FileText, CheckSquare2, MessageSquare, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
-import { useNavigate } from 'react-router-dom';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Governance = () => {
@@ -118,12 +118,12 @@ const Governance = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-4 py-8">
+            <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
               <div className="space-y-8">
                 {/* Overview */}
-                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 min-w-0">
                       <h2 className="text-2xl font-bold mb-4">Governance Overview</h2>
                       <p className="text-muted-foreground mb-6">
                         Governance measures how your company manages its overall mission, stakeholder engagement, 

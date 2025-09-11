@@ -5,8 +5,9 @@
  */
 
 import React from 'react';
-import { Building2, Home, FileText, CheckSquare2, Users, Leaf, Target } from 'lucide-react';
+import { Building2, Home, FileText, CheckSquare2, Users, Leaf, Target, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 import { BusinessSwitcher } from '@/components/business-switcher';
 import { useBusinessStore } from '@/store/business';
 import {
@@ -35,7 +36,10 @@ export function AppSidebar() {
   ];
 
   return (
-    <Sidebar className={isCollapsed ? "w-16" : "w-64"} collapsible="icon">
+    <Sidebar className={cn(
+      isCollapsed ? "w-16" : "w-64",
+      "md:bg-background bg-white" // White background on mobile
+    )} collapsible="icon">
       <SidebarContent>
         {/* Business Switcher */}
         <SidebarGroup>
@@ -129,6 +133,14 @@ export function AppSidebar() {
                   <Link to="/impact/customers" className="flex items-center gap-3">
                     <CheckSquare2 className="h-4 w-4" />
                     {!isCollapsed && <span>Customers</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link to="/impact/other" className="flex items-center gap-3">
+                    <Plus className="h-4 w-4" />
+                    {!isCollapsed && <span>Other & Extra Benefits</span>}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

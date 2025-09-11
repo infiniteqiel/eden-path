@@ -63,7 +63,7 @@ export function BusinessSwitcher({
           <ChevronDown className="h-3 w-3 ml-2 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64">
+      <DropdownMenuContent align="start" className="w-64 bg-white z-50">
         {businesses.map((business) => (
           <DropdownMenuItem
             key={business.id}
@@ -83,6 +83,13 @@ export function BusinessSwitcher({
             )}
           </DropdownMenuItem>
         ))}
+        <DropdownMenuItem
+          onClick={() => console.log('Add new company')}
+          className="flex items-center gap-2 border-t border-border mt-1 pt-2"
+        >
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+          <span className="font-medium">+ Add New Company</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

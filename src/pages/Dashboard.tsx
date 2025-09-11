@@ -154,7 +154,7 @@ const Dashboard = () => {
                         </Button>
                       </div>
                       
-                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
                          {impactSummaries.map((summary) => {
                            const impactTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').slice(0, 3);
                            
@@ -169,7 +169,7 @@ const Dashboard = () => {
                                      summary.impact === 'Environment' ? 'bg-purple-600' :
                                      'bg-indigo-600'
                                    }`} />
-                                   <h3 className="font-semibold text-sm">{summary.impact}</h3>
+                                   <h3 className="font-semibold text-sm truncate">{summary.impact}</h3>
                                  </div>
                                  
                                  {/* Progress Bar */}
@@ -186,9 +186,15 @@ const Dashboard = () => {
                                    />
                                  </div>
                                  
-                                 <div className="text-xs text-muted-foreground mb-3">
-                                   {summary.pct}% Complete
-                                 </div>
+                                  <div className={`text-xs font-medium mb-3 ${
+                                    summary.impact === 'Governance' ? 'text-blue-600' :
+                                    summary.impact === 'Workers' ? 'text-green-600' :
+                                    summary.impact === 'Community' ? 'text-orange-600' :
+                                    summary.impact === 'Environment' ? 'text-purple-600' :
+                                    'text-indigo-600'
+                                  }`}>
+                                    {summary.pct}% Complete
+                                  </div>
                                  
                                  {/* Top Task Titles */}
                                  <div className="flex-1 space-y-1">

@@ -71,8 +71,7 @@ export function TodoItem({
 
   return (
     <div 
-      className={cn("todo-item cursor-pointer", className)}
-      onClick={onUploadEvidence}
+      className={cn("todo-item", className)}
     >
       <div className="flex items-start space-x-3">
         <Checkbox
