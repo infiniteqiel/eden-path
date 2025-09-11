@@ -82,7 +82,9 @@ export function ExpandableTaskModal({
               {/* Task Details Container */}
               <div 
                 className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
-                  showAIChat ? 'w-80 opacity-75' : 'flex-1'
+                  showAIChat 
+                    ? 'hidden md:block md:w-80 md:opacity-75' 
+                    : 'flex-1'
                 }`}
                 data-container="task-details"
               >
@@ -151,8 +153,10 @@ export function ExpandableTaskModal({
 
               {/* AI Chat Container */}
               <div 
-                className={`transition-all duration-300 ease-in-out border-l border-gray-200 ${
-                  showAIChat ? 'flex-1 ml-4 opacity-100' : 'w-0 opacity-0 overflow-hidden'
+                className={`transition-all duration-300 ease-in-out ${
+                  showAIChat 
+                    ? 'flex-1 opacity-100 border-l-0 md:border-l border-gray-200 md:ml-4' 
+                    : 'w-0 opacity-0 overflow-hidden'
                 }`}
                 data-container="ai-chat"
               >
