@@ -24,14 +24,28 @@ interface AIChatModalProps {
   isOpen: boolean;
   onClose: () => void;
   impactArea: ImpactArea;
+  subArea?: string;
+  taskTitle?: string;
+  contextLevel?: 'overview' | 'subarea' | 'task';
 }
 
-export function AIChatModal({ isOpen, onClose, impactArea }: AIChatModalProps) {
+export function AIChatModal({ isOpen, onClose, impactArea, subArea, taskTitle, contextLevel = 'overview' }: AIChatModalProps) {
+  const getInitialMessage = () => {
+    switch (contextLevel) {
+      case 'subarea':
+        return `Hello! I'm your AI specialist for "${subArea}" within the ${impactArea} impact area. I can help you analyze documents, provide recommendations, and answer specific questions about ${subArea} requirements for B Corp certification. How can I assist you today?`;
+      case 'task':
+        return `Hello! I'm your task-specific AI assistant for "${taskTitle}". I can help you understand this specific requirement, provide implementation guidance, and answer questions about completing this task. What would you like to know?`;
+      default:
+        return `Hello! I'm your ${impactArea} Impact Area Specialist. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements across all ${impactArea} areas. How can I help you today?`;
+    }
+  };
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       role: 'assistant',
-      content: `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area. How can I help you today?`,
+      content: getInitialMessage(),
       timestamp: new Date()
     }
   ]);
@@ -86,7 +100,9 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-green-600" />
-            AI Analysis Chat - {impactArea}
+            {contextLevel === 'subarea' && subArea ? `AI Chat - ${subArea}` :
+             contextLevel === 'task' && taskTitle ? `AI Chat - Task` :
+             `AI Chat - ${impactArea}`}
             <Badge variant="outline" className="ml-auto">
               Beta
             </Badge>
@@ -159,7 +175,11 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder={`Ask about ${impactArea} requirements...`}
+              placeholder={
+                contextLevel === 'subarea' && subArea ? `Ask about ${subArea}...` :
+                contextLevel === 'task' && taskTitle ? `Ask about this task...` :
+                `Ask about ${impactArea} requirements...`
+              }
               disabled={isLoading}
               className="flex-1"
             />

@@ -28,7 +28,7 @@ let mockBusinesses: Business[] = [
   },
   {
     id: '2',
-    accountId: 'user-1',
+    accountId: 'user-2',
     name: 'GreenSpace Consulting',
     companyNumber: '87654321',
     legalForm: 'Ltd',
@@ -37,6 +37,18 @@ let mockBusinesses: Business[] = [
     workersCount: 8,
     industry: 'Environmental Consulting',
     createdAt: '2024-06-15T00:00:00Z'
+  },
+  {
+    id: '3',
+    accountId: 'user-3',
+    name: 'Innovation Labs PLC',
+    companyNumber: '11223344',
+    legalForm: 'Ltd',
+    country: 'UK',
+    operatingMonths: 24,
+    workersCount: 15,
+    industry: 'Software Development',
+    createdAt: '2024-03-01T00:00:00Z'
   }
 ];
 

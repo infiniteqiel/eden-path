@@ -167,7 +167,7 @@ const Governance = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {governanceAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
+                       <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <area.icon className="h-5 w-5 text-primary" />
@@ -175,8 +175,8 @@ const Governance = () => {
                           </CardTitle>
                           <CardDescription>{area.description}</CardDescription>
                         </CardHeader>
-                        {/* AI Chat Icon for Sub-Area */}
-                        <div className="absolute bottom-4 right-4">
+                        {/* AI Chat Icon for Sub-Area - Top Right */}
+                        <div className="absolute top-4 right-4">
                           <AIChatIcon 
                             onClick={() => setShowAIChat(true)}
                             size="sm"
@@ -186,20 +186,13 @@ const Governance = () => {
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
-                                  <TodoItem
-                                    todo={task}
-                                    onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                  />
-                                  {/* AI Chat Icon for Task */}
-                                  <div className="absolute bottom-2 right-2">
-                                    <AIChatIcon 
-                                      onClick={() => setShowAIChat(true)}
-                                      size="sm"
-                                    />
-                                  </div>
-                                </div>
-                              ))
+                                <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                   <TodoItem
+                                     todo={task}
+                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                   />
+                                 </div>
+                               ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
                             )}
@@ -225,19 +218,12 @@ const Governance = () => {
                    {governanceTodos.length > 0 ? (
                      <div className="space-y-4">
                        {governanceTodos.map(todo => (
-                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
+                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
                            <TodoItem
                              todo={todo}
                              onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
                              showImpact={false}
                            />
-                           {/* AI Chat Icon for Task */}
-                           <div className="absolute bottom-2 right-2">
-                             <AIChatIcon 
-                               onClick={() => setShowAIChat(true)}
-                               size="sm"
-                             />
-                           </div>
                          </div>
                        ))}
                      </div>

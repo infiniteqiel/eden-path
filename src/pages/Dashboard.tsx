@@ -155,7 +155,7 @@ const Dashboard = () => {
                       </div>
                       
                        <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
-                         {impactSummaries.map((summary) => {
+                         {impactSummaries.filter(summary => summary.impact !== 'Other').map((summary) => {
                            const impactTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').slice(0, 3);
                            
                            return (
@@ -217,10 +217,7 @@ const Dashboard = () => {
                                  <Button 
                                    variant="outline" 
                                    size="sm" 
-                                   onClick={() => {
-                                     const route = summary.impact === 'Other' ? '/impact/other' : `/impact/${summary.impact.toLowerCase()}`;
-                                     navigate(route);
-                                   }}
+                                   onClick={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
                                    className="w-full mt-2 text-xs hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 transition-all duration-300"
                                  >
                                    View Details
@@ -229,6 +226,42 @@ const Dashboard = () => {
                              </Card>
                            );
                          })}
+                         
+                         {/* Other Category - Separate */}
+                         {impactSummaries.find(s => s.impact === 'Other') && (
+                           <Card className="aspect-square p-4 hover:shadow-xl hover:shadow-primary/20 hover:scale-105 transition-all duration-300 border border-muted hover:border-primary/30 bg-gradient-to-br from-white to-white/50">
+                             <div className="h-full flex flex-col">
+                               <div className="flex items-center gap-2 mb-3">
+                                 <div className="w-3 h-3 rounded-full bg-gray-600" />
+                                 <h3 className="font-semibold text-sm truncate">Other</h3>
+                               </div>
+                               
+                               <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                                 <div 
+                                   className="h-2 rounded-full transition-all duration-500 bg-gray-600"
+                                   style={{ width: `${impactSummaries.find(s => s.impact === 'Other')?.pct || 0}%` }}
+                                 />
+                               </div>
+                               
+                               <div className="text-xs font-medium mb-3 text-gray-600">
+                                 {impactSummaries.find(s => s.impact === 'Other')?.pct || 0}% Complete
+                               </div>
+                               
+                               <div className="flex-1">
+                                 <p className="text-xs text-muted-foreground">Additional documents and benefits</p>
+                               </div>
+                               
+                               <Button 
+                                 variant="outline" 
+                                 size="sm" 
+                                 onClick={() => navigate('/impact/other')}
+                                 className="w-full mt-2 text-xs hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 transition-all duration-300"
+                               >
+                                 View Details
+                               </Button>
+                             </div>
+                           </Card>
+                         )}
                       </div>
                     </section>
 

@@ -190,8 +190,8 @@ const Customers = () => {
                           </CardTitle>
                           <CardDescription>{area.description}</CardDescription>
                         </CardHeader>
-                        {/* AI Chat Icon for Sub-Area */}
-                        <div className="absolute bottom-4 right-4">
+                        {/* AI Chat Icon for Sub-Area - Top Right */}
+                        <div className="absolute top-4 right-4">
                           <AIChatIcon 
                             onClick={() => setShowAIChat(true)}
                             size="sm"
@@ -201,20 +201,13 @@ const Customers = () => {
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
-                                  <TodoItem
-                                    todo={task}
-                                    onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                  />
-                                  {/* AI Chat Icon for Task */}
-                                  <div className="absolute bottom-2 right-2">
-                                    <AIChatIcon 
-                                      onClick={() => setShowAIChat(true)}
-                                      size="sm"
-                                    />
-                                  </div>
-                                </div>
-                              ))
+                                <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                   <TodoItem
+                                     todo={task}
+                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                   />
+                                 </div>
+                               ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
                             )}
@@ -232,19 +225,12 @@ const Customers = () => {
                    {customersTodos.length > 0 ? (
                      <div className="space-y-4">
                        {customersTodos.map(todo => (
-                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
+                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
                            <TodoItem
                              todo={todo}
                              onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
                              showImpact={false}
                            />
-                           {/* AI Chat Icon for Task */}
-                           <div className="absolute bottom-2 right-2">
-                             <AIChatIcon 
-                               onClick={() => setShowAIChat(true)}
-                               size="sm"
-                             />
-                           </div>
                          </div>
                        ))}
                      </div>

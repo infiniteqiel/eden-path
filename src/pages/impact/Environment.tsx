@@ -19,6 +19,7 @@ import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { Leaf, Zap, Recycle, Droplets, CheckSquare2, MessageSquare, Home } from 'lucide-react';
+import { AIChatIcon } from '@/components/ai-chat-icon';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Environment = () => {
@@ -188,16 +189,23 @@ const Environment = () => {
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-6">Environmental Impact Areas</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {environmentAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <area.icon className="h-5 w-5 text-primary" />
-                            {area.title}
-                          </CardTitle>
-                          <CardDescription>{area.description}</CardDescription>
-                        </CardHeader>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     {environmentAreas.map((area) => (
+                       <Card key={area.title} className="bg-white/60 relative">
+                         <CardHeader>
+                           <CardTitle className="flex items-center gap-2">
+                             <area.icon className="h-5 w-5 text-primary" />
+                             {area.title}
+                           </CardTitle>
+                           <CardDescription>{area.description}</CardDescription>
+                         </CardHeader>
+                         {/* AI Chat Icon for Sub-Area - Top Right */}
+                         <div className="absolute top-4 right-4">
+                           <AIChatIcon 
+                             onClick={() => setShowAIChat(true)}
+                             size="sm"
+                           />
+                         </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (

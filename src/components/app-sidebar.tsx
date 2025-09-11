@@ -136,6 +136,19 @@ export function AppSidebar() {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarSeparator />
+
+        {/* Other Category */}
+        <SidebarGroup>
+          <SidebarGroupLabel className={isCollapsed ? "sr-only" : ""}>
+            Other
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <Link to="/impact/other" className="flex items-center gap-3">
