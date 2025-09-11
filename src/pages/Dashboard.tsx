@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/empty-state';
 import { UploadDropzone } from '@/components/upload-dropzone';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { UploadModal } from '@/components/upload-modal';
+import { BusinessSwitcher } from '@/components/business-switcher';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -106,9 +107,17 @@ const Dashboard = () => {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            <SidebarTrigger />
             <div className="ml-4 flex items-center justify-between w-full">
-              <h1 className="font-bold text-lg">Dashboard - B Corp Progress</h1>
+              <div className="flex items-center gap-4">
+                <h1 className="font-bold text-lg">Dashboard - B Corp Progress</h1>
+                {businesses.length > 0 && (
+                  <BusinessSwitcher
+                    businesses={businesses}
+                    currentBusiness={currentBusiness}
+                    onBusinessChange={(business) => selectBusiness(business.id)}
+                  />
+                )}
+              </div>
               <Button 
                 variant="outline" 
                 size="sm"

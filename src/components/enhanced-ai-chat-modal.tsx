@@ -184,11 +184,11 @@ export function EnhancedAIChatModal({
   const getInitialMessage = () => {
     switch (contextLevel) {
       case 'subarea':
-        return `Hello! I'm your AI specialist for "${subArea}" within the ${impactArea} impact area. I can help you analyze documents, provide recommendations, and answer specific questions about ${subArea} requirements for B Corp certification. How can I assist you today?`;
+        return `Hello! I'm your ${subArea} specialist within the ${impactArea} impact area. I focus specifically on ${subArea?.toLowerCase()} requirements and best practices for B Corp certification. How can I help you with ${subArea?.toLowerCase()} today?`;
       case 'task':
-        return `Hello! I'm your task-specific AI assistant for "${taskTitle}". I can help you understand this specific requirement, provide implementation guidance, and answer questions about completing this task. What would you like to know?`;
+        return `Hello! I'm here to help you with this specific task: "${taskTitle}". I can provide guidance, answer questions, and help you complete this task effectively. What do you need to know?`;
       default:
-        return `Hello! I'm your ${impactArea} Impact Area Specialist. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements across all ${impactArea} areas. How can I help you today?`;
+        return `Hello! I'm your ${impactArea} specialist. I can help you understand all aspects of the ${impactArea} impact area for B Corp certification, including requirements, best practices, and implementation strategies. What would you like to explore?`;
     }
   };
 
@@ -302,48 +302,55 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
     setShowHistory(false);
   };
 
+  const chatAgentId = `chat-agent-${impactArea.toLowerCase()}-${contextLevel}-${subArea ? subArea.toLowerCase().replace(/\s+/g, '-') : 'main'}`;
+  const chatTitle = contextLevel === 'subarea' && subArea ? `${subArea} Specialist` :
+                   contextLevel === 'task' && taskTitle ? `Task Assistant` :
+                   `${impactArea} Specialist`;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[700px] flex flex-col">
-        <DialogHeader>
+      <DialogContent 
+        className="max-w-4xl h-[700px] flex flex-col bg-white border-2 border-gray-200 shadow-2xl"
+        data-chat-agent-id={chatAgentId}
+        data-chat-context={`${impactArea}-${contextLevel}-${subArea || 'main'}`}
+      >
+        <DialogHeader className="bg-white border-b border-gray-100 pb-4">
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-green-600" />
-            {contextLevel === 'subarea' && subArea ? `AI Chat - ${subArea}` :
-             contextLevel === 'task' && taskTitle ? `AI Chat - Task` :
-             `AI Chat - ${impactArea}`}
-            <Badge variant="outline" className="ml-auto">
+            AI Chat - {chatTitle}
+            <Badge variant="outline" className="ml-auto bg-green-50 text-green-700 border-green-200">
               Beta
             </Badge>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowHistory(!showHistory)}
-              className="ml-2"
+              className="ml-2 hover:bg-gray-100"
             >
               <History className="h-4 w-4" />
             </Button>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 flex gap-4">
+        <div className="flex-1 flex gap-4 bg-white">
           {/* Chat History Sidebar */}
           {showHistory && (
-            <div className="w-64 border-r pr-4">
-              <h4 className="font-medium mb-3">Previous Chats</h4>
+            <div className="w-64 border-r border-gray-200 pr-4 bg-gray-50 rounded-l-lg">
+              <h4 className="font-medium mb-3 text-gray-900">Previous Chats</h4>
               <ScrollArea className="h-full">
                 <div className="space-y-2">
                   {sessions.map((session) => (
                     <div
                       key={session.id}
-                      className={`p-2 rounded cursor-pointer hover:bg-muted ${
-                        currentSession?.id === session.id ? 'bg-muted' : ''
+                      className={`p-2 rounded cursor-pointer hover:bg-white transition-colors ${
+                        currentSession?.id === session.id ? 'bg-white shadow-sm' : ''
                       }`}
                       onClick={() => switchToSession(session)}
                     >
-                      <p className="text-sm font-medium truncate">
+                      <p className="text-sm font-medium truncate text-gray-900">
                         {session.specific_area || session.impact_area}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-xs text-gray-500">
                         {new Date(session.updated_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -353,8 +360,8 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
             </div>
           )}
 
-        <div className="flex-1 flex flex-col min-h-0">
-            <ScrollArea className="flex-1 pr-4 max-h-[calc(100vh-200px)]">
+        <div className="flex-1 flex flex-col min-h-0 bg-white rounded-r-lg">
+            <ScrollArea className="flex-1 pr-4 bg-gray-50 rounded-lg mx-2 mt-2 p-4 max-h-[calc(100vh-280px)] overflow-y-auto">
               <div className="space-y-4">
                 {messages.map((message) => (
                   <div
@@ -370,20 +377,20 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
                     >
                       <div className="flex-shrink-0">
                         {message.role === 'user' ? (
-                          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
                             <User className="h-4 w-4" />
                           </div>
                         ) : (
-                          <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center shadow-sm">
                             <Bot className="h-4 w-4" />
                           </div>
                         )}
                       </div>
                       <div
-                        className={`rounded-lg p-3 ${
+                        className={`rounded-lg p-3 shadow-sm ${
                           message.role === 'user'
                             ? 'bg-primary text-primary-foreground'
-                            : 'bg-muted'
+                            : 'bg-white border border-gray-200'
                         }`}
                       >
                         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -396,12 +403,12 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
                 ))}
                 {isLoading && (
                   <div className="flex gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-green-600 text-white flex items-center justify-center shadow-sm">
                       <Bot className="h-4 w-4" />
                     </div>
-                    <div className="bg-muted rounded-lg p-3">
+                    <div className="bg-white border border-gray-200 rounded-lg p-3 shadow-sm">
                       <div className="flex items-center gap-2">
-                        <div className="animate-pulse">Analyzing...</div>
+                        <div className="animate-pulse text-gray-600">Analyzing...</div>
                         <div className="flex gap-1">
                           <div className="w-2 h-2 bg-current rounded-full animate-bounce" />
                           <div className="w-2 h-2 bg-current rounded-full animate-bounce delay-100" />
@@ -415,7 +422,7 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
               </div>
             </ScrollArea>
 
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2 mt-4 mx-2 mb-2 bg-white p-3 border-t border-gray-200">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
@@ -426,12 +433,12 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
                   `Ask about ${impactArea} requirements...`
                 }
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 bg-white border-gray-300 focus:border-green-500"
               />
               <Button 
                 onClick={handleSendMessage} 
                 disabled={isLoading || !inputValue.trim()}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 shadow-sm"
               >
                 <Send className="h-4 w-4" />
               </Button>

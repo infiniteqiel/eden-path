@@ -226,20 +226,16 @@ const Community = () => {
                           </div>
                         <CardContent>
                           <div className="space-y-3">
-                            {area.tasks.length > 0 ? (
-                               area.tasks.map(task => (
-                                 <div 
-                                   key={task.id} 
-                                   className="bg-white/80 rounded p-3 cursor-pointer hover:bg-white/90 transition-colors"
-                                   onClick={() => setExpandedTaskId(task.id)}  
-                                 >
-                                    <TodoItem
-                                      todo={task}
-                                      onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                      onUploadEvidence={() => handleUploadEvidence(task)}
-                                    />
-                                 </div>
-                               ))
+                             {area.tasks.length > 0 ? (
+                                area.tasks.map(task => (
+                                  <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                     <TodoItem
+                                       todo={task}
+                                       onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                       onUploadEvidence={() => handleUploadEvidence(task)}
+                                     />
+                                   </div>
+                                 ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
                             )}
@@ -262,19 +258,19 @@ const Community = () => {
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-6">All Community Tasks</h3>
                   
-                  {communityTodos.length > 0 ? (
-                    <div className="space-y-4">
-                      {communityTodos.map(todo => (
-                        <div key={todo.id} className="bg-white/60 rounded-lg p-4">
-                           <TodoItem
-                             todo={todo}
-                             onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                             onUploadEvidence={() => handleUploadEvidence(todo)}
-                             showImpact={false}
-                           />
-                        </div>
-                      ))}
-                    </div>
+                   {communityTodos.length > 0 ? (
+                     <div className="space-y-4">
+                       {communityTodos.map(todo => (
+                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
+                            <TodoItem
+                              todo={todo}
+                              onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
+                              onUploadEvidence={() => handleUploadEvidence(todo)}
+                              showImpact={false}
+                            />
+                         </div>
+                       ))}
+                     </div>
                   ) : (
                     <div className="text-center py-12">
                       <CheckSquare2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />

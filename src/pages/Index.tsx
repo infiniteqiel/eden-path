@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { AppHeader } from "@/components/app-header";
@@ -17,6 +17,7 @@ import stakeholderTrustImage from '@/assets/stakeholder-trust-singapore.jpg';
 import competitiveEdgeImage from '@/assets/competitive-edge-singapore.jpg';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
   const { impactSummaries, loadImpactSummaries } = useAnalysisStore();
@@ -92,29 +93,39 @@ const Index = () => {
                   </Button>
                 </div>
                 
-                {/* Impact Cards - 3 then 2 layout */}
+                 {/* Impact Cards - 3 then 2 layout */}
                 <div className="space-y-6">
                   {/* First row - 3 cards */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
                     {impactSummaries.slice(0, 3).map((summary) => (
-                      <ImpactCard
-                        key={summary.impact}
-                        summary={summary}
-                        onViewTasks={() => {}}
-                        className="w-full max-w-sm"
-                      />
+                      <div 
+                        key={summary.impact} 
+                        className="w-full max-w-sm cursor-pointer transform hover:scale-105 transition-transform duration-200"
+                        onClick={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
+                      >
+                        <ImpactCard
+                          summary={summary}
+                          onViewTasks={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
+                          className="w-full"
+                        />
+                      </div>
                     ))}
                   </div>
                   
                   {/* Second row - 2 cards centered */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 justify-items-center max-w-2xl mx-auto">
                     {impactSummaries.slice(3, 5).map((summary) => (
-                      <ImpactCard
-                        key={summary.impact}
-                        summary={summary}
-                        onViewTasks={() => {}}
-                        className="w-full max-w-sm"
-                      />
+                      <div 
+                        key={summary.impact} 
+                        className="w-full max-w-sm cursor-pointer transform hover:scale-105 transition-transform duration-200"
+                        onClick={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
+                      >
+                        <ImpactCard
+                          summary={summary}
+                          onViewTasks={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
+                          className="w-full"
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>

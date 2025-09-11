@@ -9,7 +9,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
-import { AIChatModal } from '@/components/ai-chat-modal';
+import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +28,7 @@ const Customers = () => {
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
   const [showAIChat, setShowAIChat] = useState(false);
+  const [chatContext, setChatContext] = useState<{level: 'overview' | 'subarea' | 'task', subArea?: string, taskTitle?: string}>({level: 'overview'});
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -174,9 +175,15 @@ const Customers = () => {
                            </div>
                            
                            <Button 
-                             onClick={() => setShowAIChat(true)}
-                             className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                             variant="outline" 
+                             size="sm" 
+                             className="w-full"
+                             onClick={() => {
+                               setChatContext({level: 'overview'});
+                               setShowAIChat(true);
+                             }}
                            >
+                             <MessageSquare className="h-4 w-4 mr-2" />
                              AI Analysis Chat - Customers Specialist
                            </Button>
                          </div>
@@ -200,7 +207,10 @@ const Customers = () => {
                          {/* AI Chat Icon for Sub-Area - Top Right */}
                          <div className="absolute top-4 right-4">
                            <AIChatIcon 
-                             onClick={() => setShowAIChat(true)}
+                             onClick={() => {
+                               setChatContext({level: 'subarea', subArea: area.title});
+                               setShowAIChat(true);
+                             }}
                              size="sm"
                            />
                          </div>
@@ -294,10 +304,13 @@ const Customers = () => {
         </div>
       </div>
       
-      <AIChatModal 
+      <EnhancedAIChatModal 
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Customers"
+        subArea={chatContext.subArea}
+        taskTitle={chatContext.taskTitle}
+        contextLevel={chatContext.level}
       />
       
       {/* Expandable Task Modal */}
