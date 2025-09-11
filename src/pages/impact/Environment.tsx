@@ -192,13 +192,13 @@ const Environment = () => {
                            </CardTitle>
                            <CardDescription>{area.description}</CardDescription>
                          </CardHeader>
-                         {/* AI Chat Icon for Sub-Area */}
-                         <div className="absolute bottom-4 right-4">
-                           <AIChatIcon 
-                             onClick={() => setShowAIChat(true)}
-                             size="sm"
-                           />
-                         </div>
+                          {/* AI Chat Icon for Sub-Area */}
+                          <div className="absolute top-4 right-4">
+                            <AIChatIcon 
+                              onClick={() => setShowAIChat(true)}
+                              size="sm"
+                            />
+                          </div>
                          <CardContent>
                            <div className="space-y-3">
                              {area.tasks.length > 0 ? (

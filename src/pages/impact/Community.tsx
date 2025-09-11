@@ -201,13 +201,13 @@ const Community = () => {
                            </CardTitle>
                            <CardDescription>{area.description}</CardDescription>
                          </CardHeader>
-                         {/* AI Chat Icon for Sub-Area */}
-                         <div className="absolute bottom-4 right-4">
-                           <AIChatIcon 
-                             onClick={() => setShowAIChat(true)}
-                             size="sm"
-                           />
-                         </div>
+                          {/* AI Chat Icon for Sub-Area */}
+                          <div className="absolute top-4 right-4">
+                            <AIChatIcon 
+                              onClick={() => setShowAIChat(true)}
+                              size="sm"
+                            />
+                          </div>
                          <CardContent>
                            <div className="space-y-3">
                              {area.tasks.length > 0 ? (
@@ -324,7 +324,9 @@ const Community = () => {
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Community"
-        context={{ level: 'overview' }}
+        context={{ 
+          level: 'overview'
+        }}
       />
       
       {/* Expandable Task Modal */}

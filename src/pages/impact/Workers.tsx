@@ -182,21 +182,21 @@ const Workers = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {workerAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <area.icon className="h-5 w-5 text-primary" />
-                            {area.title}
-                          </CardTitle>
-                          <CardDescription>{area.description}</CardDescription>
-                        </CardHeader>
-                        {/* AI Chat Icon for Sub-Area */}
-                        <div className="absolute bottom-4 right-4">
-                          <AIChatIcon 
-                            onClick={() => setShowAIChat(true)}
-                            size="sm"
-                          />
-                        </div>
+                        <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <area.icon className="h-5 w-5 text-primary" />
+                              {area.title}
+                            </CardTitle>
+                            <CardDescription>{area.description}</CardDescription>
+                          </CardHeader>
+                          {/* AI Chat Icon for Sub-Area */}
+                          <div className="absolute top-4 right-4">
+                            <AIChatIcon 
+                              onClick={() => setShowAIChat(true)}
+                              size="sm"
+                            />
+                          </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (

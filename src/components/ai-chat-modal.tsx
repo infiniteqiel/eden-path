@@ -12,6 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Send, Bot, User } from 'lucide-react';
 import { ImpactArea } from '@/domain/data-contracts';
+import { useAnalysisStore } from '@/store/analysis';
+import { useBusinessStore } from '@/store/business';
 
 interface ChatMessage {
   id: string;
@@ -32,23 +34,49 @@ interface AIChatModalProps {
 }
 
 export function AIChatModal({ isOpen, onClose, impactArea, context }: AIChatModalProps) {
+  const { impactSummaries, todos } = useAnalysisStore();
+  const { currentBusiness } = useBusinessStore();
+  
   const getContextualIntro = () => {
+    const currentSummary = impactSummaries.find(s => s.impact === impactArea);
+    const currentTodos = todos.filter(t => t.impact === impactArea);
+    const completedTodos = currentTodos.filter(t => t.status === 'done');
+    
+    const liveDataContext = currentBusiness ? 
+      `\n\nCurrent Status for ${currentBusiness.name}:
+      - ${impactArea} Progress: ${currentSummary?.pct || 0}%
+      - Tasks Completed: ${completedTodos.length}/${currentTodos.length}
+      - Business Type: ${currentBusiness.legalForm} in ${currentBusiness.country}
+      - Operating: ${currentBusiness.operatingMonths} months
+      - Team Size: ${currentBusiness.workersCount} workers` : '';
+
     if (!context) {
-      return `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area. How can I help you today?`;
+      return `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area.${liveDataContext}
+
+How can I help you today?`;
     }
 
     switch (context.level) {
       case 'overview':
-        return `Hello! I'm your ${impactArea} Impact Area Specialist. I have deep knowledge of ${impactArea} B Corp requirements and can help you understand your overall progress, identify gaps, and create action plans for this specific impact area. How can I assist you?`;
+        return `Hello! I'm your ${impactArea} Impact Area Specialist. I have deep knowledge of ${impactArea} B Corp requirements and can help you understand your overall progress, identify gaps, and create action plans for this specific impact area.${liveDataContext}
+
+How can I assist you with your ${impactArea} strategy?`;
       
       case 'subarea':
-        return `Hello! I'm your ${context.subarea} Sub-Area Specialist within ${impactArea}. I focus specifically on ${context.subarea} requirements and best practices. I can provide detailed guidance on tasks in this area and help you understand the specific B Corp standards. How can I help you with ${context.subarea}?`;
+        const subareaTitle = context.subarea || 'Sub-Area';
+        return `Hello! I'm your ${subareaTitle} Specialist within the ${impactArea} impact area. I focus specifically on ${subareaTitle} requirements and best practices within B Corp standards.${liveDataContext}
+
+I can provide detailed guidance on tasks in this area and help you understand the specific requirements. How can I help you with ${subareaTitle}?`;
       
       case 'task':
-        return `Hello! I'm your Task-Specific Assistant for "${context.taskTitle}". I'm here to provide step-by-step guidance, explain requirements, suggest implementation approaches, and help you gather the right evidence for this specific task. What would you like to know about this task?`;
+        return `Hello! I'm your Task-Specific Assistant for "${context.taskTitle}". I'm here to provide step-by-step guidance, explain requirements, suggest implementation approaches, and help you gather the right evidence for this specific task.${liveDataContext}
+
+What would you like to know about implementing this task?`;
       
       default:
-        return `Hello! I'm your AI assistant for ${impactArea} analysis. How can I help you today?`;
+        return `Hello! I'm your AI assistant for ${impactArea} analysis.${liveDataContext}
+
+How can I help you today?`;
     }
   };
 

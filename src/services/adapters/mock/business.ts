@@ -40,7 +40,7 @@ let mockBusinesses: Business[] = [
   },
   {
     id: '3',
-    accountId: 'user-1', // Account 1 - same as first business
+    accountId: 'user-3', // Account 3 - different account for proper separation
     name: 'EcoTech Innovations',
     companyNumber: '11223344',
     legalForm: 'Ltd',
