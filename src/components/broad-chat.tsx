@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import { ImpactSummary, Todo } from '@/domain/data-contracts';
 
 interface ChatMessage {
   id: string;
@@ -22,9 +23,11 @@ interface ChatMessage {
 
 interface BroadChatProps {
   className?: string;
+  impactSummaries?: ImpactSummary[];
+  todos?: Todo[];
 }
 
-export function BroadChat({ className }: BroadChatProps) {
+export function BroadChat({ className, impactSummaries = [], todos = [] }: BroadChatProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -67,11 +70,38 @@ export function BroadChat({ className }: BroadChatProps) {
 
   const handleBirdsEyeAnalysis = () => {
     setIsLoading(true);
-    // Get live data from impact summaries and todos 
-    // This will be passed in as props from the parent component
+    
+    // Generate analysis based on live data
+    const totalTodos = todos.length;
+    const completedTodos = todos.filter(t => t.status === 'done').length;
+    const priorityTodos = todos.filter(t => t.priority === 'P1' && t.status !== 'done').length;
+    const avgProgress = impactSummaries.reduce((acc, curr) => acc + curr.pct, 0) / impactSummaries.length || 0;
+    
+    let analysisContent = "🔍 **Bird's Eye View Analysis**\n\n";
+    analysisContent += `**Overall Progress:** ${avgProgress.toFixed(1)}% average across impact areas\n`;
+    analysisContent += `**Task Completion:** ${completedTodos}/${totalTodos} tasks completed (${((completedTodos/totalTodos)*100).toFixed(0)}%)\n`;
+    analysisContent += `**Priority Items:** ${priorityTodos} high-priority tasks pending\n\n`;
+    
+    analysisContent += "**Impact Area Breakdown:**\n";
+    impactSummaries.forEach(summary => {
+      const areaTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').length;
+      analysisContent += `• ${summary.impact}: ${summary.pct}% complete (${areaTodos} tasks remaining)\n`;
+    });
+    
+    analysisContent += "\n**Recommendations:**\n";
+    if (priorityTodos > 0) {
+      analysisContent += "• Focus on high-priority (P1) tasks first\n";
+    }
+    if (avgProgress < 30) {
+      analysisContent += "• Consider uploading more business documents for better analysis\n";
+    }
+    if (avgProgress > 70) {
+      analysisContent += "• Great progress! You're well on your way to B Corp readiness\n";
+    }
+    
     const analysisMessage: ChatMessage = {
       id: `analysis-${Date.now()}`,
-      content: "🔍 **Bird's Eye View Analysis**\n\nAnalyzing your live B Corp progress data...\n\nPlease connect this component to live impact data from the Dashboard to show real progress metrics.",
+      content: analysisContent,
       role: 'assistant',
       timestamp: new Date()
     };
@@ -107,7 +137,7 @@ export function BroadChat({ className }: BroadChatProps) {
   }
 
   return (
-    <Card className={`${className} flex flex-col`} style={{ minHeight: '500px', maxHeight: '600px' }}>
+    <Card className={`${className} flex flex-col max-w-full overflow-hidden`} style={{ minHeight: '500px', maxHeight: '600px' }}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg">Business Analysis Chat</CardTitle>
         <div className="flex gap-2">
@@ -132,8 +162,8 @@ export function BroadChat({ className }: BroadChatProps) {
       
       <Separator />
       
-      <CardContent className="flex-1 flex flex-col p-4">
-        <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
+      <CardContent className="flex-1 flex flex-col p-4 min-h-0 overflow-hidden">
+        <ScrollArea className="flex-1 pr-4 min-h-0" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.length === 0 && (
               <div className="text-center text-muted-foreground py-8">

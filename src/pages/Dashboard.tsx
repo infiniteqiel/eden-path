@@ -111,6 +111,14 @@ const Dashboard = () => {
           >
             <div className="ml-4 flex items-center justify-between w-full">
               <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center gap-2 md:hidden lg:flex"
+                >
+                  Dashboard
+                </Button>
                 <h1 className="font-bold text-lg">Dashboard - B Corp Progress</h1>
                 <BusinessSwitcher
                   businesses={businesses}
@@ -141,30 +149,31 @@ const Dashboard = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-4 py-8">
-              <div className="space-y-8">
+            <div className="container mx-auto px-2 md:px-4 py-4 md:py-8 max-w-full overflow-x-hidden">
+              <div className="space-y-4 md:space-y-8">
                 {currentBusiness ? (
                   <>
                      {/* Impact Cards - One Row, Square Layout */}
                     <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                      <div className="mb-6 flex items-center justify-between">
+                      <div className="mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                         <div>
-                          <h2 className="text-2xl font-bold mb-2">B Corp Progress Overview</h2>
-                          <p className="text-muted-foreground">
+                          <h2 className="text-xl md:text-2xl font-bold mb-2">B Corp Progress Overview</h2>
+                          <p className="text-muted-foreground text-sm md:text-base">
                             Track your advancement across the five key impact areas
                           </p>
                         </div>
                         {/* Upload Button - Top Right */}
                         <Button 
                           onClick={() => setUploadModalOpen(true)}
-                          className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-lg hover:shadow-xl"
+                          className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-lg hover:shadow-xl text-sm md:text-base"
                         >
                           <Upload className="w-4 h-4" />
-                          Upload Documents
+                          <span className="hidden sm:inline">Upload Documents</span>
+                          <span className="sm:hidden">Upload</span>
                         </Button>
                       </div>
                       
-                       <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
                          {impactSummaries.filter(summary => summary.impact !== 'Other').map((summary) => {
                            const impactTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').slice(0, 3);
                            

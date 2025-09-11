@@ -335,7 +335,9 @@ function AuthenticatedContent({
 
         {/* Broad Chat */}
         <div className="animate-fade-in [animation-delay:0.7s]">
-          <BroadChat />
+          <BroadChat 
+            impactSummaries={impactSummaries}
+          />
         </div>
       </div>
 

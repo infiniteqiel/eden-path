@@ -85,7 +85,17 @@ const Tasks = () => {
           >
             <SidebarTrigger />
             <div className="ml-4 flex items-center justify-between w-full">
-              <h1 className="font-bold text-lg">Tasks - B Corp Roadmap</h1>
+              <div className="flex items-center gap-4">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center gap-2 md:hidden lg:flex"
+                >
+                  Dashboard
+                </Button>
+                <h1 className="font-bold text-lg">Tasks - B Corp Roadmap</h1>
+              </div>
               <Button 
                 variant="outline" 
                 size="sm"
@@ -108,50 +118,53 @@ const Tasks = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-4 py-8 max-w-full overflow-x-hidden">
-              <div className="space-y-8">
+            <div className="container mx-auto px-2 md:px-4 py-4 md:py-8 max-w-full overflow-x-hidden">
+              <div className="space-y-4 md:space-y-8">
                 {/* Header with Actions */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6">
-                  <div className="flex items-center justify-between mb-6">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
                     <div>
-                      <h2 className="text-2xl font-bold mb-2">Task Management</h2>
-                      <p className="text-muted-foreground">
+                      <h2 className="text-xl md:text-2xl font-bold mb-2">Task Management</h2>
+                      <p className="text-muted-foreground text-sm md:text-base">
                         Track and manage your B Corp readiness tasks across all impact areas
                       </p>
                     </div>
-                    <Button onClick={handleTestReset} variant="outline">
+                    <Button onClick={handleTestReset} variant="outline" size="sm" className="text-sm">
                       <RotateCcw className="h-4 w-4 mr-2" />
-                      Reset Tasks
+                      <span className="hidden sm:inline">Reset Tasks</span>
+                      <span className="sm:hidden">Reset</span>
                     </Button>
                   </div>
 
                   {/* Filters */}
-                  <div className="flex flex-wrap gap-4">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Filter className="h-4 w-4" />
                       <span className="text-sm font-medium">Status:</span>
-                      <div className="flex gap-1">
+                      <div className="flex flex-wrap gap-1">
                         {['all', 'todo', 'in_progress', 'done', 'blocked'].map(status => (
                           <Button
                             key={status}
                             variant={filterStatus === status ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => setFilterStatus(status)}
+                            className="text-xs"
                           >
                             {status.replace('_', ' ')}
                           </Button>
                         ))}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-medium">Priority:</span>
-                      <div className="flex gap-1">
+                      <div className="flex flex-wrap gap-1">
                         {['all', 'P1', 'P2', 'P3'].map(priority => (
                           <Button
                             key={priority}
                             variant={filterPriority === priority ? 'default' : 'outline'}
                             size="sm"
                             onClick={() => setFilterPriority(priority)}
+                            className="text-xs"
                           >
                             {priority}
                           </Button>

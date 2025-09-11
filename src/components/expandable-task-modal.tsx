@@ -13,6 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { TodoItem } from '@/components/todo-item';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
+import { AITaskChat } from '@/components/ai-task-chat';
 import { Todo } from '@/domain/data-contracts';
 import { X, Upload, MessageSquare, FileText } from 'lucide-react';
 
@@ -176,38 +177,9 @@ export function ExpandableTaskModal({
                         </Button>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="flex-1 p-0 bg-white">
-                      <div className="h-[calc(100vh-280px)] flex flex-col">
-                        <ScrollArea className="flex-1 p-4 bg-gray-50 mx-3 mt-3 mb-3 rounded-lg">
-                          <div className="space-y-3">
-                            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                              <p className="text-sm text-blue-900 font-medium">
-                                AI Assistant Ready
-                              </p>
-                              <p className="text-xs text-blue-700 mt-1">
-                                I can help you understand this task: "{todo.title}", provide step-by-step guidance, and suggest best practices based on your business context.
-                              </p>
-                            </div>
-                            
-                            <div className="bg-white p-3 rounded-lg border border-gray-200">
-                              <p className="text-xs text-muted-foreground">
-                                Framework ready for NLP integration with access to:
-                              </p>
-                              <ul className="text-xs text-muted-foreground mt-1 list-disc list-inside">
-                                <li>Your uploaded documents</li>
-                                <li>B Corp knowledge base</li>
-                                <li>Task-specific guidance</li>
-                                <li>Business context & progress</li>
-                              </ul>
-                            </div>
-                          </div>
-                        </ScrollArea>
-                        
-                        <div className="border-t pt-3 px-4 pb-4 bg-white">
-                          <p className="text-xs text-muted-foreground text-center">
-                            Chat interface ready for NLP integration
-                          </p>
-                        </div>
+                    <CardContent className="flex-1 p-0 bg-white overflow-hidden">
+                      <div className="h-[calc(100vh-280px)]">
+                        <AITaskChat todo={todo} />
                       </div>
                     </CardContent>
                   </Card>
