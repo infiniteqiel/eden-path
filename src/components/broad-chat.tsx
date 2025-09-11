@@ -163,50 +163,52 @@ export function BroadChat({ className, impactSummaries = [], todos = [] }: Broad
       <Separator />
       
       <CardContent className="flex-1 flex flex-col p-4 min-h-0 overflow-hidden">
-        <ScrollArea className="flex-1 pr-4 min-h-0" ref={scrollAreaRef}>
-          <div className="space-y-4">
-            {messages.length === 0 && (
-              <div className="text-center text-muted-foreground py-8">
-                <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                <p>Start a conversation to get comprehensive business analysis</p>
-              </div>
-            )}
-            
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+        <div className="flex-1 min-h-0">
+          <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
+            <div className="space-y-4">
+              {messages.length === 0 && (
+                <div className="text-center text-muted-foreground py-8">
+                  <MessageCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p>Start a conversation to get comprehensive business analysis</p>
+                </div>
+              )}
+              
+              {messages.map((message) => (
                 <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
+                  key={message.id}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className="whitespace-pre-wrap text-sm">{message.content}</div>
-                  <div className="text-xs opacity-70 mt-1">
-                    {message.timestamp.toLocaleTimeString()}
+                  <div
+                    className={`max-w-[80%] rounded-lg p-3 ${
+                      message.role === 'user'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
+                    }`}
+                  >
+                    <div className="whitespace-pre-wrap text-sm">{message.content}</div>
+                    <div className="text-xs opacity-70 mt-1">
+                      {message.timestamp.toLocaleTimeString()}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg p-3">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse [animation-delay:0.2s]"></div>
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse [animation-delay:0.4s]"></div>
+              ))}
+              
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-muted rounded-lg p-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                      <div className="w-2 h-2 bg-primary rounded-full animate-pulse [animation-delay:0.4s]"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </ScrollArea>
+              )}
+            </div>
+          </ScrollArea>
+        </div>
         
-        <div className="flex gap-2 mt-4">
+        <div className="flex gap-2 mt-4 flex-shrink-0">
           <Input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}

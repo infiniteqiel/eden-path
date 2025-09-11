@@ -336,46 +336,69 @@ function AuthenticatedContent({
         {/* Broad Chat */}
         <div className="animate-fade-in [animation-delay:0.7s]">
           <BroadChat 
-            impactSummaries={impactSummaries}
+            className="h-[400px]"
+            impactSummaries={impactSummaries.filter(s => s.impact !== 'Other')}
+            todos={impactSummaries.reduce((acc, summary) => {
+              // Generate skeletal task data for each impact area for the chat to reference
+              const areaPercentage = summary.pct;
+              const tasksNeeded = Math.max(1, Math.floor((100 - areaPercentage) / 20));
+              
+              const skeletalTasks = Array.from({ length: tasksNeeded }, (_, i) => ({
+                id: `${summary.impact}-task-${i}`,
+                title: `${summary.impact} improvement task ${i + 1}`,
+                impact: summary.impact as any,
+                status: 'todo' as const,
+                priority: i === 0 ? 'P1' : i === 1 ? 'P2' : 'P3' as const,
+                description: `Key task to improve ${summary.impact} readiness`,
+                category: summary.impact.toLowerCase() as any,
+                estimated_hours: 2,
+                business_id: currentBusiness?.id || ''
+              }));
+              
+              return acc.concat(skeletalTasks);
+            }, [] as any[])}
           />
         </div>
       </div>
+        </div>
+      </div>
 
-        {/* Enhanced B Corp Information */}
-        <div className="mt-16 space-y-16">
-          <div>
-            <h2 className="text-3xl font-bold text-center mb-12">
-              Why Choose B Corporation Certification?
-            </h2>
-            <BCorpBenefitsSection />
-          </div>
+      {/* Enhanced B Corp Information */}
+      <div className="mt-16 space-y-16">
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Why Choose B Corporation Certification?
+          </h2>
+          <BCorpBenefitsSection />
+        </div>
 
-          {/* Additional B Corp Movement Information */}
-          <div className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-2xl p-8">
-            <div className="max-w-4xl mx-auto text-center">
-              <h3 className="text-2xl font-bold mb-6">Join the UK B Corp Movement</h3>
-              <div className="grid md:grid-cols-3 gap-6 text-sm">
-                <div className="bg-white/80 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-primary mb-2">4,000+</div>
-                  <p className="text-muted-foreground">Global B Corps across 80+ countries</p>
-                </div>
-                <div className="bg-white/80 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-primary mb-2">51%</div>
-                  <p className="text-muted-foreground">UK awareness of B Corp certification</p>
-                </div>
-                <div className="bg-white/80 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-primary mb-2">2026</div>
-                  <p className="text-muted-foreground">New enhanced standards raising the bar</p>
-                </div>
+        {/* Additional B Corp Movement Information */}
+        <div className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-2xl p-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl font-bold mb-6">Join the UK B Corp Movement</h3>
+            <div className="grid md:grid-cols-3 gap-6 text-sm">
+              <div className="bg-white/80 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary mb-2">4,000+</div>
+                <p className="text-muted-foreground">Global B Corps across 80+ countries</p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary mb-2">51%</div>
+                <p className="text-muted-foreground">UK awareness of B Corp certification</p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary mb-2">2026</div>
+                <p className="text-muted-foreground">New enhanced standards raising the bar</p>
               </div>
             </div>
           </div>
-
-          {/* Additional B Corp Content Sections */}
-          <BCorporationContentSections />
         </div>
+
+        {/* Additional B Corp Content Sections */}
+        <BCorporationContentSections />
+      </div>
     </div>
   );
+}
 }
 
 // Additional B Corp Content Sections

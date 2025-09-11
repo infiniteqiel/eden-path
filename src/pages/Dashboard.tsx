@@ -101,7 +101,7 @@ const Dashboard = () => {
         <AppSidebar />
         <div className="flex-1">
           <header 
-            className="h-16 flex items-center border-b px-4 relative overflow-hidden"
+            className="h-16 flex items-center border-b px-2 md:px-4 relative overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url(${singaporeCityscape})`,
               backgroundSize: 'cover',
@@ -109,31 +109,34 @@ const Dashboard = () => {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            <div className="ml-4 flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <div className="ml-2 md:ml-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-2 md:gap-4">
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-2 md:hidden lg:flex"
+                  className="flex items-center gap-2 text-xs md:text-sm"
                 >
                   Dashboard
                 </Button>
-                <h1 className="font-bold text-lg">Dashboard - B Corp Progress</h1>
-                <BusinessSwitcher
-                  businesses={businesses}
-                  currentBusiness={currentBusiness}
-                  onBusinessChange={(business) => selectBusiness(business.id)}
-                  onAddCompany={() => setCompanyModalOpen(true)}
-                />
+                <h1 className="font-bold text-sm md:text-lg">Dashboard - B Corp Progress</h1>
+                <div className="hidden md:block">
+                  <BusinessSwitcher
+                    businesses={businesses}
+                    currentBusiness={currentBusiness}
+                    onBusinessChange={(business) => selectBusiness(business.id)}
+                    onAddCompany={() => setCompanyModalOpen(true)}
+                  />
+                </div>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate('/')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-xs md:text-sm"
               >
-                <Home className="w-4 h-4" />
+                <Home className="w-3 h-3 md:w-4 md:h-4" />
                 Home
               </Button>
             </div>
@@ -149,8 +152,8 @@ const Dashboard = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-2 md:px-4 py-4 md:py-8 max-w-full overflow-x-hidden">
-              <div className="space-y-4 md:space-y-8">
+            <div className="container mx-auto px-3 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 w-full overflow-x-hidden">
+              <div className="space-y-4 md:space-y-6 lg:space-y-8">
                 {currentBusiness ? (
                   <>
                      {/* Impact Cards - One Row, Square Layout */}

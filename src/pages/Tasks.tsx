@@ -75,7 +75,7 @@ const Tasks = () => {
         <AppSidebar />
         <div className="flex-1">
           <header 
-            className="h-16 flex items-center border-b px-4 relative overflow-hidden"
+            className="h-16 flex items-center border-b px-2 md:px-4 relative overflow-hidden"
             style={{
               backgroundImage: `linear-gradient(rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.9)), url(${singaporeCityscape})`,
               backgroundSize: 'cover',
@@ -84,25 +84,25 @@ const Tasks = () => {
             }}
           >
             <SidebarTrigger />
-            <div className="ml-4 flex items-center justify-between w-full">
-              <div className="flex items-center gap-4">
+            <div className="ml-2 md:ml-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-2 md:gap-4">
                 <Button 
                   variant="outline" 
                   size="sm"
                   onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-2 md:hidden lg:flex"
+                  className="flex items-center gap-2 text-xs md:text-sm"
                 >
                   Dashboard
                 </Button>
-                <h1 className="font-bold text-lg">Tasks - B Corp Roadmap</h1>
+                <h1 className="font-bold text-sm md:text-lg">Tasks - B Corp Roadmap</h1>
               </div>
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => navigate('/')}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-xs md:text-sm"
               >
-                <Home className="w-4 h-4" />
+                <Home className="w-3 h-3 md:w-4 md:h-4" />
                 Home
               </Button>
             </div>
@@ -118,8 +118,8 @@ const Tasks = () => {
               backgroundAttachment: 'fixed'
             }}
           >
-            <div className="container mx-auto px-2 md:px-4 py-4 md:py-8 max-w-full overflow-x-hidden">
-              <div className="space-y-4 md:space-y-8">
+            <div className="container mx-auto px-3 md:px-6 lg:px-8 py-4 md:py-6 lg:py-8 w-full overflow-x-hidden">
+              <div className="space-y-4 md:space-y-6 lg:space-y-8">
                 {/* Header with Actions */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-4 md:p-6">
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
