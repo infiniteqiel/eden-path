@@ -148,13 +148,22 @@ const Governance = () => {
                     </div>
                     
                      <div className="space-y-4">
-                      <Button 
-                        onClick={() => setShowAIChat(true)}
-                        className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                      >
-                        AI Analysis Chat - Governance Specialist
-                      </Button>
-                    </div>
+                       <div className="bg-white/60 rounded-lg p-4">
+                         {governanceSummary && (
+                           <ImpactCard
+                             summary={governanceSummary}
+                             onViewTasks={() => setShowAIChat(true)}
+                           />
+                         )}
+                       </div>
+                       
+                       <Button 
+                         onClick={() => setShowAIChat(true)}
+                         className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                       >
+                         AI Analysis Chat - Governance Specialist
+                       </Button>
+                     </div>
                   </div>
                 </section>
 

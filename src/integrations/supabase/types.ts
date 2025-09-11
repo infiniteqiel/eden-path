@@ -86,6 +86,119 @@ export type Database = {
         }
         Relationships: []
       }
+      businesses: {
+        Row: {
+          company_number: string | null
+          country: string | null
+          created_at: string
+          id: string
+          industry: string | null
+          legal_form: string | null
+          name: string
+          operating_months: number | null
+          updated_at: string
+          user_id: string
+          workers_count: number | null
+        }
+        Insert: {
+          company_number?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          legal_form?: string | null
+          name: string
+          operating_months?: number | null
+          updated_at?: string
+          user_id: string
+          workers_count?: number | null
+        }
+        Update: {
+          company_number?: string | null
+          country?: string | null
+          created_at?: string
+          id?: string
+          industry?: string | null
+          legal_form?: string | null
+          name?: string
+          operating_months?: number | null
+          updated_at?: string
+          user_id?: string
+          workers_count?: number | null
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          impact_area: string | null
+          level: string
+          specific_area: string | null
+          task_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          impact_area?: string | null
+          level: string
+          specific_area?: string | null
+          task_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          impact_area?: string | null
+          level?: string
+          specific_area?: string | null
+          task_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       knowledge_base_documents: {
         Row: {
           content: string
@@ -122,6 +235,66 @@ export type Database = {
           requirement_codes?: string[] | null
           title?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      todos: {
+        Row: {
+          business_id: string
+          completed_at: string | null
+          created_at: string
+          description_md: string | null
+          due_date: string | null
+          effort: string
+          evidence_chunk_ids: string[] | null
+          id: string
+          impact: string
+          kb_action_id: string | null
+          owner_user_id: string | null
+          priority: string
+          requirement_code: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          completed_at?: string | null
+          created_at?: string
+          description_md?: string | null
+          due_date?: string | null
+          effort: string
+          evidence_chunk_ids?: string[] | null
+          id?: string
+          impact: string
+          kb_action_id?: string | null
+          owner_user_id?: string | null
+          priority: string
+          requirement_code?: string | null
+          status: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          completed_at?: string | null
+          created_at?: string
+          description_md?: string | null
+          due_date?: string | null
+          effort?: string
+          evidence_chunk_ids?: string[] | null
+          id?: string
+          impact?: string
+          kb_action_id?: string | null
+          owner_user_id?: string | null
+          priority?: string
+          requirement_code?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

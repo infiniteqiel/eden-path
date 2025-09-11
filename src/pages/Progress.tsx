@@ -14,7 +14,7 @@ import { Progress as ProgressBar } from '@/components/ui/progress';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
-import { TrendingUp, Target, Calendar, Award, RotateCcw } from 'lucide-react';
+import { TrendingUp, Target, Calendar, Award, RotateCcw, MessageSquare } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Progress = () => {
@@ -210,7 +210,7 @@ const Progress = () => {
 
                 {/* Next Steps */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="text-xl font-bold mb-4">Recommended Next Steps</h3>
+                   <h3 className="text-xl font-bold mb-4">Recommended Next Steps</h3>
                   <div className="space-y-4">
                     {highPriorityPending > 0 && (
                       <div className="flex items-start gap-3 p-4 bg-red-50 rounded-lg">
@@ -247,6 +247,23 @@ const Progress = () => {
                         </div>
                       </div>
                     )}
+                    
+                    <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
+                      <MessageSquare className="h-5 w-5 text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="font-medium text-blue-900">Get AI Analysis</p>
+                        <p className="text-sm text-blue-700 mb-3">
+                          Chat with our AI specialist for personalized insights and recommendations.
+                        </p>
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate('/dashboard')}
+                          className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                          Start AI Analysis Chat
+                        </Button>
+                      </div>
+                    </div>
                   </div>
                 </section>
               </div>

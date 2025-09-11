@@ -19,6 +19,8 @@ import * as MockBusiness from './adapters/mock/business';
 import * as MockRisk from './adapters/mock/risk';
 import * as MockLegal from './adapters/mock/legal';
 import * as SupabaseAuth from './adapters/supabase/auth';
+import * as SupabaseAnalysis from './adapters/supabase/analysis';
+import * as SupabaseBusiness from './adapters/supabase/business';
 
 /**
  * Service implementations registry
@@ -31,8 +33,8 @@ import * as SupabaseAuth from './adapters/supabase/auth';
  */
 export const Services = {
   files: MockFiles as IFileService,
-  analysis: MockAnalysis as IAnalysisService,
-  business: MockBusiness as IBusinessService,
+  analysis: SupabaseAnalysis as IAnalysisService,
+  business: SupabaseBusiness as IBusinessService,
   risk: MockRisk as IRiskService,
   legal: MockLegal as ILegalService,
   auth: SupabaseAuth as IAuthService,

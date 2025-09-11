@@ -37,9 +37,8 @@ export function AppSidebar() {
 
   return (
     <Sidebar className={cn(
-      isCollapsed ? "w-16" : "w-64",
-      "bg-white" // White background always
-    )} collapsible="icon">
+      isCollapsed ? "w-16" : "w-64"
+    )} collapsible="icon" style={{ backgroundColor: '#ffffff' }}>
       <SidebarContent>
         {/* Business Switcher */}
         <SidebarGroup>

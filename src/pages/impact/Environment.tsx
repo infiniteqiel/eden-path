@@ -160,28 +160,25 @@ const Environment = () => {
                         className="mt-4" 
                       />
                       
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-3"
-                        onClick={() => setShowAIChat(true)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat - Environment Specialist
-                      </Button>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div className="bg-white/60 rounded-lg p-4">
-                        {environmentSummary && (
-                          <ImpactCard
-                            summary={environmentSummary}
-                            onViewTasks={() => setShowAIChat(true)}
-                          />
-                        )}
-                      </div>
-                      
-                    </div>
+                     <div className="space-y-4">
+                       <div className="bg-white/60 rounded-lg p-4">
+                         {environmentSummary && (
+                           <ImpactCard
+                             summary={environmentSummary}
+                             onViewTasks={() => setShowAIChat(true)}
+                           />
+                         )}
+                       </div>
+                       
+                       <Button 
+                         onClick={() => setShowAIChat(true)}
+                         className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                       >
+                         AI Analysis Chat - Environment Specialist
+                       </Button>
+                     </div>
                   </div>
                 </section>
 
