@@ -205,7 +205,7 @@ function AuthenticatedContent({
       </div>
 
       {/* Two Column Layout */}
-      <div className="grid lg:grid-cols-2 gap-8">
+      <div className="grid lg:grid-cols-2 gap-8 mb-16">
         {/* Upload Area */}
         <Card>
           <CardHeader>
@@ -232,6 +232,83 @@ function AuthenticatedContent({
 
         {/* Broad Chat */}
         <BroadChat />
+      </div>
+
+      {/* Impact Cards Section */}
+      <div className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8">
+          Your B Corp Progress Overview
+        </h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <Card className="hover:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-blue-600" />
+                Governance
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="w-full bg-secondary rounded-full h-2 mb-4">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '45%' }}></div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">Mission, purpose & stakeholder governance</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/governance')}
+                className="w-full"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-green-600" />
+                Workers
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="w-full bg-secondary rounded-full h-2 mb-4">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '60%' }}></div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">Employee benefits, training & workplace culture</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/workers')}
+                className="w-full"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Building2 className="w-5 h-5 text-purple-600" />
+                Community
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="w-full bg-secondary rounded-full h-2 mb-4">
+                <div className="bg-primary h-2 rounded-full" style={{ width: '30%' }}></div>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">Local impact & supply chain responsibility</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/community')}
+                className="w-full"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
 
       {/* Animated Benefits */}
