@@ -12,6 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AppHeader } from '@/components/app-header';
 import { RotatingBCorpFacts } from '@/components/rotating-bcorp-facts';
+import signupImage from '@/assets/singapore-cityscape.jpg';
 import { useAuthStore } from '@/store/auth';
 import { Building, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';

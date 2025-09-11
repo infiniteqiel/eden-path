@@ -10,6 +10,7 @@ import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
 import { AIChatModal } from '@/components/ai-chat-modal';
+import { AIChatIcon } from '@/components/ai-chat-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -103,7 +104,7 @@ const Customers = () => {
           >
             <SidebarTrigger />
             <div className="ml-4 flex items-center gap-3">
-              <CheckSquare2 className="h-6 w-6 text-primary" />
+              <MessageCircle className="h-6 w-6 text-primary" />
               <h1 className="font-bold text-lg">Customers - Customer Impact</h1>
             </div>
           </header>
@@ -145,11 +146,6 @@ const Customers = () => {
                         value={customersSummary?.pct || 0} 
                         className="mt-4" 
                       />
-                      
-                      <Button variant="outline" size="sm" className="mt-3">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat
-                      </Button>
                     </div>
                     
                     <div className="space-y-4">
@@ -162,13 +158,11 @@ const Customers = () => {
                         )}
                       </div>
                       
-                      <Button 
+                      <AIChatIcon 
                         onClick={() => setShowAIChat(true)}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat
-                      </Button>
+                        size="lg"
+                        className="w-full"
+                      />
                     </div>
                   </div>
                 </section>
@@ -226,7 +220,7 @@ const Customers = () => {
                     </div>
                   ) : (
                     <div className="text-center py-12">
-                      <CheckSquare2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                       <p className="text-muted-foreground">No customer tasks available</p>
                       <p className="text-sm text-muted-foreground mt-2">
                         Tasks will appear here after document analysis

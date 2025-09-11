@@ -20,7 +20,7 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Upload, FileText, ArrowRight, Building, Leaf, Users, RotateCcw } from 'lucide-react';
+import { Upload, FileText, ArrowRight, Building, Leaf, Users, RotateCcw, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
@@ -110,10 +110,10 @@ const Dashboard = () => {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => window.location.href = '/'}
+                onClick={() => navigate('/')}
                 className="flex items-center gap-2"
               >
-                <Building className="w-4 h-4" />
+                <Home className="w-4 h-4" />
                 Home
               </Button>
             </div>
@@ -143,18 +143,20 @@ const Dashboard = () => {
                           </p>
                         </div>
                         {/* Small Upload Area - Top Right */}
-                        <Card className="w-64 p-3">
-                          <div className="text-center">
-                            <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-                            <p className="text-xs text-muted-foreground mb-2">Quick Upload</p>
-                            <UploadDropzone
-                              onFilesAdd={(files) => {
-                                console.log('Files uploaded:', files);
-                              }}
-                              className="min-h-[60px]"
-                            />
-                          </div>
-                        </Card>
+                         <Card className="w-64 p-3">
+                           <div className="text-center">
+                             <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                             <p className="text-xs text-muted-foreground mb-2">Quick Upload</p>
+                             <div className="h-12 flex items-center">
+                               <UploadDropzone
+                                 onFilesAdd={(files) => {
+                                   console.log('Files uploaded:', files);
+                                 }}
+                                 className="h-12 min-h-0 bg-muted/30 border-dashed border-muted-foreground/20 rounded-lg flex items-center justify-center text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
+                               />
+                             </div>
+                           </div>
+                         </Card>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
