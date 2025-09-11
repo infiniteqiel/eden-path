@@ -310,7 +310,7 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-4xl h-[700px] flex flex-col bg-white border-2 border-gray-200 shadow-2xl"
+        className="max-w-4xl h-[700px] flex flex-col bg-white border-2 border-gray-200 shadow-2xl overflow-hidden"
         data-chat-agent-id={chatAgentId}
         data-chat-context={`${impactArea}-${contextLevel}-${subArea || 'main'}`}
       >
@@ -332,12 +332,12 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex-1 flex gap-4 bg-white">
+        <div className="flex-1 flex gap-4 bg-white overflow-hidden">
           {/* Chat History Sidebar */}
           {showHistory && (
-            <div className="w-64 border-r border-gray-200 pr-4 bg-gray-50 rounded-l-lg">
+            <div className="w-64 border-r border-gray-200 pr-4 bg-gray-50 rounded-l-lg flex-shrink-0 overflow-hidden">
               <h4 className="font-medium mb-3 text-gray-900">Previous Chats</h4>
-              <ScrollArea className="h-full">
+              <ScrollArea className="h-[calc(100%-2rem)]">
                 <div className="space-y-2">
                   {sessions.map((session) => (
                     <div
@@ -360,9 +360,9 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
             </div>
           )}
 
-        <div className="flex-1 flex flex-col min-h-0 bg-white rounded-r-lg">
-            <ScrollArea className="flex-1 pr-4 bg-gray-50 rounded-lg mx-2 mt-2 p-4 max-h-[calc(100vh-280px)] overflow-y-auto">
-              <div className="space-y-4">
+          <div className="flex-1 flex flex-col min-h-0 bg-white rounded-r-lg overflow-hidden">
+            <ScrollArea className="flex-1 bg-gray-50 rounded-lg mx-2 mt-2 p-4 overflow-hidden">
+              <div className="space-y-4 pr-2">
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -422,7 +422,7 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
               </div>
             </ScrollArea>
 
-            <div className="flex gap-2 mt-4 mx-2 mb-2 bg-white p-3 border-t border-gray-200">
+            <div className="flex gap-2 mt-4 mx-2 mb-2 bg-white p-3 border-t border-gray-200 flex-shrink-0">
               <Input
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}

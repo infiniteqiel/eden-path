@@ -22,6 +22,7 @@ import { Todo } from '@/domain/data-contracts';
 import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2, MessageSquare, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { GrowTaskButton } from '@/components/grow-task-button';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Community = () => {
@@ -223,23 +224,35 @@ const Community = () => {
                               size="sm"
                             />
                           </div>
-                        <CardContent>
-                          <div className="space-y-3">
-                             {area.tasks.length > 0 ? (
-                                area.tasks.map(task => (
-                                  <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
-                                     <TodoItem
-                                       todo={task}
-                                       onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                       onUploadEvidence={() => handleUploadEvidence(task)}
-                                     />
-                                   </div>
-                                 ))
-                            ) : (
-                              <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
-                            )}
-                          </div>
-                        </CardContent>
+                         <CardContent>
+                           <div className="space-y-3">
+                              {area.tasks.length > 0 ? (
+                                 area.tasks.map(task => (
+                                   <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                      <TodoItem
+                                        todo={task}
+                                        onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                        onUploadEvidence={() => handleUploadEvidence(task)}
+                                      />
+                                    </div>
+                                  ))
+                             ) : (
+                               <div className="space-y-3">
+                                 <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
+                                 <GrowTaskButton
+                                   subArea={area.title}
+                                   impactArea="Community"
+                                   onTaskGenerated={() => {
+                                     if (currentBusiness) {
+                                       loadTodos(currentBusiness.id);
+                                       loadImpactSummaries(currentBusiness.id);
+                                     }
+                                   }}
+                                 />
+                               </div>
+                             )}
+                           </div>
+                         </CardContent>
                       </Card>
                     ))}
                   </div>

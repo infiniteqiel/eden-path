@@ -21,6 +21,7 @@ import { Todo } from '@/domain/data-contracts';
 import { Users, Heart, DollarSign, GraduationCap, CheckSquare2, MessageSquare, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { GrowTaskButton } from '@/components/grow-task-button';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Workers = () => {
@@ -229,9 +230,21 @@ const Workers = () => {
                                    />
                                  </div>
                                ))
-                            ) : (
-                              <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
-                            )}
+                             ) : (
+                               <div className="space-y-3">
+                                 <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
+                                 <GrowTaskButton
+                                   subArea={area.title}
+                                   impactArea="Workers"
+                                   onTaskGenerated={() => {
+                                     if (currentBusiness) {
+                                       loadTodos(currentBusiness.id);
+                                       loadImpactSummaries(currentBusiness.id);
+                                     }
+                                   }}
+                                 />
+                               </div>
+                             )}
                           </div>
                         </CardContent>
                       </Card>

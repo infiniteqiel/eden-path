@@ -50,7 +50,7 @@ export function ExpandableTaskModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+        <DialogContent className="max-w-6xl h-[85vh] flex flex-col bg-white">
           <DialogHeader className="flex-shrink-0">
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -78,84 +78,116 @@ export function ExpandableTaskModal({
           </DialogHeader>
 
           <div className="flex-1 overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-              {/* Main Content */}
-              <div className="lg:col-span-2 space-y-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-lg">Task Details</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <TodoItem
-                      todo={todo}
-                      onToggleStatus={onToggleStatus ? onToggleStatus : () => {}}
-                      onUploadEvidence={() => setShowEvidenceModal(true)}
-                      showImpact
-                    />
-                  </CardContent>
-                </Card>
+            <div className="h-full flex transition-all duration-300 ease-in-out">
+              {/* Task Details Container */}
+              <div 
+                className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
+                  showAIChat ? 'w-80 opacity-75' : 'flex-1'
+                }`}
+                data-container="task-details"
+              >
+                <div className="h-full overflow-hidden">
+                  <ScrollArea className="h-full pr-4">
+                    <div className="space-y-4 pb-4">
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="text-lg">Task Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <TodoItem
+                            todo={todo}
+                            onToggleStatus={onToggleStatus ? onToggleStatus : () => {}}
+                            onUploadEvidence={() => setShowEvidenceModal(true)}
+                            showImpact
+                          />
+                        </CardContent>
+                      </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <FileText className="w-4 h-4" />
-                      Description & Guidance
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ScrollArea className="h-40">
-                      <p className="text-sm text-muted-foreground">
-                        {todo.descriptionMd || 'Detailed guidance and steps for completing this task will be provided by the AI assistant. Click the AI Chat icon to get personalized recommendations based on your business context and uploaded documents.'}
-                      </p>
-                    </ScrollArea>
-                  </CardContent>
-                </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <FileText className="w-4 h-4" />
+                            Description & Guidance
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <ScrollArea className="h-32">
+                            <p className="text-sm text-muted-foreground">
+                              {todo.descriptionMd || 'Detailed guidance and steps for completing this task will be provided by the AI assistant. Click the AI Chat icon to get personalized recommendations based on your business context and uploaded documents.'}
+                            </p>
+                          </ScrollArea>
+                        </CardContent>
+                      </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Upload className="w-4 h-4" />
-                      Evidence & Documentation
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Button 
-                      onClick={() => setShowEvidenceModal(true)}
-                      variant="outline"
-                      className="w-full"
-                    >
-                      Upload Evidence
-                    </Button>
-                  </CardContent>
-                </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Upload className="w-4 h-4" />
+                            Evidence & Documentation
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-3">
+                            <Button 
+                              onClick={() => setShowEvidenceModal(true)}
+                              variant="outline"
+                              className="w-full"
+                            >
+                              Upload Evidence
+                            </Button>
+                            <div className="text-xs text-muted-foreground space-y-1">
+                              <p>• Upload supporting documents</p>
+                              <p>• Add photos or screenshots</p>
+                              <p>• Attach policy documents</p>
+                              <p>• Include certifications</p>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </ScrollArea>
+                </div>
               </div>
 
-              {/* AI Chat Sidebar */}
-              {showAIChat && (
-                <div className="lg:col-span-1 border-l pl-6">
-                  <Card className="h-full">
-                    <CardHeader className="pb-3">
+              {/* AI Chat Container */}
+              <div 
+                className={`transition-all duration-300 ease-in-out border-l border-gray-200 ${
+                  showAIChat ? 'flex-1 ml-4 opacity-100' : 'w-0 opacity-0 overflow-hidden'
+                }`}
+                data-container="ai-chat"
+              >
+                {showAIChat && (
+                  <Card className="h-full bg-white">
+                    <CardHeader className="pb-3 bg-white border-b border-gray-100">
                       <CardTitle className="flex items-center gap-2 text-base">
                         <MessageSquare className="w-4 h-4" />
                         AI Task Assistant
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => setShowAIChat(false)}
+                          className="ml-auto hover:bg-gray-100"
+                        >
+                          <X className="w-4 h-4" />
+                        </Button>
                       </CardTitle>
                     </CardHeader>
-                    <CardContent className="flex-1 p-3">
-                      <div className="h-full flex flex-col">
-                        <ScrollArea className="flex-1 mb-4">
+                    <CardContent className="flex-1 p-0 bg-white">
+                      <div className="h-[calc(100vh-280px)] flex flex-col">
+                        <ScrollArea className="flex-1 p-4 bg-gray-50 mx-3 mt-3 mb-3 rounded-lg">
                           <div className="space-y-3">
-                            <div className="bg-blue-50 p-3 rounded-lg">
+                            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
                               <p className="text-sm text-blue-900 font-medium">
                                 AI Assistant Ready
                               </p>
                               <p className="text-xs text-blue-700 mt-1">
-                                I can help you understand this task, provide step-by-step guidance, and suggest best practices based on your business context.
+                                I can help you understand this task: "{todo.title}", provide step-by-step guidance, and suggest best practices based on your business context.
                               </p>
                             </div>
                             
-                            <div className="bg-muted/50 p-3 rounded-lg">
+                            <div className="bg-white p-3 rounded-lg border border-gray-200">
                               <p className="text-xs text-muted-foreground">
-                                Framework ready for Deepseek NLP integration with access to:
+                                Framework ready for NLP integration with access to:
                               </p>
                               <ul className="text-xs text-muted-foreground mt-1 list-disc list-inside">
                                 <li>Your uploaded documents</li>
@@ -167,7 +199,7 @@ export function ExpandableTaskModal({
                           </div>
                         </ScrollArea>
                         
-                        <div className="border-t pt-3">
+                        <div className="border-t pt-3 px-4 pb-4 bg-white">
                           <p className="text-xs text-muted-foreground text-center">
                             Chat interface ready for NLP integration
                           </p>
@@ -175,8 +207,8 @@ export function ExpandableTaskModal({
                       </div>
                     </CardContent>
                   </Card>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>

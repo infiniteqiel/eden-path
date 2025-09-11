@@ -20,6 +20,7 @@ import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { CheckSquare2, Star, Shield, Users, MessageCircle, MessageSquare, Home } from 'lucide-react';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { GrowTaskButton } from '@/components/grow-task-button';
 import { useNavigate } from 'react-router-dom';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
@@ -225,9 +226,21 @@ const Customers = () => {
                                    />
                                  </div>
                                ))
-                            ) : (
-                              <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
-                            )}
+                             ) : (
+                               <div className="space-y-3">
+                                 <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
+                                 <GrowTaskButton
+                                   subArea={area.title}
+                                   impactArea="Customers"
+                                   onTaskGenerated={() => {
+                                     if (currentBusiness) {
+                                       loadTodos(currentBusiness.id);
+                                       loadImpactSummaries(currentBusiness.id);
+                                     }
+                                   }}
+                                 />
+                               </div>
+                             )}
                           </div>
                         </CardContent>
                       </Card>
