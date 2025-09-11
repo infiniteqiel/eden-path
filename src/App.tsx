@@ -15,8 +15,8 @@ import Governance from "./pages/impact/Governance";
 import Workers from "./pages/impact/Workers";
 import Community from "./pages/impact/Community";
 import Environment from "./pages/impact/Environment";
-import Other from "./pages/impact/Other";
 import Customers from "./pages/impact/Customers";
+import Other from "./pages/impact/Other";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +40,7 @@ const App = () => (
           <Route path="/impact/workers" element={<Workers />} />
           <Route path="/impact/community" element={<Community />} />
           <Route path="/impact/environment" element={<Environment />} />
+          <Route path="/impact/customers" element={<Customers />} />
           <Route path="/impact/other" element={<Other />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

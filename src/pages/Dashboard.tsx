@@ -5,7 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AppHeader } from '@/components/app-header';
 import { AppSidebar } from '@/components/app-sidebar';
 import { ImpactCard } from '@/components/impact-card';
@@ -25,6 +25,7 @@ import { AIChatIcon } from '@/components/ai-chat-icon';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   
@@ -104,7 +105,18 @@ const Dashboard = () => {
             }}
           >
             <SidebarTrigger />
-            <h1 className="ml-4 font-bold text-lg">Dashboard - B Corp Progress</h1>
+            <div className="ml-4 flex items-center justify-between w-full">
+              <h1 className="font-bold text-lg">Dashboard - B Corp Progress</h1>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => window.location.href = '/'}
+                className="flex items-center gap-2"
+              >
+                <Building className="w-4 h-4" />
+                Home
+              </Button>
+            </div>
           </header>
           
           <main 
@@ -146,16 +158,71 @@ const Dashboard = () => {
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        {impactSummaries.map((summary) => (
-                          <ImpactCard
-                            key={summary.impact}
-                            summary={summary}
-                            onViewTasks={() => {
-                              console.log(`Viewing completed tasks for ${summary.impact}`);
-                            }}
-                            className="aspect-square"
-                          />
-                        ))}
+                        {impactSummaries.map((summary) => {
+                          const impactTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').slice(0, 3);
+                          
+                          return (
+                            <Card key={summary.impact} className="aspect-square p-4 hover:shadow-lg transition-all duration-300">
+                              <div className="h-full flex flex-col">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <div className={`w-3 h-3 rounded-full ${
+                                    summary.impact === 'Governance' ? 'bg-blue-600' :
+                                    summary.impact === 'Workers' ? 'bg-green-600' :
+                                    summary.impact === 'Community' ? 'bg-orange-600' :
+                                    summary.impact === 'Environment' ? 'bg-purple-600' :
+                                    'bg-indigo-600'
+                                  }`} />
+                                  <h3 className="font-semibold text-sm">{summary.impact}</h3>
+                                </div>
+                                
+                                {/* Progress Bar */}
+                                <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                                  <div 
+                                    className={`h-2 rounded-full transition-all duration-500 ${
+                                      summary.impact === 'Governance' ? 'bg-blue-600' :
+                                      summary.impact === 'Workers' ? 'bg-green-600' :
+                                      summary.impact === 'Community' ? 'bg-orange-600' :
+                                      summary.impact === 'Environment' ? 'bg-purple-600' :
+                                      'bg-indigo-600'
+                                    }`}
+                                    style={{ width: `${summary.pct}%` }}
+                                  />
+                                </div>
+                                
+                                <div className="text-xs text-muted-foreground mb-3">
+                                  {summary.pct}% Complete
+                                </div>
+                                
+                                {/* Top Task Titles */}
+                                <div className="flex-1 space-y-1">
+                                  {impactTodos.length > 0 ? (
+                                    impactTodos.map((todo) => (
+                                      <button
+                                        key={todo.id}
+                                        onClick={() => navigate('/tasks')}
+                                        className="block w-full text-left text-xs text-muted-foreground hover:text-primary hover:bg-secondary/50 p-1 rounded transition-colors truncate"
+                                        title={todo.title}
+                                      >
+                                        • {todo.title}
+                                      </button>
+                                    ))
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground">All tasks complete! 🎉</p>
+                                  )}
+                                </div>
+                                
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
+                                  className="w-full mt-2 text-xs"
+                                >
+                                  View Details
+                                </Button>
+                              </div>
+                            </Card>
+                          );
+                        })}
                       </div>
                     </section>
 

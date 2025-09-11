@@ -204,13 +204,24 @@ function AuthenticatedContent({
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Business Switcher */}
-      <div className="mb-8">
+      {/* Business Switcher and Dashboard Link */}
+      <div className="mb-8 flex items-center justify-between">
         <BusinessSwitcher 
           businesses={businesses}
           currentBusiness={currentBusiness}
-          onBusinessChange={() => {}} 
+          onBusinessChange={(businessId) => {
+            // Business switching logic handled by BusinessSwitcher component
+            window.location.reload(); // Simple refresh to update the data
+          }} 
         />
+        <Button 
+          onClick={() => navigate('/dashboard')}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <Building2 className="w-4 h-4" />
+          Go to Dashboard
+        </Button>
       </div>
 
       {/* Impact Cards Section - Moved to Top */}
@@ -369,12 +380,35 @@ function AuthenticatedContent({
         </div>
       </div>
 
-      {/* Animated Benefits */}
-      <div className="mt-16">
-        <h2 className="text-3xl font-bold text-center mb-12">
-          Why Choose B Corporation Certification?
-        </h2>
-        <BCorpBenefitsSection />
+      {/* Enhanced B Corp Information */}
+      <div className="mt-16 space-y-16">
+        <div>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Why Choose B Corporation Certification?
+          </h2>
+          <BCorpBenefitsSection />
+        </div>
+
+        {/* Additional B Corp Movement Information */}
+        <div className="bg-gradient-to-r from-primary/10 to-secondary/20 rounded-2xl p-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl font-bold mb-6">Join the UK B Corp Movement</h3>
+            <div className="grid md:grid-cols-3 gap-6 text-sm">
+              <div className="bg-white/80 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary mb-2">4,000+</div>
+                <p className="text-muted-foreground">Global B Corps across 80+ countries</p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary mb-2">51%</div>
+                <p className="text-muted-foreground">UK awareness of B Corp certification</p>
+              </div>
+              <div className="bg-white/80 rounded-lg p-4">
+                <div className="text-2xl font-bold text-primary mb-2">2026</div>
+                <p className="text-muted-foreground">New enhanced standards raising the bar</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
