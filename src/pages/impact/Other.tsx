@@ -15,11 +15,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
+import { useNavigate } from 'react-router-dom';
 import { useDataroomStore } from '@/store/dataroom';
-import { Star, Award, ExternalLink, Plus, FolderOpen } from 'lucide-react';
+import { Star, Award, ExternalLink, Plus, FolderOpen, Home } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Other = () => {
+  const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { files, loadFiles } = useDataroomStore();
   const [showAIChat, setShowAIChat] = useState(false);
@@ -51,9 +53,20 @@ const Other = () => {
             }}
           >
             <SidebarTrigger />
-            <div className="ml-4 flex items-center gap-3">
-              <Star className="h-6 w-6 text-primary" />
-              <h1 className="font-bold text-lg">Other & Extra Benefits</h1>
+            <div className="ml-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <Star className="h-6 w-6 text-primary" />
+                <h1 className="font-bold text-lg">Other & Extra Benefits</h1>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
             </div>
           </header>
           

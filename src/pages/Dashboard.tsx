@@ -13,6 +13,7 @@ import { TodoItem } from '@/components/todo-item';
 import { EmptyState } from '@/components/empty-state';
 import { UploadDropzone } from '@/components/upload-dropzone';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
+import { UploadModal } from '@/components/upload-modal';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +28,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 const Dashboard = () => {
   const navigate = useNavigate();
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
@@ -142,89 +144,85 @@ const Dashboard = () => {
                             Track your advancement across the five key impact areas
                           </p>
                         </div>
-                        {/* Small Upload Area - Top Right */}
-                         <Card className="w-64 p-3">
-                           <div className="text-center">
-                             <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
-                             <p className="text-xs text-muted-foreground mb-2">Quick Upload</p>
-                             <div className="h-12 flex items-center">
-                               <UploadDropzone
-                                 onFilesAdd={(files) => {
-                                   console.log('Files uploaded:', files);
-                                 }}
-                                 className="h-12 min-h-0 bg-muted/30 border-dashed border-muted-foreground/20 rounded-lg flex items-center justify-center text-sm text-muted-foreground hover:bg-muted/50 transition-colors"
-                               />
-                             </div>
-                           </div>
-                         </Card>
+                        {/* Upload Button - Top Right */}
+                        <Button 
+                          onClick={() => setUploadModalOpen(true)}
+                          className="flex items-center gap-2 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 transition-all duration-300 shadow-lg hover:shadow-xl"
+                        >
+                          <Upload className="w-4 h-4" />
+                          Upload Documents
+                        </Button>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        {impactSummaries.map((summary) => {
-                          const impactTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').slice(0, 3);
-                          
-                          return (
-                            <Card key={summary.impact} className="aspect-square p-4 hover:shadow-lg transition-all duration-300">
-                              <div className="h-full flex flex-col">
-                                <div className="flex items-center gap-2 mb-3">
-                                  <div className={`w-3 h-3 rounded-full ${
-                                    summary.impact === 'Governance' ? 'bg-blue-600' :
-                                    summary.impact === 'Workers' ? 'bg-green-600' :
-                                    summary.impact === 'Community' ? 'bg-orange-600' :
-                                    summary.impact === 'Environment' ? 'bg-purple-600' :
-                                    'bg-indigo-600'
-                                  }`} />
-                                  <h3 className="font-semibold text-sm">{summary.impact}</h3>
-                                </div>
-                                
-                                {/* Progress Bar */}
-                                <div className="w-full bg-secondary rounded-full h-2 mb-3">
-                                  <div 
-                                    className={`h-2 rounded-full transition-all duration-500 ${
-                                      summary.impact === 'Governance' ? 'bg-blue-600' :
-                                      summary.impact === 'Workers' ? 'bg-green-600' :
-                                      summary.impact === 'Community' ? 'bg-orange-600' :
-                                      summary.impact === 'Environment' ? 'bg-purple-600' :
-                                      'bg-indigo-600'
-                                    }`}
-                                    style={{ width: `${summary.pct}%` }}
-                                  />
-                                </div>
-                                
-                                <div className="text-xs text-muted-foreground mb-3">
-                                  {summary.pct}% Complete
-                                </div>
-                                
-                                {/* Top Task Titles */}
-                                <div className="flex-1 space-y-1">
-                                  {impactTodos.length > 0 ? (
-                                    impactTodos.map((todo) => (
-                                      <button
-                                        key={todo.id}
-                                        onClick={() => navigate('/tasks')}
-                                        className="block w-full text-left text-xs text-muted-foreground hover:text-primary hover:bg-secondary/50 p-1 rounded transition-colors truncate"
-                                        title={todo.title}
-                                      >
-                                        • {todo.title}
-                                      </button>
-                                    ))
-                                  ) : (
-                                    <p className="text-xs text-muted-foreground">All tasks complete! 🎉</p>
-                                  )}
-                                </div>
-                                
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  onClick={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
-                                  className="w-full mt-2 text-xs"
-                                >
-                                  View Details
-                                </Button>
-                              </div>
-                            </Card>
-                          );
-                        })}
+                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                         {impactSummaries.map((summary) => {
+                           const impactTodos = todos.filter(t => t.impact === summary.impact && t.status !== 'done').slice(0, 3);
+                           
+                           return (
+                             <Card key={summary.impact} className="aspect-square p-4 hover:shadow-xl hover:shadow-primary/20 hover:scale-105 transition-all duration-300 border border-muted hover:border-primary/30 bg-gradient-to-br from-white to-white/50">
+                               <div className="h-full flex flex-col">
+                                 <div className="flex items-center gap-2 mb-3">
+                                   <div className={`w-3 h-3 rounded-full ${
+                                     summary.impact === 'Governance' ? 'bg-blue-600' :
+                                     summary.impact === 'Workers' ? 'bg-green-600' :
+                                     summary.impact === 'Community' ? 'bg-orange-600' :
+                                     summary.impact === 'Environment' ? 'bg-purple-600' :
+                                     'bg-indigo-600'
+                                   }`} />
+                                   <h3 className="font-semibold text-sm">{summary.impact}</h3>
+                                 </div>
+                                 
+                                 {/* Progress Bar */}
+                                 <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                                   <div 
+                                     className={`h-2 rounded-full transition-all duration-500 ${
+                                       summary.impact === 'Governance' ? 'bg-blue-600' :
+                                       summary.impact === 'Workers' ? 'bg-green-600' :
+                                       summary.impact === 'Community' ? 'bg-orange-600' :
+                                       summary.impact === 'Environment' ? 'bg-purple-600' :
+                                       'bg-indigo-600'
+                                     }`}
+                                     style={{ width: `${summary.pct}%` }}
+                                   />
+                                 </div>
+                                 
+                                 <div className="text-xs text-muted-foreground mb-3">
+                                   {summary.pct}% Complete
+                                 </div>
+                                 
+                                 {/* Top Task Titles */}
+                                 <div className="flex-1 space-y-1">
+                                   {impactTodos.length > 0 ? (
+                                     impactTodos.map((todo) => (
+                                       <button
+                                         key={todo.id}
+                                         onClick={() => navigate('/tasks')}
+                                         className="block w-full text-left text-xs text-muted-foreground hover:text-primary hover:bg-secondary/50 p-1 rounded transition-colors truncate"
+                                         title={todo.title}
+                                       >
+                                         • {todo.title}
+                                       </button>
+                                     ))
+                                   ) : (
+                                     <p className="text-xs text-muted-foreground">All tasks complete! 🎉</p>
+                                   )}
+                                 </div>
+                                 
+                                 <Button 
+                                   variant="outline" 
+                                   size="sm" 
+                                   onClick={() => {
+                                     const route = summary.impact === 'Other' ? '/impact/other' : `/impact/${summary.impact.toLowerCase()}`;
+                                     navigate(route);
+                                   }}
+                                   className="w-full mt-2 text-xs hover:bg-gradient-to-r hover:from-primary/10 hover:to-primary/5 transition-all duration-300"
+                                 >
+                                   View Details
+                                 </Button>
+                               </div>
+                             </Card>
+                           );
+                         })}
                       </div>
                     </section>
 
@@ -316,6 +314,15 @@ const Dashboard = () => {
             todo={selectedTodo}
           />
         )}
+        
+        {/* Upload Modal */}
+        <UploadModal
+          isOpen={uploadModalOpen}
+          onClose={() => setUploadModalOpen(false)}
+          onFilesAdd={(files) => {
+            console.log('Files uploaded:', files);
+          }}
+        />
       </SidebarProvider>
     );
   };

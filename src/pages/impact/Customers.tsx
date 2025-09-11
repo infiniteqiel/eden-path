@@ -18,13 +18,17 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { CheckSquare2, Star, Shield, Users, MessageCircle, MessageSquare } from 'lucide-react';
+import { CheckSquare2, Star, Shield, Users, MessageCircle, MessageSquare, Home } from 'lucide-react';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { useNavigate } from 'react-router-dom';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Customers = () => {
+  const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
   const [showAIChat, setShowAIChat] = useState(false);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -103,9 +107,20 @@ const Customers = () => {
             }}
           >
             <SidebarTrigger />
-            <div className="ml-4 flex items-center gap-3">
-              <MessageCircle className="h-6 w-6 text-primary" />
-              <h1 className="font-bold text-lg">Customers - Customer Impact</h1>
+            <div className="ml-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <MessageCircle className="h-6 w-6 text-primary" />
+                <h1 className="font-bold text-lg">Customers - Customer Impact</h1>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
             </div>
           </header>
           
@@ -157,12 +172,6 @@ const Customers = () => {
                           />
                         )}
                       </div>
-                      
-                      <AIChatIcon 
-                        onClick={() => setShowAIChat(true)}
-                        size="lg"
-                        className="w-full"
-                      />
                     </div>
                   </div>
                 </section>
@@ -173,7 +182,7 @@ const Customers = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {customerAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60">
+                      <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <area.icon className="h-5 w-5 text-primary" />
@@ -181,15 +190,29 @@ const Customers = () => {
                           </CardTitle>
                           <CardDescription>{area.description}</CardDescription>
                         </CardHeader>
+                        {/* AI Chat Icon for Sub-Area */}
+                        <div className="absolute bottom-4 right-4">
+                          <AIChatIcon 
+                            onClick={() => setShowAIChat(true)}
+                            size="sm"
+                          />
+                        </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3">
+                                <div key={task.id} className="bg-white/80 rounded p-3 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
                                   <TodoItem
                                     todo={task}
                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
                                   />
+                                  {/* AI Chat Icon for Task */}
+                                  <div className="absolute bottom-2 right-2">
+                                    <AIChatIcon 
+                                      onClick={() => setShowAIChat(true)}
+                                      size="sm"
+                                    />
+                                  </div>
                                 </div>
                               ))
                             ) : (
@@ -206,19 +229,26 @@ const Customers = () => {
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-6">All Customer Tasks</h3>
                   
-                  {customersTodos.length > 0 ? (
-                    <div className="space-y-4">
-                      {customersTodos.map(todo => (
-                        <div key={todo.id} className="bg-white/60 rounded-lg p-4">
-                          <TodoItem
-                            todo={todo}
-                            onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                            showImpact={false}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
+                   {customersTodos.length > 0 ? (
+                     <div className="space-y-4">
+                       {customersTodos.map(todo => (
+                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
+                           <TodoItem
+                             todo={todo}
+                             onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
+                             showImpact={false}
+                           />
+                           {/* AI Chat Icon for Task */}
+                           <div className="absolute bottom-2 right-2">
+                             <AIChatIcon 
+                               onClick={() => setShowAIChat(true)}
+                               size="sm"
+                             />
+                           </div>
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
                     <div className="text-center py-12">
                       <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                       <p className="text-muted-foreground">No customer tasks available</p>
@@ -276,6 +306,16 @@ const Customers = () => {
         onClose={() => setShowAIChat(false)}
         impactArea="Customers"
       />
+      
+      {/* Expandable Task Modal */}
+      {expandedTaskId && (
+        <ExpandableTaskModal
+          isOpen={true}
+          todo={customersTodos.find(t => t.id === expandedTaskId)!}
+          onClose={() => setExpandedTaskId(null)}
+          onToggleStatus={(status) => handleTodoToggle(expandedTaskId, status)}
+        />
+      )}
     </SidebarProvider>
   );
 };

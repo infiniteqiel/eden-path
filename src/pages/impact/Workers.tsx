@@ -17,13 +17,18 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
-import { Users, Heart, DollarSign, GraduationCap, CheckSquare2, MessageSquare } from 'lucide-react';
+import { Users, Heart, DollarSign, GraduationCap, CheckSquare2, MessageSquare, Home } from 'lucide-react';
+import { AIChatIcon } from '@/components/ai-chat-icon';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { useNavigate } from 'react-router-dom';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Workers = () => {
+  const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
   const [showAIChat, setShowAIChat] = useState(false);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -102,9 +107,20 @@ const Workers = () => {
             }}
           >
             <SidebarTrigger />
-            <div className="ml-4 flex items-center gap-3">
-              <Users className="h-6 w-6 text-primary" />
-              <h1 className="font-bold text-lg">Workers - Employee Impact</h1>
+            <div className="ml-4 flex items-center justify-between w-full">
+              <div className="flex items-center gap-3">
+                <Users className="h-6 w-6 text-primary" />
+                <h1 className="font-bold text-lg">Workers - Employee Impact</h1>
+              </div>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2"
+              >
+                <Home className="w-4 h-4" />
+                Home
+              </Button>
             </div>
           </header>
           
