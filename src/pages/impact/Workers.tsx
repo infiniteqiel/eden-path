@@ -161,16 +161,6 @@ const Workers = () => {
                         value={workersSummary?.pct || 0} 
                         className="mt-4" 
                       />
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-3"
-                        onClick={() => setShowAIChat(true)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat - Workers Specialist
-                      </Button>
                     </div>
                     
                     <div className="space-y-4">
@@ -182,14 +172,6 @@ const Workers = () => {
                           />
                         )}
                       </div>
-                      
-                      <Button 
-                        onClick={() => setShowAIChat(true)}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat
-                      </Button>
                     </div>
                   </div>
                 </section>
@@ -200,7 +182,7 @@ const Workers = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {workerAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60">
+                      <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <area.icon className="h-5 w-5 text-primary" />
@@ -208,11 +190,18 @@ const Workers = () => {
                           </CardTitle>
                           <CardDescription>{area.description}</CardDescription>
                         </CardHeader>
+                        {/* AI Chat Icon for Sub-Area */}
+                        <div className="absolute bottom-4 right-4">
+                          <AIChatIcon 
+                            onClick={() => setShowAIChat(true)}
+                            size="sm"
+                          />
+                        </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3">
+                                <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
                                   <TodoItem
                                     todo={task}
                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
@@ -244,7 +233,7 @@ const Workers = () => {
                   {workersTodos.length > 0 ? (
                     <div className="space-y-4">
                       {workersTodos.map(todo => (
-                        <div key={todo.id} className="bg-white/60 rounded-lg p-4">
+                        <div key={todo.id} className="bg-white/60 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
                           <TodoItem
                             todo={todo}
                             onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
@@ -310,7 +299,18 @@ const Workers = () => {
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Workers"
+        context={{ level: 'overview' }}
       />
+      
+      {/* Expandable Task Modal */}
+      {expandedTaskId && (
+        <ExpandableTaskModal
+          isOpen={true}
+          todo={workersTodos.find(t => t.id === expandedTaskId)!}
+          onClose={() => setExpandedTaskId(null)}
+          onToggleStatus={(status) => handleTodoToggle(expandedTaskId, status)}
+        />
+      )}
     </SidebarProvider>
   );
 };

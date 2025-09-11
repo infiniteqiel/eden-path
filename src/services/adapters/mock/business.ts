@@ -5,7 +5,7 @@
 import { Business, Account } from '@/domain/data-contracts';
 import { IBusinessService } from '@/services/ports/business';
 
-// Mock data
+// Mock data - simulating different accounts
 const mockAccount: Account = {
   id: 'user-1',
   name: 'Sarah Mitchell',
@@ -16,7 +16,7 @@ const mockAccount: Account = {
 let mockBusinesses: Business[] = [
   {
     id: '1',
-    accountId: 'user-1',
+    accountId: 'user-1', // Account 1
     name: 'TechCorp Solutions Ltd',
     companyNumber: '12345678',
     legalForm: 'Ltd',
@@ -28,7 +28,7 @@ let mockBusinesses: Business[] = [
   },
   {
     id: '2',
-    accountId: 'user-1',
+    accountId: 'user-2', // Account 2 - different account
     name: 'GreenSpace Consulting',
     companyNumber: '87654321',
     legalForm: 'Ltd',
@@ -37,6 +37,18 @@ let mockBusinesses: Business[] = [
     workersCount: 8,
     industry: 'Environmental Consulting',
     createdAt: '2024-06-15T00:00:00Z'
+  },
+  {
+    id: '3',
+    accountId: 'user-1', // Account 1 - same as first business
+    name: 'EcoTech Innovations',
+    companyNumber: '11223344',
+    legalForm: 'Ltd',
+    country: 'UK',
+    operatingMonths: 24,
+    workersCount: 12,
+    industry: 'CleanTech',
+    createdAt: '2024-03-15T00:00:00Z'
   }
 ];
 

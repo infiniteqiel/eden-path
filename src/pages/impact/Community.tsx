@@ -20,6 +20,8 @@ import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2, MessageSquare, Home } from 'lucide-react';
+import { AIChatIcon } from '@/components/ai-chat-icon';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Community = () => {
@@ -27,6 +29,7 @@ const Community = () => {
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
@@ -168,15 +171,6 @@ const Community = () => {
                         className="mt-4" 
                       />
                       
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-3"
-                        onClick={() => setShowAIChat(true)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat - Community Specialist
-                      </Button>
                     </div>
                     
                     <div className="space-y-4">
@@ -197,36 +191,43 @@ const Community = () => {
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-6">Community Impact Areas</h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {communityAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <area.icon className="h-5 w-5 text-primary" />
-                            {area.title}
-                          </CardTitle>
-                          <CardDescription>{area.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
-                            {area.tasks.length > 0 ? (
-                              area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3">
-                                   <TodoItem
-                                     todo={task}
-                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                     onUploadEvidence={() => handleUploadEvidence(task)}
-                                   />
-                                </div>
-                              ))
-                            ) : (
-                              <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     {communityAreas.map((area) => (
+                       <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
+                         <CardHeader>
+                           <CardTitle className="flex items-center gap-2">
+                             <area.icon className="h-5 w-5 text-primary" />
+                             {area.title}
+                           </CardTitle>
+                           <CardDescription>{area.description}</CardDescription>
+                         </CardHeader>
+                         {/* AI Chat Icon for Sub-Area */}
+                         <div className="absolute bottom-4 right-4">
+                           <AIChatIcon 
+                             onClick={() => setShowAIChat(true)}
+                             size="sm"
+                           />
+                         </div>
+                         <CardContent>
+                           <div className="space-y-3">
+                             {area.tasks.length > 0 ? (
+                               area.tasks.map(task => (
+                                 <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                    <TodoItem
+                                      todo={task}
+                                      onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                      onUploadEvidence={() => handleUploadEvidence(task)}
+                                    />
+                                 </div>
+                               ))
+                             ) : (
+                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
+                             )}
+                           </div>
+                         </CardContent>
+                       </Card>
+                     ))}
+                   </div>
                 </section>
 
                 {/* Community Documents */}
@@ -241,20 +242,20 @@ const Community = () => {
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                   <h3 className="text-xl font-bold mb-6">All Community Tasks</h3>
                   
-                  {communityTodos.length > 0 ? (
-                    <div className="space-y-4">
-                      {communityTodos.map(todo => (
-                        <div key={todo.id} className="bg-white/60 rounded-lg p-4">
-                           <TodoItem
-                             todo={todo}
-                             onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                             onUploadEvidence={() => handleUploadEvidence(todo)}
-                             showImpact={false}
-                           />
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
+                   {communityTodos.length > 0 ? (
+                     <div className="space-y-4">
+                       {communityTodos.map(todo => (
+                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
+                            <TodoItem
+                              todo={todo}
+                              onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
+                              onUploadEvidence={() => handleUploadEvidence(todo)}
+                              showImpact={false}
+                            />
+                         </div>
+                       ))}
+                     </div>
+                   ) : (
                     <div className="text-center py-12">
                       <CheckSquare2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
                       <p className="text-muted-foreground">No community tasks available</p>
@@ -323,7 +324,18 @@ const Community = () => {
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Community"
+        context={{ level: 'overview' }}
       />
+      
+      {/* Expandable Task Modal */}
+      {expandedTaskId && (
+        <ExpandableTaskModal
+          isOpen={true}
+          todo={communityTodos.find(t => t.id === expandedTaskId)!}
+          onClose={() => setExpandedTaskId(null)}
+          onToggleStatus={(status) => handleTodoToggle(expandedTaskId, status)}
+        />
+      )}
     </SidebarProvider>
   );
 };

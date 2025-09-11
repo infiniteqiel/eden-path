@@ -24,14 +24,39 @@ interface AIChatModalProps {
   isOpen: boolean;
   onClose: () => void;
   impactArea: ImpactArea;
+  context?: {
+    level: 'overview' | 'subarea' | 'task';
+    subarea?: string;
+    taskTitle?: string;
+  };
 }
 
-export function AIChatModal({ isOpen, onClose, impactArea }: AIChatModalProps) {
+export function AIChatModal({ isOpen, onClose, impactArea, context }: AIChatModalProps) {
+  const getContextualIntro = () => {
+    if (!context) {
+      return `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area. How can I help you today?`;
+    }
+
+    switch (context.level) {
+      case 'overview':
+        return `Hello! I'm your ${impactArea} Impact Area Specialist. I have deep knowledge of ${impactArea} B Corp requirements and can help you understand your overall progress, identify gaps, and create action plans for this specific impact area. How can I assist you?`;
+      
+      case 'subarea':
+        return `Hello! I'm your ${context.subarea} Sub-Area Specialist within ${impactArea}. I focus specifically on ${context.subarea} requirements and best practices. I can provide detailed guidance on tasks in this area and help you understand the specific B Corp standards. How can I help you with ${context.subarea}?`;
+      
+      case 'task':
+        return `Hello! I'm your Task-Specific Assistant for "${context.taskTitle}". I'm here to provide step-by-step guidance, explain requirements, suggest implementation approaches, and help you gather the right evidence for this specific task. What would you like to know about this task?`;
+      
+      default:
+        return `Hello! I'm your AI assistant for ${impactArea} analysis. How can I help you today?`;
+    }
+  };
+
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       role: 'assistant',
-      content: `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area. How can I help you today?`,
+      content: getContextualIntro(),
       timestamp: new Date()
     }
   ]);
@@ -86,7 +111,9 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-green-600" />
-            AI Analysis Chat - {impactArea}
+            {context?.level === 'task' ? `Task Assistant - ${context.taskTitle}` : 
+             context?.level === 'subarea' ? `${context.subarea} Specialist` :
+             `AI Analysis Chat - ${impactArea}`}
             <Badge variant="outline" className="ml-auto">
               Beta
             </Badge>

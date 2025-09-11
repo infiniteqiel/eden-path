@@ -298,6 +298,7 @@ const Governance = () => {
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Governance"
+        context={{ level: 'overview' }}
       />
       
       {/* Expandable Task Modal */}

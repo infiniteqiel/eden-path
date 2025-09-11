@@ -201,19 +201,12 @@ const Customers = () => {
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
-                                  <TodoItem
-                                    todo={task}
-                                    onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                  />
-                                  {/* AI Chat Icon for Task */}
-                                  <div className="absolute bottom-2 right-2">
-                                    <AIChatIcon 
-                                      onClick={() => setShowAIChat(true)}
-                                      size="sm"
-                                    />
-                                  </div>
-                                </div>
+                                 <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                   <TodoItem
+                                     todo={task}
+                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                   />
+                                 </div>
                               ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
@@ -305,6 +298,7 @@ const Customers = () => {
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Customers"
+        context={{ level: 'overview' }}
       />
       
       {/* Expandable Task Modal */}
