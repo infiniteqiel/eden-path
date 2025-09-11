@@ -5,7 +5,7 @@
  * The UI layer imports ONLY from here to maintain clean separation.
  */
 
-export type ImpactArea = 'Governance' | 'Workers' | 'Community' | 'Environment' | 'Customers';
+export type ImpactArea = 'Governance' | 'Workers' | 'Community' | 'Environment' | 'Customers' | 'Other';
 
 export type TodoStatus = 'todo' | 'in_progress' | 'blocked' | 'done';
 export type TodoPriority = 'P1' | 'P2' | 'P3';
