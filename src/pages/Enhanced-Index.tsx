@@ -360,8 +360,6 @@ function AuthenticatedContent({
           />
         </div>
       </div>
-        </div>
-      </div>
 
       {/* Enhanced B Corp Information */}
       <div className="mt-16 space-y-16">
@@ -398,7 +396,6 @@ function AuthenticatedContent({
       </div>
     </div>
   );
-}
 }
 
 // Additional B Corp Content Sections

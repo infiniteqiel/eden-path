@@ -114,14 +114,14 @@ export function OptimizedExpandableTaskModal({
                             <div>
                               <h4 className="font-medium mb-2">Description</h4>
                               <p className="text-sm text-muted-foreground">
-                                {todo.description}
+                                {todo.descriptionMd || "No description available"}
                               </p>
                             </div>
                             
                             <div>
-                              <h4 className="font-medium mb-2">Estimated Time</h4>
+                              <h4 className="font-medium mb-2">Priority & Status</h4>
                               <p className="text-sm text-muted-foreground">
-                                {todo.estimated_hours} hours
+                                Priority: {todo.priority} | Status: {todo.status.replace('_', ' ')}
                               </p>
                             </div>
                           </div>
