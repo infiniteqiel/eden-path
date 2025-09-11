@@ -15,6 +15,7 @@ import { UploadDropzone } from '@/components/upload-dropzone';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { UploadModal } from '@/components/upload-modal';
 import { BusinessSwitcher } from '@/components/business-switcher';
+import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,6 +31,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
   const [uploadModalOpen, setUploadModalOpen] = React.useState(false);
+  const [companyModalOpen, setCompanyModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
@@ -110,13 +112,12 @@ const Dashboard = () => {
             <div className="ml-4 flex items-center justify-between w-full">
               <div className="flex items-center gap-4">
                 <h1 className="font-bold text-lg">Dashboard - B Corp Progress</h1>
-                {businesses.length > 0 && (
-                  <BusinessSwitcher
-                    businesses={businesses}
-                    currentBusiness={currentBusiness}
-                    onBusinessChange={(business) => selectBusiness(business.id)}
-                  />
-                )}
+                <BusinessSwitcher
+                  businesses={businesses}
+                  currentBusiness={currentBusiness}
+                  onBusinessChange={(business) => selectBusiness(business.id)}
+                  onAddCompany={() => setCompanyModalOpen(true)}
+                />
               </div>
               <Button 
                 variant="outline" 
@@ -379,6 +380,11 @@ const Dashboard = () => {
           onFilesAdd={(files) => {
             console.log('Files uploaded:', files);
           }}
+        />
+        
+        <CompanyCreationModal
+          open={companyModalOpen}
+          onClose={() => setCompanyModalOpen(false)}
         />
       </SidebarProvider>
     );

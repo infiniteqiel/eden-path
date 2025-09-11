@@ -158,10 +158,23 @@ const Workers = () => {
                         </div>
                       </div>
                       
-                      <Progress 
+                       <Progress 
                         value={workersSummary?.pct || 0} 
                         className="mt-4" 
                       />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mt-4"
+                        onClick={() => {
+                          setChatContext({level: 'overview'});
+                          setShowAIChat(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat - Workers Specialist
+                      </Button>
                     </div>
                     
                     <div className="space-y-4">
@@ -173,16 +186,6 @@ const Workers = () => {
                           />
                         )}
                       </div>
-                      
-                        <Button 
-                         onClick={() => {
-                           setChatContext({level: 'overview'});
-                           setShowAIChat(true);
-                         }}
-                         className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                       >
-                         AI Analysis Chat - Workers Specialist
-                       </Button>
                     </div>
                   </div>
                 </section>

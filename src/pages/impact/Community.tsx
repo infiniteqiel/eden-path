@@ -167,36 +167,35 @@ const Community = () => {
                         </div>
                       </div>
                       
-                      <Progress 
+                       <Progress 
                         value={communitySummary?.pct || 0} 
                         className="mt-4" 
                       />
                       
-                       <Button 
-                         variant="outline" 
-                         size="sm" 
-                         className="mt-3"
-                         onClick={() => {
-                           setChatContext({level: 'overview'});
-                           setShowAIChat(true);
-                         }}
-                       >
-                         <MessageSquare className="h-4 w-4 mr-2" />
-                         AI Analysis Chat - Community Specialist
-                       </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mt-4"
+                        onClick={() => {
+                          setChatContext({level: 'overview'});
+                          setShowAIChat(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat - Community Specialist
+                      </Button>
                     </div>
                     
-                    <div className="space-y-4">
-                      <div className="bg-white/60 rounded-lg p-4">
-                        {communitySummary && (
-                          <ImpactCard
-                            summary={communitySummary}
-                            onViewTasks={() => setShowAIChat(true)}
-                          />
-                        )}
-                      </div>
-                      
-                    </div>
+                     <div className="space-y-4">
+                       <div className="bg-white/60 rounded-lg p-4">
+                         {communitySummary && (
+                           <ImpactCard
+                             summary={communitySummary}
+                             onViewTasks={() => setShowAIChat(true)}
+                           />
+                         )}
+                       </div>
+                     </div>
                   </div>
                 </section>
 

@@ -5,12 +5,13 @@ import { AppHeader } from "@/components/app-header";
 import { ImpactCard } from "@/components/impact-card";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { BusinessSwitcher } from "@/components/business-switcher";
+import { CompanyCreationModal } from "@/components/company-creation-modal";
 import { useAuthStore } from "@/store/auth";
 import { useBusinessStore } from "@/store/business";
 import { useAnalysisStore } from "@/store/analysis";
 import { useDataroomStore } from "@/store/dataroom";
 import { FileText, CheckSquare, Scale, ArrowRight, Shield, Users, Target, Building, Leaf } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 import legalProtectionImage from '@/assets/legal-protection-singapore.jpg';
 import stakeholderTrustImage from '@/assets/stakeholder-trust-singapore.jpg';
@@ -22,6 +23,7 @@ const Index = () => {
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
   const { impactSummaries, loadImpactSummaries } = useAnalysisStore();
   const { uploadFile } = useDataroomStore();
+  const [companyModalOpen, setCompanyModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -69,15 +71,14 @@ const Index = () => {
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
                 Transform your business into a force for good. Track your progress toward B Corporation certification with our comprehensive readiness platform.
               </p>
-              {businesses.length > 0 && (
-                <div className="inline-block">
-                  <BusinessSwitcher
-                    businesses={businesses}
-                    currentBusiness={currentBusiness}
-                    onBusinessChange={(business) => selectBusiness(business.id)}
-                  />
-                </div>
-              )}
+              <div className="inline-block">
+                <BusinessSwitcher
+                  businesses={businesses}
+                  currentBusiness={currentBusiness}
+                  onBusinessChange={(business) => selectBusiness(business.id)}
+                  onAddCompany={() => setCompanyModalOpen(true)}
+                />
+              </div>
             </div>
 
             {/* Progress Overview on Hero */}
@@ -312,6 +313,7 @@ const Index = () => {
 
   // Public home page
   return (
+    <>
     <div className="min-h-screen bg-background">
       <AppHeader mode="public" />
       
@@ -425,6 +427,12 @@ const Index = () => {
         </div>
       </main>
     </div>
+    
+    <CompanyCreationModal
+      open={companyModalOpen}
+      onClose={() => setCompanyModalOpen(false)}
+    />
+    </>
   );
 };
 

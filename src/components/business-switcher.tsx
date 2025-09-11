@@ -20,6 +20,7 @@ interface BusinessSwitcherProps {
   businesses: Business[];
   currentBusiness: Business | null;
   onBusinessChange: (business: Business) => void;
+  onAddCompany?: () => void;
   disabled?: boolean;
 }
 
@@ -27,26 +28,9 @@ export function BusinessSwitcher({
   businesses, 
   currentBusiness, 
   onBusinessChange,
+  onAddCompany,
   disabled = false
 }: BusinessSwitcherProps) {
-  if (businesses.length === 0) {
-    return (
-      <div className="flex items-center space-x-2 text-muted-foreground text-sm">
-        <Building2 className="h-4 w-4" />
-        <span>No businesses</span>
-      </div>
-    );
-  }
-
-  if (businesses.length === 1) {
-    return (
-      <div className="flex items-center space-x-2">
-        <Building2 className="h-4 w-4 text-muted-foreground" />
-        <span className="font-medium text-sm">{businesses[0].name}</span>
-      </div>
-    );
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -64,28 +48,35 @@ export function BusinessSwitcher({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64 bg-white z-50">
-        {businesses.map((business) => (
-          <DropdownMenuItem
-            key={business.id}
-            onClick={() => onBusinessChange(business)}
-            className="flex items-center justify-between"
-          >
-            <div className="flex flex-col">
-              <span className="font-medium">{business.name}</span>
-              {business.companyNumber && (
-                <span className="text-xs text-muted-foreground">
-                  {business.companyNumber}
-                </span>
+        {businesses.length > 0 ? (
+          businesses.map((business) => (
+            <DropdownMenuItem
+              key={business.id}
+              onClick={() => onBusinessChange(business)}
+              className="flex items-center justify-between"
+            >
+              <div className="flex flex-col">
+                <span className="font-medium">{business.name}</span>
+                {business.companyNumber && (
+                  <span className="text-xs text-muted-foreground">
+                    {business.companyNumber}
+                  </span>
+                )}
+              </div>
+              {currentBusiness?.id === business.id && (
+                <Check className="h-4 w-4 text-primary" />
               )}
-            </div>
-            {currentBusiness?.id === business.id && (
-              <Check className="h-4 w-4 text-primary" />
-            )}
+            </DropdownMenuItem>
+          ))
+        ) : (
+          <DropdownMenuItem disabled className="text-muted-foreground">
+            No businesses yet
           </DropdownMenuItem>
-        ))}
+        )}
+        {businesses.length > 0 && <div className="border-t border-border my-1" />}
         <DropdownMenuItem
-          onClick={() => console.log('Add new company')}
-          className="flex items-center gap-2 border-t border-border mt-1 pt-2"
+          onClick={onAddCompany}
+          className="flex items-center gap-2"
         >
           <Building2 className="h-4 w-4 text-muted-foreground" />
           <span className="font-medium">+ Add New Company</span>

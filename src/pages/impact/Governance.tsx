@@ -142,10 +142,23 @@ const Governance = () => {
                         </div>
                       </div>
                       
-                      <Progress 
+                       <Progress 
                         value={governanceSummary?.pct || 0} 
                         className="mt-4" 
                       />
+                      
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full mt-4"
+                        onClick={() => {
+                          setChatContext({level: 'overview'});
+                          setShowAIChat(true);
+                        }}
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        AI Analysis Chat - Governance Specialist
+                      </Button>
                     </div>
                     
                      <div className="space-y-4">
@@ -157,19 +170,6 @@ const Governance = () => {
                            />
                          )}
                        </div>
-                       
-                       <Button 
-                         variant="outline" 
-                         size="sm" 
-                         className="w-full"
-                         onClick={() => {
-                           setChatContext({level: 'overview'});
-                           setShowAIChat(true);
-                         }}
-                       >
-                         <MessageSquare className="h-4 w-4 mr-2" />
-                         AI Analysis Chat - Governance Specialist
-                       </Button>
                      </div>
                   </div>
                 </section>
