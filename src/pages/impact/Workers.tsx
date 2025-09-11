@@ -161,16 +161,6 @@ const Workers = () => {
                         value={workersSummary?.pct || 0} 
                         className="mt-4" 
                       />
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-3"
-                        onClick={() => setShowAIChat(true)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat - Workers Specialist
-                      </Button>
                     </div>
                     
                     <div className="space-y-4">
@@ -183,13 +173,12 @@ const Workers = () => {
                         )}
                       </div>
                       
-                      <Button 
-                        onClick={() => setShowAIChat(true)}
-                        className="w-full bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat
-                      </Button>
+                       <Button 
+                         onClick={() => setShowAIChat(true)}
+                         className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                       >
+                         AI Analysis Chat - Workers Specialist
+                       </Button>
                     </div>
                   </div>
                 </section>

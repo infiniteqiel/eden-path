@@ -38,7 +38,7 @@ export function AppSidebar() {
   return (
     <Sidebar className={cn(
       isCollapsed ? "w-16" : "w-64",
-      "md:bg-background bg-white" // White background on mobile
+      "bg-white" // White background always
     )} collapsible="icon">
       <SidebarContent>
         {/* Business Switcher */}

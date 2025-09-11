@@ -67,9 +67,11 @@ export function BroadChat({ className }: BroadChatProps) {
 
   const handleBirdsEyeAnalysis = () => {
     setIsLoading(true);
+    // Get live data from impact summaries and todos 
+    // This will be passed in as props from the parent component
     const analysisMessage: ChatMessage = {
       id: `analysis-${Date.now()}`,
-      content: "🔍 **Bird's Eye View Analysis**\n\nHere's your current B Corp progress overview:\n\n**Governance:** 2/5 tasks completed\n**Workers:** 3/7 tasks completed  \n**Community:** 1/4 tasks completed\n**Environment:** 0/3 tasks completed\n**Customers:** 2/6 tasks completed\n\n**Priority Actions:**\n1. Complete legal mission lock documentation\n2. Implement worker feedback system\n3. Establish environmental monitoring\n\nYour business shows strong foundation in stakeholder governance. Focus on environmental policies next for balanced progress.",
+      content: "🔍 **Bird's Eye View Analysis**\n\nAnalyzing your live B Corp progress data...\n\nPlease connect this component to live impact data from the Dashboard to show real progress metrics.",
       role: 'assistant',
       timestamp: new Date()
     };

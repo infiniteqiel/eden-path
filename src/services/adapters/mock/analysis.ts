@@ -243,7 +243,23 @@ export const reanalyze = async (businessId: string): Promise<AnalysisJob> => {
   return startIngestion(businessId);
 };
 
-// Test Reset function - generates fresh random tasks
+// Global reset function - clears ALL data
+export const resetAllTestData = async (): Promise<void> => {
+  // Clear all localStorage data
+  localStorage.removeItem(TODOS_STORAGE_KEY);
+  localStorage.removeItem(JOBS_STORAGE_KEY); 
+  localStorage.removeItem(FINDINGS_STORAGE_KEY);
+  
+  // Reset in-memory arrays
+  mockJobs = [];
+  mockFindings = [];
+  mockTodos = [];
+  
+  // Reset counters
+  nextJobId = 1;
+  nextTodoId = 1;
+};
+
 export const resetTestData = async (businessId: string): Promise<{ todos: Todo[], impactSummaries: ImpactSummary[] }> => {
   await new Promise(resolve => setTimeout(resolve, 300));
   

@@ -62,4 +62,9 @@ export interface IAnalysisService {
    * Reset test data with fresh random tasks
    */
   resetTestData(businessId: string): Promise<{ todos: Todo[], impactSummaries: ImpactSummary[] }>;
+
+  /**
+   * Reset all test data globally (dev only)
+   */
+  resetAllTestData(): Promise<void>;
 }

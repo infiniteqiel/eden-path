@@ -163,16 +163,14 @@ const Customers = () => {
                       />
                     </div>
                     
-                    <div className="space-y-4">
-                      <div className="bg-white/60 rounded-lg p-4">
-                        {customersSummary && (
-                          <ImpactCard
-                            summary={customersSummary}
-                            onViewTasks={() => setShowAIChat(true)}
-                          />
-                        )}
-                      </div>
-                    </div>
+                        <div className="space-y-4">
+                          <Button 
+                            onClick={() => setShowAIChat(true)}
+                            className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                          >
+                            AI Analysis Chat - Customers Specialist
+                          </Button>
+                        </div>
                   </div>
                 </section>
 
@@ -182,7 +180,7 @@ const Customers = () => {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {customerAreas.map((area) => (
-                      <Card key={area.title} className="bg-white/60 relative hover:shadow-lg transition-all duration-300">
+                       <Card key={area.title} className="bg-white/60 hover:shadow-lg transition-all duration-300">
                         <CardHeader>
                           <CardTitle className="flex items-center gap-2">
                             <area.icon className="h-5 w-5 text-primary" />
@@ -190,13 +188,6 @@ const Customers = () => {
                           </CardTitle>
                           <CardDescription>{area.description}</CardDescription>
                         </CardHeader>
-                        {/* AI Chat Icon for Sub-Area - Top Right */}
-                        <div className="absolute top-4 right-4">
-                          <AIChatIcon 
-                            onClick={() => setShowAIChat(true)}
-                            size="sm"
-                          />
-                        </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (

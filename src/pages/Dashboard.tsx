@@ -32,7 +32,7 @@ const Dashboard = () => {
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
-  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
+  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, resetTestData, resetAllTestData } = useAnalysisStore();
 
   // Get quick todos (top 5 priority P1/P2 not done)
   const quickTodos = todos
@@ -287,6 +287,15 @@ const Dashboard = () => {
                           >
                             <RotateCcw className="h-4 w-4 mr-2" />
                             Test Reset
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={resetAllTestData}
+                            className="shrink-0 bg-red-50 text-red-600 border-red-200 hover:bg-red-100"
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Reset All Data (Global)
                           </Button>
                         </div>
                       </div>

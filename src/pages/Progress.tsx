@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AppSidebar } from '@/components/app-sidebar';
 import { ImpactCard } from '@/components/impact-card';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,7 @@ import { TrendingUp, Target, Calendar, Award, RotateCcw } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Progress = () => {
+  const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, resetTestData } = useAnalysisStore();
 
@@ -140,7 +142,7 @@ const Progress = () => {
                       <div key={summary.impact} className="bg-white/60 rounded-lg p-4">
                         <ImpactCard
                           summary={summary}
-                          onViewTasks={() => console.log(`View tasks for ${summary.impact}`)}
+                          onViewTasks={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
                         />
                       </div>
                     ))}

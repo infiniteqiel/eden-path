@@ -29,6 +29,7 @@ interface AnalysisState {
   startAnalysis: (businessId: string) => Promise<void>;
   generateRoadmap: (businessId: string) => Promise<void>;
   resetTestData: (businessId: string) => Promise<void>;
+  resetAllTestData: () => Promise<void>;
   openEvidenceDrawer: (todoId: string) => Promise<void>;
   closeEvidenceDrawer: () => void;
   clearError: () => void;
@@ -176,6 +177,23 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to reset test data', 
+        isLoading: false 
+      });
+    }
+  },
+
+  resetAllTestData: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      await analysisService.resetAllTestData();
+      set({ 
+        todos: [], 
+        impactSummaries: [], 
+        isLoading: false 
+      });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to reset all test data', 
         isLoading: false 
       });
     }
