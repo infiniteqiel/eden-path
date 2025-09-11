@@ -12,8 +12,6 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { MessageSquare, Send, Bot, User } from 'lucide-react';
 import { ImpactArea } from '@/domain/data-contracts';
-import { useAnalysisStore } from '@/store/analysis';
-import { useBusinessStore } from '@/store/business';
 
 interface ChatMessage {
   id: string;
@@ -26,65 +24,14 @@ interface AIChatModalProps {
   isOpen: boolean;
   onClose: () => void;
   impactArea: ImpactArea;
-  context?: {
-    level: 'overview' | 'subarea' | 'task';
-    subarea?: string;
-    taskTitle?: string;
-  };
 }
 
-export function AIChatModal({ isOpen, onClose, impactArea, context }: AIChatModalProps) {
-  const { impactSummaries, todos } = useAnalysisStore();
-  const { currentBusiness } = useBusinessStore();
-  
-  const getContextualIntro = () => {
-    const currentSummary = impactSummaries.find(s => s.impact === impactArea);
-    const currentTodos = todos.filter(t => t.impact === impactArea);
-    const completedTodos = currentTodos.filter(t => t.status === 'done');
-    
-    const liveDataContext = currentBusiness ? 
-      `\n\nCurrent Status for ${currentBusiness.name}:
-      - ${impactArea} Progress: ${currentSummary?.pct || 0}%
-      - Tasks Completed: ${completedTodos.length}/${currentTodos.length}
-      - Business Type: ${currentBusiness.legalForm} in ${currentBusiness.country}
-      - Operating: ${currentBusiness.operatingMonths} months
-      - Team Size: ${currentBusiness.workersCount} workers` : '';
-
-    if (!context) {
-      return `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area.${liveDataContext}
-
-How can I help you today?`;
-    }
-
-    switch (context.level) {
-      case 'overview':
-        return `Hello! I'm your ${impactArea} Impact Area Specialist. I have deep knowledge of ${impactArea} B Corp requirements and can help you understand your overall progress, identify gaps, and create action plans for this specific impact area.${liveDataContext}
-
-How can I assist you with your ${impactArea} strategy?`;
-      
-      case 'subarea':
-        const subareaTitle = context.subarea || 'Sub-Area';
-        return `Hello! I'm your ${subareaTitle} Specialist within the ${impactArea} impact area. I focus specifically on ${subareaTitle} requirements and best practices within B Corp standards.${liveDataContext}
-
-I can provide detailed guidance on tasks in this area and help you understand the specific requirements. How can I help you with ${subareaTitle}?`;
-      
-      case 'task':
-        return `Hello! I'm your Task-Specific Assistant for "${context.taskTitle}". I'm here to provide step-by-step guidance, explain requirements, suggest implementation approaches, and help you gather the right evidence for this specific task.${liveDataContext}
-
-What would you like to know about implementing this task?`;
-      
-      default:
-        return `Hello! I'm your AI assistant for ${impactArea} analysis.${liveDataContext}
-
-How can I help you today?`;
-    }
-  };
-
+export function AIChatModal({ isOpen, onClose, impactArea }: AIChatModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       role: 'assistant',
-      content: getContextualIntro(),
+      content: `Hello! I'm your AI assistant for ${impactArea} analysis. I can help you analyze your documents, provide recommendations, and answer questions about B Corp requirements in this impact area. How can I help you today?`,
       timestamp: new Date()
     }
   ]);
@@ -139,9 +86,7 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5 text-green-600" />
-            {context?.level === 'task' ? `Task Assistant - ${context.taskTitle}` : 
-             context?.level === 'subarea' ? `${context.subarea} Specialist` :
-             `AI Analysis Chat - ${impactArea}`}
+            AI Analysis Chat - {impactArea}
             <Badge variant="outline" className="ml-auto">
               Beta
             </Badge>

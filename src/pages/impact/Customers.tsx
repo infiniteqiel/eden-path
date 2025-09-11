@@ -190,23 +190,30 @@ const Customers = () => {
                           </CardTitle>
                           <CardDescription>{area.description}</CardDescription>
                         </CardHeader>
-                         {/* AI Chat Icon for Sub-Area */}
-                         <div className="absolute top-4 right-4">
-                           <AIChatIcon 
-                             onClick={() => setShowAIChat(true)}
-                             size="sm"
-                           />
-                         </div>
+                        {/* AI Chat Icon for Sub-Area */}
+                        <div className="absolute bottom-4 right-4">
+                          <AIChatIcon 
+                            onClick={() => setShowAIChat(true)}
+                            size="sm"
+                          />
+                        </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
                               area.tasks.map(task => (
-                                 <div key={task.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
-                                   <TodoItem
-                                     todo={task}
-                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                   />
-                                 </div>
+                                <div key={task.id} className="bg-white/80 rounded p-3 relative cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(task.id)}>
+                                  <TodoItem
+                                    todo={task}
+                                    onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                  />
+                                  {/* AI Chat Icon for Task */}
+                                  <div className="absolute bottom-2 right-2">
+                                    <AIChatIcon 
+                                      onClick={() => setShowAIChat(true)}
+                                      size="sm"
+                                    />
+                                  </div>
+                                </div>
                               ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
@@ -298,7 +305,6 @@ const Customers = () => {
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Customers"
-        context={{ level: 'overview' }}
       />
       
       {/* Expandable Task Modal */}
