@@ -254,6 +254,7 @@ export type Database = {
           priority: string
           requirement_code: string | null
           status: string
+          sub_area: string | null
           title: string
           updated_at: string
           user_id: string
@@ -273,6 +274,7 @@ export type Database = {
           priority: string
           requirement_code?: string | null
           status: string
+          sub_area?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -292,6 +294,7 @@ export type Database = {
           priority?: string
           requirement_code?: string | null
           status?: string
+          sub_area?: string | null
           title?: string
           updated_at?: string
           user_id?: string
