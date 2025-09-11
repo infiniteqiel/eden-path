@@ -21,6 +21,7 @@ import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { Upload, FileText, ArrowRight, Building, Leaf, Users, RotateCcw } from 'lucide-react';
+import { AIChatIcon } from '@/components/ai-chat-icon';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Dashboard = () => {
@@ -120,13 +121,28 @@ const Dashboard = () => {
               <div className="space-y-8">
                 {currentBusiness ? (
                   <>
-                    {/* Impact Cards - One Row, Square Layout */}
+                     {/* Impact Cards - One Row, Square Layout */}
                     <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                      <div className="mb-6">
-                        <h2 className="text-2xl font-bold mb-2">B Corp Progress Overview</h2>
-                        <p className="text-muted-foreground">
-                          Track your advancement across the five key impact areas
-                        </p>
+                      <div className="mb-6 flex items-center justify-between">
+                        <div>
+                          <h2 className="text-2xl font-bold mb-2">B Corp Progress Overview</h2>
+                          <p className="text-muted-foreground">
+                            Track your advancement across the five key impact areas
+                          </p>
+                        </div>
+                        {/* Small Upload Area - Top Right */}
+                        <Card className="w-64 p-3">
+                          <div className="text-center">
+                            <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
+                            <p className="text-xs text-muted-foreground mb-2">Quick Upload</p>
+                            <UploadDropzone
+                              onFilesAdd={(files) => {
+                                console.log('Files uploaded:', files);
+                              }}
+                              className="min-h-[60px]"
+                            />
+                          </div>
+                        </Card>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -143,22 +159,7 @@ const Dashboard = () => {
                       </div>
                     </section>
 
-                    {/* Upload Documents Section */}
-                    <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                      <div className="mb-6">
-                        <h3 className="text-xl font-bold mb-2">Upload Documents</h3>
-                        <p className="text-muted-foreground">
-                          Upload your business documents for AI analysis
-                        </p>
-                      </div>
-                      <UploadDropzone
-                        onFilesAdd={(files) => {
-                          console.log('Files uploaded:', files);
-                        }}
-                      />
-                    </section>
-
-                    {/* Priority Tasks To Do */}
+                    {/* Priority Tasks To Do - Expanded */}
                     <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                       <div className="flex items-center justify-between mb-6">
                         <div>
@@ -167,21 +168,27 @@ const Dashboard = () => {
                             Top priority items to advance your B Corp readiness
                           </p>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={handleTestReset}
-                          className="shrink-0"
-                        >
-                          <RotateCcw className="h-4 w-4 mr-2" />
-                          Test Reset
-                        </Button>
+                        <div className="flex items-center gap-2">
+                          <AIChatIcon 
+                            onClick={() => console.log('AI Chat for Dashboard')}
+                            size="md"
+                          />
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={handleTestReset}
+                            className="shrink-0"
+                          >
+                            <RotateCcw className="h-4 w-4 mr-2" />
+                            Test Reset
+                          </Button>
+                        </div>
                       </div>
                       
-                      <ScrollArea className="h-80">
+                      <ScrollArea className="h-96">
                         <div className="space-y-3 pr-4">
                           {quickTodos.length > 0 ? (
-                            quickTodos.map((todo) => (
+                            quickTodos.slice(0, 4).map((todo) => (
                               <div key={todo.id} className="bg-white/60 rounded-lg p-4">
                                 <TodoItem
                                   todo={todo}
@@ -193,6 +200,13 @@ const Dashboard = () => {
                           ) : (
                             <div className="bg-white/60 rounded-lg p-6 text-center">
                               <p className="text-muted-foreground">No priority tasks at the moment</p>
+                            </div>
+                          )}
+                          {quickTodos.length > 4 && (
+                            <div className="text-center pt-4">
+                              <p className="text-sm text-muted-foreground">
+                                +{quickTodos.length - 4} more tasks
+                              </p>
                             </div>
                           )}
                         </div>

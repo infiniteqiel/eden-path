@@ -7,6 +7,7 @@
 import React, { useEffect, useState } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -16,6 +17,7 @@ import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { CheckSquare2, Clock, AlertCircle, Filter, RotateCcw } from 'lucide-react';
+import { AIChatIcon } from '@/components/ai-chat-icon';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Tasks = () => {
@@ -23,6 +25,7 @@ const Tasks = () => {
   const { todos, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
+  const [expandedTask, setExpandedTask] = useState<Todo | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -166,12 +169,23 @@ const Tasks = () => {
                           </div>
                           <div className="space-y-3">
                             {statusTodos.map(todo => (
-                              <div key={todo.id} className="bg-white/80 rounded p-3">
-                                <TodoItem
-                                  todo={todo}
-                                  onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
-                                  showImpact
-                                />
+                              <div key={todo.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTask(todo)}>
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <TodoItem
+                                      todo={todo}
+                                      onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
+                                      showImpact
+                                    />
+                                  </div>
+                                  <AIChatIcon 
+                                    onClick={() => {
+                                      console.log('AI Chat for task:', todo.id);
+                                    }}
+                                    size="sm"
+                                    className="ml-2"
+                                  />
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -190,11 +204,22 @@ const Tasks = () => {
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {impactTodos.map(todo => (
-                              <div key={todo.id} className="bg-white/80 rounded p-3">
-                                <TodoItem
-                                  todo={todo}
-                                  onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
-                                />
+                              <div key={todo.id} className="bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTask(todo)}>
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <TodoItem
+                                      todo={todo}
+                                      onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
+                                    />
+                                  </div>
+                                  <AIChatIcon 
+                                    onClick={() => {
+                                      console.log('AI Chat for task:', todo.id);
+                                    }}
+                                    size="sm"
+                                    className="ml-2"
+                                  />
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -208,6 +233,19 @@ const Tasks = () => {
           </main>
         </div>
       </div>
+      
+      {/* Expandable Task Modal */}
+      {expandedTask && (
+        <ExpandableTaskModal
+          isOpen={!!expandedTask}
+          onClose={() => setExpandedTask(null)}
+          todo={expandedTask}
+          onToggleStatus={(status) => {
+            handleTodoToggle(expandedTask.id, status);
+            setExpandedTask(null);
+          }}
+        />
+      )}
     </SidebarProvider>
   );
 };

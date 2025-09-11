@@ -86,7 +86,7 @@ export default function EnhancedIndex() {
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div 
-          className="h-[70vh] bg-cover bg-center bg-no-repeat"
+          className="h-[70vh] bg-cover bg-center bg-no-repeat relative"
           style={{ backgroundImage: `url(${heroImage})` }}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-primary/40" />
@@ -96,7 +96,7 @@ export default function EnhancedIndex() {
               <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
                 Welcome to Your B Corp Journey
               </h1>
-              <p className="text-xl md:text-2xl mb-8 animate-fade-in [animation-delay:0.3s]">
+              <p className="text-xl md:text-2xl mb-4 animate-fade-in [animation-delay:0.3s]">
                 Transform your business into a force for good. Track your progress toward 
                 B Corporation certification with our comprehensive readiness platform.
               </p>
@@ -118,6 +118,15 @@ export default function EnhancedIndex() {
                 </div>
               )}
             </div>
+          </div>
+          
+          {/* Waves Bottom Border */}
+          <div className="absolute bottom-0 w-full">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none" className="w-full h-12 md:h-20">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" 
+                    fill="hsl(var(--background))" 
+                    className="opacity-90"></path>
+            </svg>
           </div>
         </div>
       </section>
@@ -204,10 +213,134 @@ function AuthenticatedContent({
         />
       </div>
 
+      {/* Impact Cards Section - Moved to Top */}
+      <div className="mb-16">
+        <h2 className="text-3xl font-bold text-center mb-8 animate-fade-in">
+          Your B Corp Progress Overview
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          {/* Mock Impact Cards with actual data when available */}
+          <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in [animation-delay:0.1s]">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Building2 className="w-4 h-4 text-blue-600" />
+                Governance
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                <div className="bg-blue-600 h-2 rounded-full transition-all duration-500" style={{ width: '45%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">Mission & stakeholder governance</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/governance')}
+                className="w-full text-xs"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in [animation-delay:0.2s]">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Users className="w-4 h-4 text-green-600" />
+                Workers
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                <div className="bg-green-600 h-2 rounded-full transition-all duration-500" style={{ width: '60%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">Employee benefits & culture</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/workers')}
+                className="w-full text-xs"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in [animation-delay:0.3s]">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <Building2 className="w-4 h-4 text-orange-600" />
+                Community  
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                <div className="bg-orange-600 h-2 rounded-full transition-all duration-500" style={{ width: '30%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">Local impact & supply chain</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/community')}
+                className="w-full text-xs"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in [animation-delay:0.4s]">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <TrendingUp className="w-4 h-4 text-purple-600" />
+                Environment
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                <div className="bg-purple-600 h-2 rounded-full transition-all duration-500" style={{ width: '25%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">Environmental practices</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/environment')}
+                className="w-full text-xs"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in [animation-delay:0.5s]">
+            <CardHeader className="pb-2">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <MessageCircle className="w-4 h-4 text-indigo-600" />
+                Customers
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="w-full bg-secondary rounded-full h-2 mb-3">
+                <div className="bg-indigo-600 h-2 rounded-full transition-all duration-500" style={{ width: '40%' }}></div>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">Customer impact & welfare</p>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => navigate('/impact/customers')}
+                className="w-full text-xs"
+              >
+                View Progress
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
       {/* Two Column Layout */}
       <div className="grid lg:grid-cols-2 gap-8 mb-16">
         {/* Upload Area */}
-        <Card>
+        <Card className="animate-fade-in [animation-delay:0.6s]">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Upload className="w-5 h-5" />
@@ -231,83 +364,8 @@ function AuthenticatedContent({
         </Card>
 
         {/* Broad Chat */}
-        <BroadChat />
-      </div>
-
-      {/* Impact Cards Section */}
-      <div className="mb-16">
-        <h2 className="text-3xl font-bold text-center mb-8">
-          Your B Corp Progress Overview
-        </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-blue-600" />
-                Governance
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full bg-secondary rounded-full h-2 mb-4">
-                <div className="bg-primary h-2 rounded-full" style={{ width: '45%' }}></div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">Mission, purpose & stakeholder governance</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate('/impact/governance')}
-                className="w-full"
-              >
-                View Progress
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-green-600" />
-                Workers
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full bg-secondary rounded-full h-2 mb-4">
-                <div className="bg-primary h-2 rounded-full" style={{ width: '60%' }}></div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">Employee benefits, training & workplace culture</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate('/impact/workers')}
-                className="w-full"
-              >
-                View Progress
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-lg transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-purple-600" />
-                Community
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full bg-secondary rounded-full h-2 mb-4">
-                <div className="bg-primary h-2 rounded-full" style={{ width: '30%' }}></div>
-              </div>
-              <p className="text-sm text-muted-foreground mb-4">Local impact & supply chain responsibility</p>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate('/impact/community')}
-                className="w-full"
-              >
-                View Progress
-              </Button>
-            </CardContent>
-          </Card>
+        <div className="animate-fade-in [animation-delay:0.7s]">
+          <BroadChat />
         </div>
       </div>
 
