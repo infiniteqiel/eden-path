@@ -19,8 +19,8 @@ import { X, Upload, MessageSquare, FileText } from 'lucide-react';
 interface ExpandableTaskModalProps {
   isOpen: boolean;
   onClose: () => void;
-  todo: Todo;
-  onToggleStatus: (status: Todo['status']) => void;
+  todo: Todo | null;
+  onToggleStatus?: (status: Todo['status']) => void;
 }
 
 export function ExpandableTaskModal({ 
@@ -31,6 +31,8 @@ export function ExpandableTaskModal({
 }: ExpandableTaskModalProps) {
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
+
+  if (!todo) return null;
 
   const priorityColors = {
     P1: 'bg-red-100 text-red-800 border-red-200',
@@ -86,7 +88,7 @@ export function ExpandableTaskModal({
                   <CardContent>
                     <TodoItem
                       todo={todo}
-                      onToggleStatus={onToggleStatus}
+                      onToggleStatus={onToggleStatus ? onToggleStatus : () => {}}
                       onUploadEvidence={() => setShowEvidenceModal(true)}
                       showImpact
                     />

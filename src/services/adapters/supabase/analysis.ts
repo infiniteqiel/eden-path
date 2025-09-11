@@ -169,7 +169,6 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
     .eq('business_id', businessId)
     .eq('user_id', user.id);
 
-  // Create baseline todos
   const baselineTodos = [
     {
       user_id: user.id,
@@ -180,7 +179,8 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       description_md: 'Your Articles of Association must include specific B Corp mission lock language to meet certification requirements.',
       priority: 'P1',
       effort: 'High',
-      status: 'todo'
+      status: 'todo',
+      sub_area: 'Legal Requirements'
     },
     {
       user_id: user.id,
@@ -191,7 +191,8 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       description_md: 'Create formal processes for considering all stakeholders in business decisions.',
       priority: 'P1',
       effort: 'Medium',
-      status: 'todo'
+      status: 'todo',
+      sub_area: 'Accountability'
     },
     {
       user_id: user.id,
@@ -202,7 +203,20 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       description_md: 'Establish and document fair wage policies, including living wage considerations.',
       priority: 'P1',
       effort: 'Medium',
-      status: 'todo'
+      status: 'todo',
+      sub_area: 'Compensation & Benefits'
+    },
+    {
+      user_id: user.id,
+      business_id: businessId,
+      impact: 'Workers',
+      requirement_code: 'WOR-002',
+      title: 'Create employee handbook with health and safety policies',
+      description_md: 'Develop comprehensive employee handbook covering health, safety, and wellbeing policies.',
+      priority: 'P2',
+      effort: 'Medium',
+      status: 'todo',
+      sub_area: 'Well-being & Safety'
     },
     {
       user_id: user.id,
@@ -213,7 +227,20 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       description_md: 'Create formal environmental policies and begin tracking key environmental metrics.',
       priority: 'P2',
       effort: 'Medium',
-      status: 'todo'
+      status: 'todo',
+      sub_area: 'Environmental Policy'
+    },
+    {
+      user_id: user.id,
+      business_id: businessId,
+      impact: 'Environment',
+      requirement_code: 'ENV-002',
+      title: 'Implement carbon footprint tracking',
+      description_md: 'Begin measuring and tracking your company\'s carbon emissions and energy usage.',
+      priority: 'P2',
+      effort: 'Low',
+      status: 'todo',
+      sub_area: 'Energy & Carbon'
     },
     {
       user_id: user.id,
@@ -224,7 +251,20 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       description_md: 'Formally document your community involvement and social impact programs.',
       priority: 'P2',
       effort: 'Low',
-      status: 'todo'
+      status: 'todo',
+      sub_area: 'Local Community'
+    },
+    {
+      user_id: user.id,
+      business_id: businessId,
+      impact: 'Community',
+      requirement_code: 'COM-002',
+      title: 'Develop supplier diversity program',
+      description_md: 'Create policies and practices to work with diverse suppliers and local businesses.',
+      priority: 'P2',
+      effort: 'Medium',
+      status: 'todo',
+      sub_area: 'Supply Chain'
     },
     {
       user_id: user.id,
@@ -235,7 +275,20 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       description_md: 'Establish customer feedback collection and ensure GDPR-compliant data protection.',
       priority: 'P2',
       effort: 'Medium',
-      status: 'todo'
+      status: 'todo',
+      sub_area: 'Data Protection'
+    },
+    {
+      user_id: user.id,
+      business_id: businessId,
+      impact: 'Customers',
+      requirement_code: 'CUS-002',
+      title: 'Create customer satisfaction measurement system',
+      description_md: 'Implement systems to regularly measure and improve customer satisfaction.',
+      priority: 'P3',
+      effort: 'Low',
+      status: 'todo',
+      sub_area: 'Customer Experience'
     }
   ];
 

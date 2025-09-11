@@ -14,6 +14,27 @@ import { ImpactSummary } from '@/domain/data-contracts';
 import { useAnalysisStore } from '@/store/analysis';
 import { cn } from '@/lib/utils';
 
+// Modal to show all tasks for an impact area
+interface AllTasksModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  impactArea: string;
+}
+
+function AllTasksModal({ isOpen, onClose, impactArea }: AllTasksModalProps) {
+  const { todos } = useAnalysisStore();
+  const areaTasks = todos.filter(todo => todo.impact === impactArea);
+  
+  return (
+    <CompletedTasksModal
+      isOpen={isOpen}
+      onClose={onClose}
+      completedTasks={areaTasks}
+      impactArea={impactArea as any}
+    />
+  );
+}
+
 interface ImpactCardProps {
   summary: ImpactSummary;
   onViewTasks: () => void;
@@ -41,7 +62,7 @@ const impactColors = {
 export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps) {
   const { impact, total, done, pct } = summary;
   const { todos } = useAnalysisStore();
-  const [showCompletedModal, setShowCompletedModal] = useState(false);
+  const [showAllTasksModal, setShowAllTasksModal] = useState(false);
   
   const completedTasks = todos.filter(todo => 
     todo.impact === impact && todo.status === 'done'
@@ -77,7 +98,7 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
         <Button 
           variant="ghost" 
           size="sm" 
-          onClick={() => setShowCompletedModal(true)}
+          onClick={() => setShowAllTasksModal(true)}
           className="w-full justify-between text-muted-foreground hover:text-foreground text-[10px] sm:text-xs py-1.5 sm:py-2 h-auto"
         >
           View tasks
@@ -92,10 +113,9 @@ export function ImpactCard({ summary, onViewTasks, className }: ImpactCardProps)
         </Button>
       </div>
         
-      <CompletedTasksModal
-        isOpen={showCompletedModal}
-        onClose={() => setShowCompletedModal(false)}
-        completedTasks={completedTasks}
+      <AllTasksModal
+        isOpen={showAllTasksModal}
+        onClose={() => setShowAllTasksModal(false)}
         impactArea={impact}
       />
     </Card>

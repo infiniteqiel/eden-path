@@ -353,9 +353,8 @@ I'm analyzing your uploaded documents and cross-referencing with the B Corp know
             </div>
           )}
 
-          {/* Main Chat Area */}
-          <div className="flex-1 flex flex-col">
-            <ScrollArea className="flex-1 pr-4">
+        <div className="flex-1 flex flex-col min-h-0">
+            <ScrollArea className="flex-1 pr-4 max-h-[calc(100vh-200px)]">
               <div className="space-y-4">
                 {messages.map((message) => (
                   <div

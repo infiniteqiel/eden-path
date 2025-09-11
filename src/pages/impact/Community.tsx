@@ -10,7 +10,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
-import { AIChatModal } from '@/components/ai-chat-modal';
+import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,7 @@ import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { Target, HandHeart, ShoppingCart, MapPin, CheckSquare2, MessageSquare, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Community = () => {
@@ -28,6 +29,8 @@ const Community = () => {
   const [evidenceModalOpen, setEvidenceModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [chatContext, setChatContext] = useState<{level: 'overview' | 'subarea' | 'task', subArea?: string, taskTitle?: string}>({level: 'overview'});
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
@@ -169,15 +172,18 @@ const Community = () => {
                         className="mt-4" 
                       />
                       
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="mt-3"
-                        onClick={() => setShowAIChat(true)}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat - Community Specialist
-                      </Button>
+                       <Button 
+                         variant="outline" 
+                         size="sm" 
+                         className="mt-3"
+                         onClick={() => {
+                           setChatContext({level: 'overview'});
+                           setShowAIChat(true);
+                         }}
+                       >
+                         <MessageSquare className="h-4 w-4 mr-2" />
+                         AI Analysis Chat - Community Specialist
+                       </Button>
                     </div>
                     
                     <div className="space-y-4">
@@ -208,25 +214,32 @@ const Community = () => {
                            </CardTitle>
                            <CardDescription>{area.description}</CardDescription>
                          </CardHeader>
-                         {/* AI Chat Icon for Sub-Area - Top Right */}
-                         <div className="absolute top-4 right-4">
-                           <AIChatIcon 
-                             onClick={() => setShowAIChat(true)}
-                             size="sm"
-                           />
-                         </div>
+                          {/* AI Chat Icon for Sub-Area - Top Right */}
+                          <div className="absolute top-4 right-4">
+                            <AIChatIcon 
+                              onClick={() => {
+                                setChatContext({level: 'subarea', subArea: area.title});
+                                setShowAIChat(true);
+                              }}
+                              size="sm"
+                            />
+                          </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
-                              area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3">
-                                   <TodoItem
-                                     todo={task}
-                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                     onUploadEvidence={() => handleUploadEvidence(task)}
-                                   />
-                                </div>
-                              ))
+                               area.tasks.map(task => (
+                                 <div 
+                                   key={task.id} 
+                                   className="bg-white/80 rounded p-3 cursor-pointer hover:bg-white/90 transition-colors"
+                                   onClick={() => setExpandedTaskId(task.id)}  
+                                 >
+                                    <TodoItem
+                                      todo={task}
+                                      onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                      onUploadEvidence={() => handleUploadEvidence(task)}
+                                    />
+                                 </div>
+                               ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
                             )}
@@ -327,10 +340,23 @@ const Community = () => {
         )}
       </div>
       
-      <AIChatModal 
+      <EnhancedAIChatModal 
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Community"
+        subArea={chatContext.subArea}
+        taskTitle={chatContext.taskTitle}
+        contextLevel={chatContext.level}
+      />
+      
+      <ExpandableTaskModal
+        todo={todos.find(t => t.id === expandedTaskId) || null}
+        isOpen={!!expandedTaskId}
+        onClose={() => setExpandedTaskId(null)}
+        onToggleStatus={(status) => {
+          const todo = todos.find(t => t.id === expandedTaskId);
+          if (todo) handleTodoToggle(todo.id, status);
+        }}
       />
     </SidebarProvider>
   );

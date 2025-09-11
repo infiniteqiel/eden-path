@@ -10,7 +10,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
-import { AIChatModal } from '@/components/ai-chat-modal';
+import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -20,6 +20,7 @@ import { useAnalysisStore } from '@/store/analysis';
 import { Todo } from '@/domain/data-contracts';
 import { Leaf, Zap, Recycle, Droplets, CheckSquare2, MessageSquare, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Environment = () => {
@@ -27,6 +28,8 @@ const Environment = () => {
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
   const [showAIChat, setShowAIChat] = useState(false);
+  const [chatContext, setChatContext] = useState<{level: 'overview' | 'subarea' | 'task', subArea?: string, taskTitle?: string}>({level: 'overview'});
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -172,12 +175,15 @@ const Environment = () => {
                          )}
                        </div>
                        
-                       <Button 
-                         onClick={() => setShowAIChat(true)}
-                         className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                       >
-                         AI Analysis Chat - Environment Specialist
-                       </Button>
+                        <Button 
+                          onClick={() => {
+                            setChatContext({level: 'overview'});
+                            setShowAIChat(true);
+                          }}
+                          className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                        >
+                          AI Analysis Chat - Environment Specialist
+                        </Button>
                      </div>
                   </div>
                 </section>
@@ -196,24 +202,31 @@ const Environment = () => {
                            </CardTitle>
                            <CardDescription>{area.description}</CardDescription>
                          </CardHeader>
-                         {/* AI Chat Icon for Sub-Area - Top Right */}
-                         <div className="absolute top-4 right-4">
-                           <AIChatIcon 
-                             onClick={() => setShowAIChat(true)}
-                             size="sm"
-                           />
-                         </div>
+                          {/* AI Chat Icon for Sub-Area - Top Right */}
+                          <div className="absolute top-4 right-4">
+                            <AIChatIcon 
+                              onClick={() => {
+                                setChatContext({level: 'subarea', subArea: area.title});
+                                setShowAIChat(true);
+                              }}
+                              size="sm"
+                            />
+                          </div>
                         <CardContent>
                           <div className="space-y-3">
                             {area.tasks.length > 0 ? (
-                              area.tasks.map(task => (
-                                <div key={task.id} className="bg-white/80 rounded p-3">
-                                  <TodoItem
-                                    todo={task}
-                                    onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                  />
-                                </div>
-                              ))
+                               area.tasks.map(task => (
+                                 <div 
+                                   key={task.id} 
+                                   className="bg-white/80 rounded p-3 cursor-pointer hover:bg-white/90 transition-colors"
+                                   onClick={() => setExpandedTaskId(task.id)}
+                                 >
+                                   <TodoItem
+                                     todo={task}
+                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
+                                   />
+                                 </div>
+                               ))
                             ) : (
                               <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
                             )}
@@ -301,10 +314,23 @@ const Environment = () => {
         </div>
       </div>
       
-      <AIChatModal 
+      <EnhancedAIChatModal 
         isOpen={showAIChat}
         onClose={() => setShowAIChat(false)}
         impactArea="Environment"
+        subArea={chatContext.subArea}
+        taskTitle={chatContext.taskTitle}
+        contextLevel={chatContext.level}
+      />
+      
+      <ExpandableTaskModal
+        todo={todos.find(t => t.id === expandedTaskId) || null}
+        isOpen={!!expandedTaskId}
+        onClose={() => setExpandedTaskId(null)}
+        onToggleStatus={(status) => {
+          const todo = todos.find(t => t.id === expandedTaskId);
+          if (todo) handleTodoToggle(todo.id, status);
+        }}
       />
     </SidebarProvider>
   );

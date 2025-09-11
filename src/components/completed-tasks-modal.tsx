@@ -34,7 +34,7 @@ export function CompletedTasksModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle className="h-5 w-5 text-success" />
-            Completed Tasks
+            All Tasks
             {impactArea && (
               <Badge variant="secondary">{impactArea}</Badge>
             )}
@@ -45,12 +45,12 @@ export function CompletedTasksModal({
           {filteredTasks.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <CheckCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No completed tasks yet.</p>
-              <p className="text-sm">Complete some tasks to see them here!</p>
+              <p>No tasks available yet.</p>
+              <p className="text-sm">Tasks will appear here after document analysis!</p>
             </div>
           ) : (
             filteredTasks.map((task) => (
-              <Card key={task.id} className="border border-success/20 bg-success/5">
+              <Card key={task.id} className={`border ${task.status === 'done' ? 'border-success/20 bg-success/5' : 'border-border bg-background'}`}>
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -68,9 +68,21 @@ export function CompletedTasksModal({
                         <Badge variant="outline" className="text-xs">
                           {task.effort} effort
                         </Badge>
+                        <Badge variant={task.status === 'done' ? 'default' : 'secondary'} className="text-xs">
+                          {task.status === 'done' ? 'Completed' : 
+                           task.status === 'in_progress' ? 'In Progress' :
+                           task.status === 'blocked' ? 'Blocked' : 'To Do'}
+                        </Badge>
                       </div>
                     </div>
-                    <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
+                    {task.status === 'done' ? (
+                      <CheckCircle className="h-5 w-5 text-success flex-shrink-0" />
+                    ) : (
+                      <div className={`h-5 w-5 rounded-full border-2 flex-shrink-0 ${
+                        task.status === 'in_progress' ? 'border-blue-500' :
+                        task.status === 'blocked' ? 'border-red-500' : 'border-muted-foreground'
+                      }`} />
+                    )}
                   </div>
 
                   {task.descriptionMd && (
