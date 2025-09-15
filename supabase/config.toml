@@ -35,6 +35,9 @@ enable_signup = true
 [functions.extract-document-text]
 verify_jwt = false
 
+[functions.generate-ai-tasks]
+verify_jwt = true
+
 [edge-runtime]
 enabled = true
 port = 54330

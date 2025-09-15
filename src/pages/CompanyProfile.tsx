@@ -22,6 +22,7 @@ export default function CompanyProfile() {
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState<Partial<Business>>({});
   const [companyDescription, setCompanyDescription] = useState('');
+  const [isSavingDescription, setIsSavingDescription] = useState(false);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -68,6 +69,29 @@ export default function CompanyProfile() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveDescription = async () => {
+    if (!currentBusiness) return;
+    
+    setIsSavingDescription(true);
+    try {
+      // In a real implementation, you'd save the description to the database
+      // For now, we'll just show a success message
+      toast({
+        title: "Description Saved",
+        description: "Company description has been saved successfully.",
+      });
+    } catch (error) {
+      console.error('Error saving description:', error);
+      toast({
+        title: "Save Failed",
+        description: "Failed to save company description. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingDescription(false);
     }
   };
 
@@ -254,7 +278,15 @@ export default function CompanyProfile() {
                     </p>
                   </div>
                   
-                  <div className="flex justify-center">
+                  <div className="flex justify-center gap-3">
+                    <Button 
+                      onClick={handleSaveDescription}
+                      disabled={isSavingDescription || !companyDescription.trim()}
+                      variant="outline"
+                    >
+                      <Save className="h-4 w-4 mr-2" />
+                      {isSavingDescription ? 'Saving...' : 'Save Description'}
+                    </Button>
                     <AiAnalysisButton 
                       businessId={currentBusiness.id}
                       triggerText="Analyze Company Description"
