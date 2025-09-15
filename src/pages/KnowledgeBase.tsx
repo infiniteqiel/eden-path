@@ -32,7 +32,10 @@ export default function KnowledgeBase() {
       <div className="flex h-screen w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
-          <AppHeader>
+          <AppHeader mode="auth" />
+          
+          {/* Page Header */}
+          <div className="border-b border-border bg-background px-4 py-3">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <div className="flex items-center gap-2">
@@ -40,7 +43,7 @@ export default function KnowledgeBase() {
                 <h1 className="font-semibold">Knowledge Base Management</h1>
               </div>
             </div>
-          </AppHeader>
+          </div>
           
           <main className="flex-1 overflow-y-auto p-6">
             <div className="max-w-4xl mx-auto space-y-6">
