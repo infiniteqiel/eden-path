@@ -47,6 +47,66 @@ export type Database = {
         }
         Relationships: []
       }
+      analysis_jobs: {
+        Row: {
+          business_id: string
+          completed_at: string | null
+          created_at: string | null
+          dataroom_id: string
+          error_message: string | null
+          id: string
+          job_type: string
+          metadata: Json | null
+          progress_pct: number | null
+          started_at: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          business_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          dataroom_id: string
+          error_message?: string | null
+          id?: string
+          job_type: string
+          metadata?: Json | null
+          progress_pct?: number | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          dataroom_id?: string
+          error_message?: string | null
+          id?: string
+          job_type?: string
+          metadata?: Json | null
+          progress_pct?: number | null
+          started_at?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "analysis_jobs_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_jobs_dataroom_id_fkey"
+            columns: ["dataroom_id"]
+            isOneToOne: false
+            referencedRelation: "datarooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       analysis_results: {
         Row: {
           analysis_type: string
@@ -198,6 +258,176 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      datarooms: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "datarooms_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_categories: {
+        Row: {
+          ai_reasoning: string | null
+          confidence_score: number | null
+          created_at: string | null
+          file_id: string
+          id: string
+          impact_area: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          file_id: string
+          id?: string
+          impact_area: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          file_id?: string
+          id?: string
+          impact_area?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_categories_file_id_fkey"
+            columns: ["file_id"]
+            isOneToOne: true
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_chunks: {
+        Row: {
+          chunk_index: number
+          created_at: string | null
+          dataroom_id: string
+          file_id: string
+          id: string
+          page_number: number | null
+          text_content: string
+          token_count: number | null
+        }
+        Insert: {
+          chunk_index: number
+          created_at?: string | null
+          dataroom_id: string
+          file_id: string
+          id?: string
+          page_number?: number | null
+          text_content: string
+          token_count?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          created_at?: string | null
+          dataroom_id?: string
+          file_id?: string
+          id?: string
+          page_number?: number | null
+          text_content?: string
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_chunks_dataroom_id_fkey"
+            columns: ["dataroom_id"]
+            isOneToOne: false
+            referencedRelation: "datarooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          content_type: string | null
+          created_at: string | null
+          dataroom_id: string
+          extracted_text: string | null
+          extraction_method: string | null
+          extraction_status: string | null
+          file_kind: string | null
+          file_size_bytes: number | null
+          id: string
+          impact_area: string | null
+          original_name: string
+          processed_at: string | null
+          storage_bucket: string
+          storage_path: string
+          updated_at: string | null
+          uploaded_at: string | null
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string | null
+          dataroom_id: string
+          extracted_text?: string | null
+          extraction_method?: string | null
+          extraction_status?: string | null
+          file_kind?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          impact_area?: string | null
+          original_name: string
+          processed_at?: string | null
+          storage_bucket?: string
+          storage_path: string
+          updated_at?: string | null
+          uploaded_at?: string | null
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string | null
+          dataroom_id?: string
+          extracted_text?: string | null
+          extraction_method?: string | null
+          extraction_status?: string | null
+          file_kind?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          impact_area?: string | null
+          original_name?: string
+          processed_at?: string | null
+          storage_bucket?: string
+          storage_path?: string
+          updated_at?: string | null
+          uploaded_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_dataroom_id_fkey"
+            columns: ["dataroom_id"]
+            isOneToOne: false
+            referencedRelation: "datarooms"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       knowledge_base_documents: {
         Row: {

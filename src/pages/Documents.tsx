@@ -6,7 +6,7 @@
 
 import React, { useEffect } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
-import { UploadDropzone } from '@/components/upload-dropzone';
+import { EnhancedUploadDropzone } from '@/components/enhanced-upload-dropzone';
 import { FileCard } from '@/components/file-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,11 +28,8 @@ const Documents = () => {
     }
   }, [currentBusiness, loadFiles]);
 
-  const handleUpload = async (uploadedFiles: File[]) => {
+  const handleUploadComplete = () => {
     if (currentBusiness) {
-      for (const file of uploadedFiles) {
-        await uploadFile(currentBusiness.id, file);
-      }
       loadFiles(currentBusiness.id);
     }
   };
@@ -97,7 +94,10 @@ const Documents = () => {
                       Upload your business documents for AI analysis and B Corp readiness assessment
                     </p>
                   </div>
-                  <UploadDropzone onFilesAdd={handleUpload} />
+                  <EnhancedUploadDropzone 
+                    businessId={currentBusiness?.id || ''} 
+                    onUploadComplete={handleUploadComplete} 
+                  />
                 </section>
 
                 {/* Document Categories */}

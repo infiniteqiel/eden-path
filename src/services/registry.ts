@@ -13,7 +13,6 @@ import { ILegalService } from './ports/legal';
 import { IAuthService } from './ports/auth';
 
 // Import implementations
-import * as MockFiles from './adapters/mock/files';
 import * as MockAnalysis from './adapters/mock/analysis';
 import * as MockBusiness from './adapters/mock/business';
 import * as MockRisk from './adapters/mock/risk';
@@ -21,6 +20,7 @@ import * as MockLegal from './adapters/mock/legal';
 import * as SupabaseAuth from './adapters/supabase/auth';
 import * as SupabaseAnalysis from './adapters/supabase/analysis';
 import * as SupabaseBusiness from './adapters/supabase/business';
+import { supabaseFileService } from './adapters/supabase/files';
 
 /**
  * Service implementations registry
@@ -32,7 +32,7 @@ import * as SupabaseBusiness from './adapters/supabase/business';
  * 4. The UI layer remains completely unchanged
  */
 export const Services = {
-  files: MockFiles as IFileService,
+  files: supabaseFileService as IFileService,
   analysis: SupabaseAnalysis as IAnalysisService,
   business: SupabaseBusiness as IBusinessService,
   risk: MockRisk as IRiskService,
