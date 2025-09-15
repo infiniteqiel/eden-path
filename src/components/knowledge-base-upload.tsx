@@ -28,6 +28,12 @@ interface KnowledgeBaseUploadProps {
 export function KnowledgeBaseUpload({ className }: KnowledgeBaseUploadProps) {
   const [knowledgeFiles, setKnowledgeFiles] = useState<KnowledgeBaseFile[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [knowledgeBaseStatus, setKnowledgeBaseStatus] = useState({
+    hasDocuments: false,
+    hasMasterDocument: false,
+    documentCount: 0,
+    version: undefined as string | undefined
+  });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
