@@ -8,6 +8,7 @@ import About from "./pages/About";
 import SignUp from "./pages/auth/SignUp";
 import SignIn from "./pages/auth/SignIn";
 import Dashboard from "./pages/Dashboard";
+import CompanyProfile from "./pages/CompanyProfile";
 import Documents from "./pages/Documents";
 import Tasks from "./pages/Tasks";
 import Progress from "./pages/Progress";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/auth/signup" element={<SignUp />} />
           <Route path="/auth/signin" element={<SignIn />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/company-profile" element={<CompanyProfile />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/tasks" element={<Tasks />} />
           <Route path="/progress" element={<Progress />} />

@@ -30,6 +30,7 @@ export function AppSidebar() {
 
   const navigationItems = [
     { title: 'Dashboard', url: '/dashboard', icon: Home },
+    { title: 'Company Profile', url: '/company-profile', icon: Building2 },
     { title: 'Documents', url: '/documents', icon: FileText },
     { title: 'Tasks', url: '/tasks', icon: CheckSquare2 },
     { title: 'Progress', url: '/progress', icon: Target },
