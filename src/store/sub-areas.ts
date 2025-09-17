@@ -13,7 +13,7 @@ interface SubAreasState {
   // Actions
   loadSubAreas: (businessId: string) => Promise<void>;
   loadSubAreasByImpact: (businessId: string, impactArea: string) => Promise<ImpactSubArea[]>;
-  ensureDefaults: (businessId: string, impactArea: string) => Promise<void>;
+  ensureDefaults: (businessId: string) => Promise<void>;
   createSubArea: (businessId: string, impactArea: string, title: string, description?: string) => Promise<void>;
   updateSubAreaOrder: (updates: { id: string; sortOrder: number }[]) => Promise<void>;
   clearError: () => void;
@@ -53,7 +53,7 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
     }
   },
 
-  ensureDefaults: async (businessId: string, impactArea: string) => {
+  ensureDefaults: async (businessId: string) => {
     try {
       // Seed defaults only once per business to prevent duplicates (server seeds all areas)
       const allSubAreas = await subAreasService.getSubAreas(businessId);
@@ -61,8 +61,8 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
         await subAreasService.seedDefaultSubAreas(businessId);
       }
       
-      // Load and set the sub-areas
-      await get().loadSubAreasByImpact(businessId, impactArea);
+      // Load and set all sub-areas
+      await get().loadSubAreas(businessId);
     } catch (error) {
       console.error('Error ensuring default sub-areas:', error);
       set({ 

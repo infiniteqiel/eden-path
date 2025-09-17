@@ -26,6 +26,7 @@ import {
 import { useBusinessStore } from '@/store/business';
 import { useToast } from '@/hooks/use-toast';
 import { useAuthStore } from '@/store/auth';
+import { usePostBusinessCreation } from '@/hooks/use-business-context';
 
 interface CompanyCreationModalProps {
   open: boolean;
@@ -37,15 +38,18 @@ export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProp
     name: '',
     description: '',
     industry: '',
-    size: '',
-    stage: '',
-    location: ''
+    companyNumber: '',
+    legalForm: '' as 'Ltd' | 'LLP' | 'CIC' | '',
+    country: 'UK' as 'UK',
+    operatingMonths: '',
+    workersCount: '1'
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createBusiness } = useBusinessStore();
   const { user } = useAuthStore();
   const { toast } = useToast();
+  const { initializeNewBusiness } = usePostBusinessCreation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,12 +65,20 @@ export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProp
     }
 
     try {
-      await createBusiness({
+      const business = await createBusiness({
         accountId: user.id,
         name: formData.name,
-        industry: formData.industry,
-        workersCount: parseInt(formData.size) || 1
+        description: formData.description || undefined,
+        industry: formData.industry || undefined,
+        companyNumber: formData.companyNumber || undefined,
+        legalForm: formData.legalForm || undefined,
+        country: formData.country,
+        operatingMonths: parseInt(formData.operatingMonths) || undefined,
+        workersCount: parseInt(formData.workersCount) || 1
       });
+
+      // Initialize business data after creation
+      await initializeNewBusiness(business.id);
 
       toast({
         title: "Company Created",
@@ -78,9 +90,11 @@ export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProp
         name: '',
         description: '',
         industry: '',
-        size: '',
-        stage: '',
-        location: ''
+        companyNumber: '',
+        legalForm: '' as 'Ltd' | 'LLP' | 'CIC' | '',
+        country: 'UK' as 'UK',
+        operatingMonths: '',
+        workersCount: '1'
       });
     } catch (error) {
       toast({
@@ -123,13 +137,46 @@ export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="companyNumber">Company Number</Label>
               <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                placeholder="City, Country"
+                id="companyNumber"
+                value={formData.companyNumber}
+                onChange={(e) => setFormData(prev => ({ ...prev, companyNumber: e.target.value }))}
+                placeholder="e.g., 12345678"
               />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="legalForm">Legal Form *</Label>
+              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, legalForm: value as 'Ltd' | 'LLP' | 'CIC' }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select legal form" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Ltd">Private Limited Company (Ltd)</SelectItem>
+                  <SelectItem value="LLP">Limited Liability Partnership (LLP)</SelectItem>
+                  <SelectItem value="CIC">Community Interest Company (CIC)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="operatingMonths">Operating Months *</Label>
+              <Input
+                id="operatingMonths"
+                type="number"
+                min="0"
+                max="120"
+                value={formData.operatingMonths}
+                onChange={(e) => setFormData(prev => ({ ...prev, operatingMonths: e.target.value }))}
+                placeholder="e.g., 12"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                How many months has your business been operating?
+              </p>
             </div>
           </div>
 
@@ -159,44 +206,32 @@ export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProp
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="size">Company Size</Label>
-              <Select onValueChange={(value) => setFormData(prev => ({ ...prev, size: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select team size" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">Just me (founder)</SelectItem>
-                  <SelectItem value="2-5">2-5 employees</SelectItem>
-                  <SelectItem value="6-10">6-10 employees</SelectItem>
-                  <SelectItem value="11-25">11-25 employees</SelectItem>
-                  <SelectItem value="26-50">26-50 employees</SelectItem>
-                  <SelectItem value="50+">50+ employees</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="workersCount">Number of Workers *</Label>
+              <Input
+                id="workersCount"
+                type="number"
+                min="1"
+                value={formData.workersCount}
+                onChange={(e) => setFormData(prev => ({ ...prev, workersCount: e.target.value }))}
+                placeholder="1"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Include founders and all employees
+              </p>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="stage">Business Stage</Label>
-            <Select onValueChange={(value) => setFormData(prev => ({ ...prev, stage: value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select current stage" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="idea">Idea Stage</SelectItem>
-                <SelectItem value="startup">Early Startup</SelectItem>
-                <SelectItem value="growth">Growth Stage</SelectItem>
-                <SelectItem value="established">Established Business</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
           <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <Button type="submit" disabled={!formData.name || isSubmitting} className="flex-1">
+            <Button 
+              type="submit" 
+              disabled={!formData.name || !formData.legalForm || !formData.operatingMonths || isSubmitting} 
+              className="flex-1"
+            >
               {isSubmitting ? "Creating..." : "Create Company"}
             </Button>
             <Button type="button" variant="outline" onClick={handleSkip} className="flex-1">
-              Skip this step and upload documents
+              Skip this step
             </Button>
           </div>
         </form>

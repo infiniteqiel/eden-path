@@ -8,6 +8,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { Business } from '@/domain/data-contracts';
 import { businessService } from '@/services/registry';
+import { subAreasService } from '@/services/adapters/supabase/sub-areas';
 
 interface BusinessState {
   businesses: Business[];
@@ -79,6 +80,15 @@ export const useBusinessStore = create<BusinessState>()(
         try {
           const business = await businessService.create(businessData);
           const { businesses } = get();
+          
+          // Seed default sub-areas for the new business
+          try {
+            await subAreasService.seedDefaultSubAreas(business.id);
+          } catch (subAreaError) {
+            console.warn('Failed to seed default sub-areas:', subAreaError);
+            // Don't throw here - business creation succeeded
+          }
+          
           set({ 
             businesses: [...businesses, business],
             currentBusiness: business,

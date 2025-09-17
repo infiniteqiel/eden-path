@@ -72,7 +72,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
     if (currentBusiness) {
       loadImpactSummaries(currentBusiness.id);
       loadTodos(currentBusiness.id);
-      ensureDefaults(currentBusiness.id, config.impactArea);
+      ensureDefaults(currentBusiness.id);
       loadSubAreasByImpact(currentBusiness.id, config.impactArea);
     }
   }, [currentBusiness, loadImpactSummaries, loadTodos, ensureDefaults, loadSubAreasByImpact, config.impactArea]);

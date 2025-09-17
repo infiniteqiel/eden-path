@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/store/auth';
 import { useBusinessStore } from '@/store/business';
+import { useBusinessContext } from '@/hooks/use-business-context';
 import { Business } from '@/domain/data-contracts';
 
 interface AppHeaderProps {
@@ -30,7 +31,8 @@ interface AppHeaderProps {
 export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
-  const { currentBusiness, businesses } = useBusinessStore();
+  const { businesses, selectBusiness } = useBusinessStore();
+  const { currentBusiness } = useBusinessContext();
   const [companyModalOpen, setCompanyModalOpen] = React.useState(false);
 
   const handleSignOut = async () => {
@@ -38,9 +40,8 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
     navigate('/');
   };
 
-  const handleBusinessChange = (business: Business) => {
-    // Navigate to dashboard with new business
-    navigate(`/dashboard`);
+  const handleBusinessChange = async (business: Business) => {
+    await selectBusiness(business.id);
   };
 
   if (mode === 'public') {
