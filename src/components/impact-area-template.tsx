@@ -14,6 +14,7 @@ import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
 import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
 import { DroppableSubArea } from '@/components/droppable-sub-area';
+import { DroppableUnassignedArea } from '@/components/droppable-unassigned-area';
 import { DraggableTask } from '@/components/draggable-task';
 import { AddSubAreaModal } from '@/components/add-sub-area-modal';
 import { Button } from '@/components/ui/button';
@@ -98,28 +99,100 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
 
     if (!over || active.id === over.id) return;
 
-    // Handle task being dropped on a sub-area
-    if (over.data?.current?.type === 'subArea') {
-      const taskId = active.id as string;
-      const subAreaId = over.id as string;
-      
-      try {
+    const taskId = active.id as string;
+
+    try {
+      // Handle task being dropped on a sub-area
+      if (over.data?.current?.type === 'subArea') {
+        const subAreaId = over.id as string;
         await assignTaskToSubArea(taskId, subAreaId);
         toast({
           title: "Task assigned",
           description: "Task has been assigned to the selected area.",
         });
+      }
+      // Handle task being dropped on unassigned area
+      else if (over.data?.current?.type === 'unassigned') {
+        await assignTaskToSubArea(taskId, null);
+        toast({
+          title: "Task unassigned",
+          description: "Task has been moved to unassigned tasks.",
+        });
+      }
+      
+      if (currentBusiness) {
+        loadTodos(currentBusiness.id);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update task assignment.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleOrganiseTasks = async () => {
+    if (!currentBusiness || unassignedTasks.length === 0) return;
+
+    try {
+      let assignedCount = 0;
+      
+      // Auto-map tasks to sub-areas based on keyword matching
+      for (const task of unassignedTasks) {
+        const taskText = `${task.title} ${task.descriptionMd || ''}`.toLowerCase();
+        
+        // Find best matching sub-area
+        let bestMatch = null;
+        let bestScore = 0;
+        
+        for (const subArea of subAreas.filter(sa => sa.impactArea === config.impactArea)) {
+          const areaText = `${subArea.title} ${subArea.description || ''}`.toLowerCase();
+          
+          // Simple keyword matching score
+          let score = 0;
+          const areaWords = areaText.split(' ').filter(w => w.length > 3);
+          
+          for (const word of areaWords) {
+            if (taskText.includes(word)) {
+              score += 1;
+            }
+          }
+          
+          if (score > bestScore) {
+            bestScore = score;
+            bestMatch = subArea;
+          }
+        }
+        
+        // Assign if we found a decent match
+        if (bestMatch && bestScore > 0) {
+          await assignTaskToSubArea(task.id, bestMatch.id);
+          assignedCount++;
+        }
+      }
+      
+      if (assignedCount > 0) {
+        toast({
+          title: "Tasks organised",
+          description: `${assignedCount} task${assignedCount === 1 ? '' : 's'} automatically assigned to areas.`,
+        });
         
         if (currentBusiness) {
           loadTodos(currentBusiness.id);
         }
-      } catch (error) {
+      } else {
         toast({
-          title: "Error",
-          description: "Failed to assign task to area.",
-          variant: "destructive",
+          title: "No matches found",
+          description: "No clear matches found between tasks and areas.",
         });
       }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to organise tasks.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -258,26 +331,39 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
 
                 {/* Impact Areas */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-xl font-bold">{config.impactArea} Areas</h3>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setShowAddAreaModal(true)}
-                      className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
-                    >
-                      <Plus className="h-4 w-4" />
-                      Add Area
-                    </Button>
-                  </div>
-
                   <DndContext
                     sensors={sensors}
                     onDragStart={handleDragStart}
                     onDragEnd={handleDragEnd}
                     collisionDetection={closestCorners}
                   >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-xl font-bold">{config.impactArea} Areas</h3>
+                      <div className="flex items-center gap-3">
+                        {unassignedTasks.length > 0 && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={handleOrganiseTasks}
+                            className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
+                          >
+                            <CheckSquare2 className="h-4 w-4" />
+                            Organise Tasks
+                          </Button>
+                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setShowAddAreaModal(true)}
+                          className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add Area
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                       {subAreas
                         .filter(sa => sa.impactArea === config.impactArea)
                         .map((subArea) => (
@@ -299,6 +385,14 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                         ))}
                     </div>
 
+                    {/* Unified All Tasks Section */}
+                    <DroppableUnassignedArea
+                      tasks={unassignedTasks}
+                      impactArea={config.impactArea}
+                      onTaskToggle={handleTodoToggle}
+                      onTaskClick={setExpandedTaskId}
+                    />
+
                     <DragOverlay>
                       {activeTask && (
                         <div className="bg-white rounded-lg p-4 shadow-lg border-2 border-primary/30 animate-scale-in">
@@ -313,54 +407,6 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                   </DndContext>
 
                 </section>
-
-                {/* All Tasks - INSIDE DndContext */}
-                <DndContext
-                  sensors={sensors}
-                  onDragStart={handleDragStart}
-                  onDragEnd={handleDragEnd}
-                  collisionDetection={closestCorners}
-                >
-                  <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-bold">All {config.impactArea} Tasks</h3>
-                      <p className="text-sm text-muted-foreground">Drag & Drop tasks to organize them into areas above</p>
-                    </div>
-                    
-                     {unassignedTasks.length > 0 ? (
-                       <div className="space-y-4">
-                         {unassignedTasks.map(todo => (
-                           <DraggableTask
-                             key={todo.id}
-                             task={todo}
-                             onToggleStatus={handleTodoToggle}
-                             onClick={() => setExpandedTaskId(todo.id)}
-                           />
-                         ))}
-                       </div>
-                     ) : (
-                      <div className="text-center py-12 animate-fade-in">
-                        <CheckSquare2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                        <p className="text-muted-foreground">No unassigned {config.impactArea.toLowerCase()} tasks</p>
-                        <p className="text-sm text-muted-foreground mt-2">
-                          All tasks have been organized or generate new ones through document analysis
-                        </p>
-                      </div>
-                    )}
-                  </section>
-
-                  <DragOverlay>
-                    {activeTask && (
-                      <div className="bg-white rounded-lg p-4 shadow-lg border-2 border-primary/30 animate-scale-in">
-                        <TodoItem
-                          todo={activeTask}
-                          onToggleStatus={() => {}}
-                          showImpact={false}
-                        />
-                      </div>
-                    )}
-                  </DragOverlay>
-                </DndContext>
 
                 {/* Documents */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
