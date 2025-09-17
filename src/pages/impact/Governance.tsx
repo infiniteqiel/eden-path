@@ -232,22 +232,22 @@ const Governance = () => {
                   </div>
                 </section>
 
-                {/* Governance Documents */}
-                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                  <ImpactFilesSection 
-                    impactArea="Governance" 
-                    className="bg-transparent border-0 shadow-none p-0"
-                  />
-                </section>
-
                 {/* All Governance Tasks */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="text-xl font-bold mb-6">All Governance Tasks</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold">All Governance Tasks</h3>
+                    <p className="text-sm text-muted-foreground">Drag & Drop tasks to organize them into areas above</p>
+                  </div>
                   
                    {governanceTodos.length > 0 ? (
                      <div className="space-y-4">
                        {governanceTodos.map(todo => (
-                         <div key={todo.id} className="bg-white/60 rounded-lg p-4 cursor-pointer hover:shadow-md transition-all duration-200" onClick={() => setExpandedTaskId(todo.id)}>
+                         <div 
+                           key={todo.id} 
+                           className="bg-white/60 rounded-lg p-4 cursor-move hover:shadow-md transition-all duration-200 border-l-4 border-primary/20" 
+                           onClick={() => setExpandedTaskId(todo.id)}
+                           draggable
+                         >
                            <TodoItem
                              todo={todo}
                              onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
@@ -265,6 +265,14 @@ const Governance = () => {
                       </p>
                     </div>
                   )}
+                </section>
+
+                {/* Governance Documents */}
+                <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                  <ImpactFilesSection 
+                    impactArea="Governance" 
+                    className="bg-transparent border-0 shadow-none p-0"
+                  />
                 </section>
 
                 {/* Resources */}
