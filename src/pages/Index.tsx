@@ -77,6 +77,7 @@ const Index = () => {
                   currentBusiness={currentBusiness}
                   onBusinessChange={(business) => selectBusiness(business.id)}
                   onAddCompany={() => setCompanyModalOpen(true)}
+                  hideAddCompany={true}
                 />
               </div>
             </div>
