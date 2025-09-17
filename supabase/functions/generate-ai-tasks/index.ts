@@ -164,14 +164,47 @@ IMPORTANT: Return ONLY valid JSON, no markdown formatting, no code blocks, no ex
 
     console.log('Successfully parsed', tasksData.tasks.length, 'tasks');
 
-    // Insert tasks into database
+    // Normalize data to match UI expectations
+    const normalizeImpactArea = (area: string): string => {
+      const normalized = area.toLowerCase();
+      const impactMap: Record<string, string> = {
+        'governance': 'Governance',
+        'workers': 'Workers', 
+        'community': 'Community',
+        'environment': 'Environment',
+        'customers': 'Customers'
+      };
+      return impactMap[normalized] || 'Other';
+    };
+
+    const normalizePriority = (priority: string): string => {
+      const normalized = priority.toLowerCase();
+      const priorityMap: Record<string, string> = {
+        'high': 'P1',
+        'medium': 'P2', 
+        'low': 'P3'
+      };
+      return priorityMap[normalized] || 'P2';
+    };
+
+    const normalizeEffort = (effort: string): string => {
+      const normalized = effort.toLowerCase();
+      const effortMap: Record<string, string> = {
+        'low': 'Low',
+        'medium': 'Medium',
+        'high': 'High'
+      };
+      return effortMap[normalized] || 'Medium';
+    };
+
+    // Insert tasks into database with normalized values
     const tasksToInsert = tasksData.tasks.map((task: any) => ({
       title: task.title,
       description_md: task.description,
-      impact: task.impact_area.toLowerCase(),
-      priority: task.priority.toLowerCase(),
-      effort: task.effort.toLowerCase(),
-      status: 'not_started',
+      impact: normalizeImpactArea(task.impact_area),
+      priority: normalizePriority(task.priority),
+      effort: normalizeEffort(task.effort),
+      status: 'todo',
       business_id: businessId,
       user_id: user.id,
     }));

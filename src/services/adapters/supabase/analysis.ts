@@ -49,17 +49,57 @@ export const listTodos = async (businessId: string): Promise<Todo[]> => {
 
   if (error) throw error;
 
+  // Backward compatibility: normalize any legacy data
+  const normalizeImpact = (impact: string): ImpactArea => {
+    const impactMap: Record<string, ImpactArea> = {
+      'governance': 'Governance',
+      'workers': 'Workers',
+      'community': 'Community', 
+      'environment': 'Environment',
+      'customers': 'Customers'
+    };
+    return impactMap[impact.toLowerCase()] || (impact as ImpactArea) || 'Other';
+  };
+
+  const normalizePriority = (priority: string): Todo['priority'] => {
+    const priorityMap: Record<string, Todo['priority']> = {
+      'high': 'P1',
+      'medium': 'P2',
+      'low': 'P3'
+    };
+    return priorityMap[priority.toLowerCase()] || (priority as Todo['priority']) || 'P2';
+  };
+
+  const normalizeEffort = (effort: string): Todo['effort'] => {
+    const effortMap: Record<string, Todo['effort']> = {
+      'low': 'Low',
+      'medium': 'Medium',
+      'high': 'High'
+    };
+    return effortMap[effort.toLowerCase()] || (effort as Todo['effort']) || 'Medium';
+  };
+
+  const normalizeStatus = (status: string): Todo['status'] => {
+    const statusMap: Record<string, Todo['status']> = {
+      'not_started': 'todo',
+      'in_progress': 'in_progress',
+      'blocked': 'blocked',
+      'done': 'done'
+    };
+    return statusMap[status] || (status as Todo['status']) || 'todo';
+  };
+
   return (data || []).map(row => ({
     id: row.id,
     businessId: row.business_id,
-    impact: row.impact as ImpactArea,
+    impact: normalizeImpact(row.impact),
     requirementCode: row.requirement_code,
     kbActionId: row.kb_action_id,
     title: row.title,
     descriptionMd: row.description_md,
-    priority: row.priority as Todo['priority'],
-    effort: row.effort as Todo['effort'],
-    status: row.status as Todo['status'],
+    priority: normalizePriority(row.priority),
+    effort: normalizeEffort(row.effort),
+    status: normalizeStatus(row.status),
     evidenceChunkIds: row.evidence_chunk_ids || [],
     ownerUserId: row.owner_user_id,
     dueDate: row.due_date,
