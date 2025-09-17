@@ -4,13 +4,13 @@ import { Card } from "@/components/ui/card";
 import { AppHeader } from "@/components/app-header";
 import { ImpactCard } from "@/components/impact-card";
 import { UploadDropzone } from "@/components/upload-dropzone";
-import { BusinessSwitcher } from "@/components/business-switcher";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { CompanyCreationModal } from "@/components/company-creation-modal";
 import { useAuthStore } from "@/store/auth";
 import { useBusinessStore } from "@/store/business";
 import { useAnalysisStore } from "@/store/analysis";
 import { useDataroomStore } from "@/store/dataroom";
-import { FileText, CheckSquare, Scale, ArrowRight, Shield, Users, Target, Building, Leaf } from "lucide-react";
+import { FileText, CheckSquare, Scale, ArrowRight, Shield, Users, Target, Building, Leaf, Check, ChevronDown, Building2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 import legalProtectionImage from '@/assets/legal-protection-singapore.jpg';
@@ -72,13 +72,48 @@ const Index = () => {
                 Transform your business into a force for good. Track your progress toward B Corporation certification with our comprehensive readiness platform.
               </p>
               <div className="inline-block">
-                <BusinessSwitcher
-                  businesses={businesses}
-                  currentBusiness={currentBusiness}
-                  onBusinessChange={(business) => selectBusiness(business.id)}
-                  onAddCompany={() => setCompanyModalOpen(true)}
-                  hideAddCompany={true}
-                />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-9 px-3 font-medium"
+                    >
+                      <Building2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                      <span className="max-w-[200px] truncate">
+                        {currentBusiness?.name || 'Select business'}
+                      </span>
+                      <ChevronDown className="h-3 w-3 ml-2 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-64 bg-background border border-border shadow-md z-[60]">
+                    {businesses.length > 0 ? (
+                      businesses.map((business) => (
+                        <DropdownMenuItem
+                          key={business.id}
+                          onClick={() => selectBusiness(business.id)}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium">{business.name}</span>
+                            {business.companyNumber && (
+                              <span className="text-xs text-muted-foreground">
+                                {business.companyNumber}
+                              </span>
+                            )}
+                          </div>
+                          {currentBusiness?.id === business.id && (
+                            <Check className="h-4 w-4 text-primary" />
+                          )}
+                        </DropdownMenuItem>
+                      ))
+                    ) : (
+                      <DropdownMenuItem disabled className="text-muted-foreground">
+                        No businesses yet
+                      </DropdownMenuItem>
+                    )}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
