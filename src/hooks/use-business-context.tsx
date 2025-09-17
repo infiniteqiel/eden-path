@@ -60,10 +60,13 @@ export function usePostBusinessCreation() {
   const dataroomStore = useDataroomStore();
   const subAreasStore = useSubAreasStore();
 
-  const initializeNewBusiness = async (businessId: string) => {
+  const initializeNewBusiness = async (businessId: string, businessData?: any) => {
     try {
       // Ensure default sub-areas are loaded
       await subAreasStore.ensureDefaults(businessId);
+      
+      // Generate baseline B Corp tasks for new company
+      await generateBaselineTasks(businessId, businessData);
       
       // Initialize empty state for other stores
       analysisStore.clearError();
@@ -77,6 +80,28 @@ export function usePostBusinessCreation() {
       ]);
     } catch (error) {
       console.warn('Failed to initialize new business:', error);
+    }
+  };
+
+  const generateBaselineTasks = async (businessId: string, businessData?: any) => {
+    try {
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('generate-baseline-tasks', {
+        body: {
+          businessId,
+          businessData
+        }
+      });
+
+      if (error) {
+        console.error('Failed to generate baseline tasks:', error);
+        return;
+      }
+
+      console.log('Baseline tasks generated successfully:', data);
+    } catch (error) {
+      console.error('Error generating baseline tasks:', error);
     }
   };
 

@@ -77,8 +77,16 @@ export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProp
         workersCount: parseInt(formData.workersCount) || 1
       });
 
-      // Initialize business data after creation
-      await initializeNewBusiness(business.id);
+      // Initialize business data after creation with business data for task generation
+      await initializeNewBusiness(business.id, {
+        name: formData.name,
+        description: formData.description,
+        industry: formData.industry,
+        legalForm: formData.legalForm,
+        country: formData.country,
+        operatingMonths: formData.operatingMonths,
+        workersCount: formData.workersCount
+      });
 
       toast({
         title: "Company Created",
