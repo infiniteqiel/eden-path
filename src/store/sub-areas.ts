@@ -41,13 +41,8 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
   loadSubAreasByImpact: async (businessId: string, impactArea: string) => {
     try {
       const subAreas = await subAreasService.getSubAreasByImpact(businessId, impactArea);
-      
-      // Update the store with the new sub-areas for this impact area
-      const currentSubAreas = get().subAreas;
-      const otherSubAreas = currentSubAreas.filter(sa => sa.impactArea !== impactArea);
-      const updatedSubAreas = [...otherSubAreas, ...subAreas];
-      
-      set({ subAreas: updatedSubAreas });
+      // Only keep sub-areas for the active impact area to avoid cross-area mixing
+      set({ subAreas });
       return subAreas;
     } catch (error) {
       console.error('Error loading sub-areas by impact:', error);
@@ -60,11 +55,9 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
 
   ensureDefaults: async (businessId: string, impactArea: string) => {
     try {
-      // Check if sub-areas already exist for this impact area
-      const existingSubAreas = await subAreasService.getSubAreasByImpact(businessId, impactArea);
-      
-      // Only seed if no sub-areas exist for this impact area
-      if (existingSubAreas.length === 0) {
+      // Seed defaults only once per business to prevent duplicates (server seeds all areas)
+      const allSubAreas = await subAreasService.getSubAreas(businessId);
+      if (allSubAreas.length === 0) {
         await subAreasService.seedDefaultSubAreas(businessId);
       }
       

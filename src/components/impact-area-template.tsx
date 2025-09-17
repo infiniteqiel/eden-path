@@ -72,8 +72,9 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
       loadImpactSummaries(currentBusiness.id);
       loadTodos(currentBusiness.id);
       ensureDefaults(currentBusiness.id, config.impactArea);
+      loadSubAreasByImpact(currentBusiness.id, config.impactArea);
     }
-  }, [currentBusiness, loadImpactSummaries, loadTodos, ensureDefaults, config.impactArea]);
+  }, [currentBusiness, loadImpactSummaries, loadTodos, ensureDefaults, loadSubAreasByImpact, config.impactArea]);
 
   const impactSummary = impactSummaries.find(s => s.impact === config.impactArea);
   const impactTodos = todos.filter(t => t.impact === config.impactArea);
@@ -277,37 +278,27 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                     collisionDetection={closestCorners}
                   >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {subAreas.map((subArea) => (
-                        <DroppableSubArea
-                          key={subArea.id}
-                          subArea={subArea}
-                          tasks={getTasksForSubArea(subArea.id)}
-                          icon={getSubAreaIcon(subArea)}
-                          impactArea={config.impactArea}
-                          onTaskToggle={handleTodoToggle}
-                          onTaskClick={setExpandedTaskId}
-                          onAIChatClick={(subAreaTitle) => {
-                            setChatContext({level: 'subarea', subArea: subAreaTitle});
-                            setShowAIChat(true);
-                          }}
-                          onTaskGenerated={handleTaskGenerated}
-                          className="animate-fade-in hover-scale"
-                        />
-                      ))}
+                      {subAreas
+                        .filter(sa => sa.impactArea === config.impactArea)
+                        .map((subArea) => (
+                          <DroppableSubArea
+                            key={subArea.id}
+                            subArea={subArea}
+                            tasks={getTasksForSubArea(subArea.id)}
+                            icon={getSubAreaIcon(subArea)}
+                            impactArea={config.impactArea}
+                            onTaskToggle={handleTodoToggle}
+                            onTaskClick={setExpandedTaskId}
+                            onAIChatClick={(subAreaTitle) => {
+                              setChatContext({level: 'subarea', subArea: subAreaTitle});
+                              setShowAIChat(true);
+                            }}
+                            onTaskGenerated={handleTaskGenerated}
+                            className="animate-fade-in hover-scale"
+                          />
+                        ))}
                     </div>
 
-                    <DragOverlay>
-                      {activeTask && (
-                        <div className="bg-white rounded-lg p-4 shadow-lg border-2 border-primary/30 animate-scale-in">
-                          <TodoItem
-                            todo={activeTask}
-                            onToggleStatus={() => {}}
-                            showImpact={false}
-                          />
-                        </div>
-                      )}
-                    </DragOverlay>
-                  </DndContext>
                 </section>
 
                 {/* All Tasks - INSIDE DndContext */}
