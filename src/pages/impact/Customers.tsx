@@ -30,7 +30,7 @@ const Customers = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { currentBusiness } = useBusinessStore();
-  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
+  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, assignTaskToSubArea } = useAnalysisStore();
   const { subAreas, loadSubAreasByImpact } = useSubAreasStore();
   const [showAIChat, setShowAIChat] = useState(false);
   const [chatContext, setChatContext] = useState<{level: 'overview' | 'subarea' | 'task', subArea?: string, taskTitle?: string}>({level: 'overview'});

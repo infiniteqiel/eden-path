@@ -13,6 +13,7 @@ interface SubAreasState {
   // Actions
   loadSubAreas: (businessId: string) => Promise<void>;
   loadSubAreasByImpact: (businessId: string, impactArea: string) => Promise<ImpactSubArea[]>;
+  ensureDefaults: (businessId: string, impactArea: string) => Promise<void>;
   createSubArea: (businessId: string, impactArea: string, title: string, description?: string) => Promise<void>;
   updateSubAreaOrder: (updates: { id: string; sortOrder: number }[]) => Promise<void>;
   clearError: () => void;
@@ -54,6 +55,18 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
         error: error instanceof Error ? error.message : 'Failed to load sub-areas'
       });
       return [];
+    }
+  },
+
+  ensureDefaults: async (businessId: string, impactArea: string) => {
+    try {
+      await subAreasService.seedDefaultSubAreas(businessId);
+      await get().loadSubAreasByImpact(businessId, impactArea);
+    } catch (error) {
+      console.error('Error ensuring default sub-areas:', error);
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to ensure default sub-areas'
+      });
     }
   },
 
