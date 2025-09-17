@@ -187,13 +187,14 @@ IMPORTANT: Return ONLY valid JSON, no markdown formatting, no code blocks, no ex
       throw insertError;
     }
 
-    console.log('Successfully inserted tasks:', insertedTasks?.length);
+    console.log('Successfully inserted', insertedTasks?.length, 'new tasks for business:', businessId);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         tasksGenerated: insertedTasks?.length || 0,
-        tasks: insertedTasks 
+        tasks: insertedTasks,
+        businessId: businessId
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

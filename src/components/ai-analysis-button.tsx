@@ -12,14 +12,16 @@ import { supabase } from '@/integrations/supabase/client';
 interface AiAnalysisButtonProps {
   businessId: string;
   triggerText?: string;
-  customContext?: string;
+  savedDescription?: string;
+  hasUnsavedChanges?: boolean;
   onAnalysisComplete?: () => void;
 }
 
 export function AiAnalysisButton({ 
   businessId, 
   triggerText = "Start AI Analysis",
-  customContext,
+  savedDescription = '',
+  hasUnsavedChanges = false,
   onAnalysisComplete
 }: AiAnalysisButtonProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -36,28 +38,36 @@ export function AiAnalysisButton({
       return;
     }
 
+    if (hasUnsavedChanges) {
+      toast({
+        title: "Unsaved Changes",
+        description: "Please save your description before analyzing.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!savedDescription || !savedDescription.trim()) {
+      toast({
+        title: "No Description",
+        description: "Please save a company description first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     setIsComplete(false);
 
     try {
       console.log('Starting AI analysis for business:', businessId);
-
-      if (!customContext || !customContext.trim()) {
-        toast({
-          title: "No saved description",
-          description: "Please save your company description first, then analyze.",
-          variant: "destructive",
-        });
-        setIsAnalyzing(false);
-        return;
-      }
       
       // Call the AI task generation function using the saved description only
       const { data, error } = await supabase.functions.invoke('generate-ai-tasks', {
         body: {
           businessId,
-          context: customContext.trim(),
-          analysisType: 'profile_description_only'
+          context: savedDescription.trim(),
+          analysisType: 'company_description_analysis'
         }
       });
 
@@ -71,10 +81,13 @@ export function AiAnalysisButton({
       setIsComplete(true);
       toast({
         title: "Analysis Complete",
-        description: "AI has analyzed your company profile and generated B Corp recommendations.",
+        description: `AI has analyzed your company description and generated ${data?.tasksGenerated || 0} new B Corp tasks.`,
       });
 
-      onAnalysisComplete?.();
+      // Trigger refresh of tasks in the UI if callback provided
+      if (onAnalysisComplete) {
+        onAnalysisComplete();
+      }
 
       // Reset the complete state after 3 seconds
       setTimeout(() => {
@@ -102,11 +115,20 @@ export function AiAnalysisButton({
     );
   }
 
+  const isDisabled = isAnalyzing || !businessId || hasUnsavedChanges || !savedDescription?.trim();
+
   return (
     <Button 
       onClick={handleAnalysis}
-      disabled={isAnalyzing || !businessId}
+      disabled={isDisabled}
       className="min-w-[200px]"
+      title={
+        hasUnsavedChanges 
+          ? "Save your description first" 
+          : !savedDescription?.trim() 
+            ? "No description saved" 
+            : undefined
+      }
     >
       {isAnalyzing ? (
         <>

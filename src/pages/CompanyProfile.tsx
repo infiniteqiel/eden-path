@@ -269,35 +269,48 @@ export default function CompanyProfile() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="description">Company Description</Label>
-                    <Textarea
-                      id="description"
-                      value={companyDescription}
-                      onChange={(e) => setCompanyDescription(e.target.value)}
-                      placeholder="Describe your company's mission, business model, and activities..."
-                      className="min-h-[120px]"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      This description will be used for AI analysis to generate B Corp recommendations.
-                    </p>
-                  </div>
+                   <div className="space-y-2">
+                     <div className="flex items-center justify-between">
+                       <Label htmlFor="description">Company Description</Label>
+                       {isDescriptionDirty && (
+                         <span className="text-xs text-amber-600 font-medium">
+                           • Unsaved changes
+                         </span>
+                       )}
+                     </div>
+                     <Textarea
+                       id="description"
+                       value={companyDescription}
+                       onChange={(e) => setCompanyDescription(e.target.value)}
+                       placeholder="Describe your company's mission, business model, and activities..."
+                       className="min-h-[120px]"
+                     />
+                     <p className="text-xs text-muted-foreground">
+                       This description will be used for AI analysis to generate B Corp recommendations.
+                     </p>
+                   </div>
                   
-                  <div className="flex justify-center gap-3">
-                    <Button 
-                      onClick={handleSaveDescription}
-                      disabled={isSavingDescription || !companyDescription.trim()}
-                      variant="outline"
-                    >
-                      <Save className="h-4 w-4 mr-2" />
-                      {isSavingDescription ? 'Saving...' : 'Save Description'}
-                    </Button>
-                    <AiAnalysisButton 
-                      businessId={currentBusiness.id}
-                      triggerText="Analyze Company Description"
-                      customContext={companyDescription}
-                    />
-                  </div>
+                   <div className="flex justify-center gap-3">
+                     <Button 
+                       onClick={handleSaveDescription}
+                       disabled={isSavingDescription || !companyDescription.trim() || !isDescriptionDirty}
+                       variant="outline"
+                       className={isDescriptionDirty ? "border-amber-200 bg-amber-50" : ""}
+                     >
+                       <Save className="h-4 w-4 mr-2" />
+                       {isSavingDescription ? 'Saving...' : isDescriptionDirty ? 'Save Changes' : 'Saved'}
+                     </Button>
+                     <AiAnalysisButton 
+                       businessId={currentBusiness.id}
+                       triggerText="Analyze Company Description"
+                       savedDescription={currentBusiness.description || ''}
+                       hasUnsavedChanges={isDescriptionDirty}
+                       onAnalysisComplete={() => {
+                         // Could trigger a reload of tasks if needed
+                         console.log('Analysis completed, tasks should be visible in Tasks page');
+                       }}
+                     />
+                   </div>
                 </CardContent>
               </Card>
 
