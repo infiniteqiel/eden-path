@@ -60,7 +60,15 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
 
   ensureDefaults: async (businessId: string, impactArea: string) => {
     try {
-      await subAreasService.seedDefaultSubAreas(businessId);
+      // Check if sub-areas already exist for this impact area
+      const existingSubAreas = await subAreasService.getSubAreasByImpact(businessId, impactArea);
+      
+      // Only seed if no sub-areas exist for this impact area
+      if (existingSubAreas.length === 0) {
+        await subAreasService.seedDefaultSubAreas(businessId);
+      }
+      
+      // Load and set the sub-areas
       await get().loadSubAreasByImpact(businessId, impactArea);
     } catch (error) {
       console.error('Error ensuring default sub-areas:', error);
