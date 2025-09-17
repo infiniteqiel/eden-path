@@ -44,6 +44,7 @@ export interface Business {
   operatingMonths?: number;
   workersCount?: number;
   industry?: string;
+  description?: string;
   createdAt: string;
 }
 

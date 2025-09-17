@@ -151,6 +151,7 @@ export type Database = {
           company_number: string | null
           country: string | null
           created_at: string
+          description: string | null
           id: string
           industry: string | null
           legal_form: string | null
@@ -164,6 +165,7 @@ export type Database = {
           company_number?: string | null
           country?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           industry?: string | null
           legal_form?: string | null
@@ -177,6 +179,7 @@ export type Database = {
           company_number?: string | null
           country?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           industry?: string | null
           legal_form?: string | null

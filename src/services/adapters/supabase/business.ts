@@ -30,6 +30,7 @@ export const list = async (): Promise<Business[]> => {
     operatingMonths: row.operating_months,
     workersCount: row.workers_count,
     industry: row.industry,
+    description: row.description,
     createdAt: row.created_at
   }));
 };
@@ -57,6 +58,7 @@ export const get = async (id: string): Promise<Business> => {
     operatingMonths: data.operating_months,
     workersCount: data.workers_count,
     industry: data.industry,
+    description: data.description,
     createdAt: data.created_at
   };
 };
@@ -75,7 +77,8 @@ export const create = async (business: Omit<Business, 'id' | 'createdAt'>): Prom
       country: business.country,
       operating_months: business.operatingMonths,
       workers_count: business.workersCount,
-      industry: business.industry
+      industry: business.industry,
+      description: business.description,
     })
     .select()
     .single();
@@ -92,6 +95,7 @@ export const create = async (business: Omit<Business, 'id' | 'createdAt'>): Prom
     operatingMonths: data.operating_months,
     workersCount: data.workers_count,
     industry: data.industry,
+    description: data.description,
     createdAt: data.created_at
   };
 };
@@ -109,7 +113,8 @@ export const update = async (id: string, updates: Partial<Business>): Promise<Bu
       country: updates.country,
       operating_months: updates.operatingMonths,
       workers_count: updates.workersCount,
-      industry: updates.industry
+      industry: updates.industry,
+      description: updates.description,
     })
     .eq('id', id)
     .eq('user_id', user.id)
@@ -128,6 +133,7 @@ export const update = async (id: string, updates: Partial<Business>): Promise<Bu
     operatingMonths: data.operating_months,
     workersCount: data.workers_count,
     industry: data.industry,
+    description: data.description,
     createdAt: data.created_at
   };
 };

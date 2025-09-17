@@ -36,8 +36,11 @@ export default function CompanyProfile() {
         industry: currentBusiness.industry || ''
       });
       
-      // Generate initial company description from existing data
-      setCompanyDescription(generateCompanyDescription(currentBusiness));
+      // Initialize company description from saved value or generate one
+      const initialDesc = currentBusiness.description && currentBusiness.description.trim().length > 0
+        ? currentBusiness.description
+        : generateCompanyDescription(currentBusiness);
+      setCompanyDescription(initialDesc);
     }
   }, [currentBusiness]);
 
@@ -77,8 +80,7 @@ export default function CompanyProfile() {
     
     setIsSavingDescription(true);
     try {
-      // In a real implementation, you'd save the description to the database
-      // For now, we'll just show a success message
+      await updateBusiness(currentBusiness.id, { description: companyDescription.trim() });
       toast({
         title: "Description Saved",
         description: "Company description has been saved successfully.",
@@ -109,6 +111,9 @@ export default function CompanyProfile() {
       </div>
     );
   }
+
+  // Determine if the description has unsaved changes
+  const isDescriptionDirty = (companyDescription.trim() !== (currentBusiness.description?.trim() || ''));
 
   return (
     <SidebarProvider>

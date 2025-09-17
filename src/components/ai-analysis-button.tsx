@@ -41,13 +41,23 @@ export function AiAnalysisButton({
 
     try {
       console.log('Starting AI analysis for business:', businessId);
+
+      if (!customContext || !customContext.trim()) {
+        toast({
+          title: "No saved description",
+          description: "Please save your company description first, then analyze.",
+          variant: "destructive",
+        });
+        setIsAnalyzing(false);
+        return;
+      }
       
-      // Call the AI task generation function
+      // Call the AI task generation function using the saved description only
       const { data, error } = await supabase.functions.invoke('generate-ai-tasks', {
         body: {
           businessId,
-          context: customContext || 'Company profile analysis',
-          analysisType: 'profile_analysis'
+          context: customContext.trim(),
+          analysisType: 'profile_description_only'
         }
       });
 
