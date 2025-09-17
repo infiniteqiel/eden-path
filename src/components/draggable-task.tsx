@@ -34,6 +34,7 @@ export function DraggableTask({ task, onToggleStatus, onClick }: DraggableTaskPr
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
+    transformOrigin: '0 0', // Ensure transform starts from top-left corner
   };
 
   return (
@@ -41,8 +42,9 @@ export function DraggableTask({ task, onToggleStatus, onClick }: DraggableTaskPr
       ref={setNodeRef}
       style={style}
       className={cn(
-        "bg-white/80 rounded p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200",
-        isDragging && "opacity-30 scale-105 shadow-xl border-2 border-primary/50"
+        "bg-white/80 rounded p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200 touch-none",
+        isDragging && "opacity-30 shadow-xl border-2 border-primary/50",
+        !isDragging && "hover:scale-[1.02]"
       )}
       onClick={!isDragging ? onClick : undefined}
       {...attributes}

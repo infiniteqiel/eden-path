@@ -63,7 +63,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 3,
       },
     })
   );
@@ -393,9 +393,19 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                       onTaskClick={setExpandedTaskId}
                     />
 
-                    <DragOverlay>
+                    <DragOverlay 
+                      dropAnimation={null}
+                      style={{
+                        cursor: 'grabbing',
+                      }}
+                    >
                       {activeTask && (
-                        <div className="bg-white rounded-lg p-4 shadow-lg border-2 border-primary/30 animate-scale-in">
+                        <div 
+                          className="bg-white rounded-lg p-3 shadow-2xl border-2 border-primary/50 rotate-2 scale-105 pointer-events-none"
+                          style={{
+                            transformOrigin: '0 0',
+                          }}
+                        >
                           <TodoItem
                             todo={activeTask}
                             onToggleStatus={() => {}}
