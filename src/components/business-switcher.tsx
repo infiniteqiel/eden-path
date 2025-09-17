@@ -22,6 +22,7 @@ interface BusinessSwitcherProps {
   onBusinessChange: (business: Business) => void;
   onAddCompany?: () => void;
   disabled?: boolean;
+  hideAddCompany?: boolean;
 }
 
 export function BusinessSwitcher({ 
@@ -29,7 +30,8 @@ export function BusinessSwitcher({
   currentBusiness, 
   onBusinessChange,
   onAddCompany,
-  disabled = false
+  disabled = false,
+  hideAddCompany = false
 }: BusinessSwitcherProps) {
   return (
     <DropdownMenu>
@@ -73,14 +75,18 @@ export function BusinessSwitcher({
             No businesses yet
           </DropdownMenuItem>
         )}
-        {businesses.length > 0 && <div className="border-t border-border my-1" />}
-        <DropdownMenuItem
-          onClick={onAddCompany}
-          className="flex items-center gap-2"
-        >
-          <Building2 className="h-4 w-4 text-muted-foreground" />
-          <span className="font-medium">+ Add New Company</span>
-        </DropdownMenuItem>
+        {!hideAddCompany && (
+          <>
+            {businesses.length > 0 && <div className="border-t border-border my-1" />}
+            <DropdownMenuItem
+              onClick={onAddCompany}
+              className="flex items-center gap-2"
+            >
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+              <span className="font-medium">+ Add New Company</span>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );
