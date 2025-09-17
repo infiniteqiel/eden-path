@@ -26,6 +26,7 @@ interface AnalysisState {
   loadTodos: (businessId: string) => Promise<void>;
   loadImpactSummaries: (businessId: string) => Promise<void>;
   updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<void>;
+  assignTaskToSubArea: (todoId: string, subAreaId: string | null) => Promise<void>;
   startAnalysis: (businessId: string) => Promise<void>;
   generateRoadmap: (businessId: string) => Promise<void>;
   resetTestData: (businessId: string) => Promise<void>;
@@ -109,6 +110,39 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
           todo.id === todoId ? originalTodo : todo
         ),
         error: error instanceof Error ? error.message : 'Failed to update todo'
+      }));
+    }
+  },
+
+  assignTaskToSubArea: async (todoId: string, subAreaId: string | null) => {
+    const { todos } = get();
+    const originalTodo = todos.find(t => t.id === todoId);
+    if (!originalTodo) return;
+
+    // Optimistically update UI first
+    set(state => ({
+      todos: state.todos.map(todo => 
+        todo.id === todoId ? { ...todo, subAreaId } : todo
+      ),
+      error: null
+    }));
+
+    try {
+      const updatedTodo = await analysisService.assignTaskToSubArea(todoId, subAreaId);
+      
+      // Confirm the update with server response
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? updatedTodo : todo
+        )
+      }));
+    } catch (error) {
+      // Revert optimistic update on error
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? originalTodo : todo
+        ),
+        error: error instanceof Error ? error.message : 'Failed to assign task to sub-area'
       }));
     }
   },

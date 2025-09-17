@@ -6,38 +6,57 @@
 
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DndContext, DragEndEvent, DragStartEvent, closestCorners, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
 import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
+import { DroppableSubArea } from '@/components/droppable-sub-area';
+import { DraggableTask } from '@/components/draggable-task';
+import { AddSubAreaModal } from '@/components/add-sub-area-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
+import { useSubAreasStore } from '@/store/sub-areas';
 import { Todo } from '@/domain/data-contracts';
-import { Leaf, Zap, Recycle, Droplets, CheckSquare2, MessageSquare, Home } from 'lucide-react';
+import { Leaf, Zap, Recycle, Droplets, CheckSquare2, MessageSquare, Home, Plus } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import { GrowTaskButton } from '@/components/grow-task-button';
+import { useToast } from '@/hooks/use-toast';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
 const Environment = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { currentBusiness } = useBusinessStore();
-  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus } = useAnalysisStore();
+  const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, assignTaskToSubArea } = useAnalysisStore();
+  const { subAreas, loadSubAreasByImpact, createSubArea } = useSubAreasStore();
   const [showAIChat, setShowAIChat] = useState(false);
   const [chatContext, setChatContext] = useState<{level: 'overview' | 'subarea' | 'task', subArea?: string, taskTitle?: string}>({level: 'overview'});
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
+  const [showAddAreaModal, setShowAddAreaModal] = useState(false);
+  const [activeId, setActiveId] = useState<string | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
 
   useEffect(() => {
     if (currentBusiness) {
       loadImpactSummaries(currentBusiness.id);
       loadTodos(currentBusiness.id);
+      loadSubAreasByImpact(currentBusiness.id, 'Environment');
     }
-  }, [currentBusiness, loadImpactSummaries, loadTodos]);
+  }, [currentBusiness, loadImpactSummaries, loadTodos, loadSubAreasByImpact]);
 
   const environmentSummary = impactSummaries.find(s => s.impact === 'Environment');
   const environmentTodos = todos.filter(t => t.impact === 'Environment');
@@ -51,48 +70,79 @@ const Environment = () => {
     }
   };
 
-  const environmentAreas = [
-    {
-      title: 'Energy & Carbon',
-      description: 'Energy consumption and carbon footprint management',
-      icon: Zap,
-      tasks: environmentTodos.filter(t => 
-        t.title.toLowerCase().includes('energy') || 
-        t.title.toLowerCase().includes('carbon') || 
-        t.title.toLowerCase().includes('emissions')
-      )
-    },
-    {
-      title: 'Waste Management',
-      description: 'Waste reduction, recycling, and circular economy',
-      icon: Recycle,
-      tasks: environmentTodos.filter(t => 
-        t.title.toLowerCase().includes('waste') || 
-        t.title.toLowerCase().includes('recycl') || 
-        t.title.toLowerCase().includes('circular')
-      )
-    },
-    {
-      title: 'Water & Resources',
-      description: 'Water conservation and resource efficiency',
-      icon: Droplets,
-      tasks: environmentTodos.filter(t => 
-        t.title.toLowerCase().includes('water') || 
-        t.title.toLowerCase().includes('resource') || 
-        t.title.toLowerCase().includes('material')
-      )
-    },
-    {
-      title: 'Environmental Policy',
-      description: 'Environmental management systems and policies',
-      icon: Leaf,
-      tasks: environmentTodos.filter(t => 
-        t.title.toLowerCase().includes('policy') || 
-        t.title.toLowerCase().includes('management') || 
-        t.title.toLowerCase().includes('compliance')
-      )
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (!over || active.id === over.id) return;
+
+    // Handle task being dropped on a sub-area
+    if (over.data?.current?.type === 'subArea') {
+      const taskId = active.id as string;
+      const subAreaId = over.id as string;
+      
+      try {
+        await assignTaskToSubArea(taskId, subAreaId);
+        toast({
+          title: "Task assigned",
+          description: "Task has been assigned to the selected area.",
+        });
+        
+        if (currentBusiness) {
+          loadTodos(currentBusiness.id);
+        }
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to assign task to area.",
+          variant: "destructive",
+        });
+      }
     }
-  ];
+  };
+
+  const handleTaskGenerated = () => {
+    if (currentBusiness) {
+      loadTodos(currentBusiness.id);
+      loadImpactSummaries(currentBusiness.id);
+    }
+  };
+
+  const handleCreateSubArea = async (title: string, description?: string) => {
+    if (!currentBusiness) return;
+    
+    try {
+      await createSubArea(currentBusiness.id, 'Environment', title, description);
+      
+      toast({
+        title: "Area created",
+        description: `${title} has been added successfully.`,
+      });
+      
+      loadSubAreasByImpact(currentBusiness.id, 'Environment');
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create area.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Get tasks for each sub-area
+  const getTasksForSubArea = (subAreaId: string) => {
+    return environmentTodos.filter(todo => todo.subAreaId === subAreaId);
+  };
+
+  // Get unassigned tasks for the "All Tasks" section
+  const unassignedTasks = environmentTodos.filter(todo => !todo.subAreaId);
+
+  // Get the dragged task for overlay
+  const activeTask = activeId ? environmentTodos.find(t => t.id === activeId) : null;
 
   return (
     <SidebarProvider>
@@ -193,63 +243,60 @@ const Environment = () => {
 
                 {/* Environment Areas */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="text-xl font-bold mb-6">Environmental Impact Areas</h3>
-                  
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     {environmentAreas.map((area) => (
-                       <Card key={area.title} className="bg-white/60 relative">
-                         <CardHeader>
-                           <CardTitle className="flex items-center gap-2">
-                             <area.icon className="h-5 w-5 text-primary" />
-                             {area.title}
-                           </CardTitle>
-                           <CardDescription>{area.description}</CardDescription>
-                         </CardHeader>
-                          {/* AI Chat Icon for Sub-Area - Top Right */}
-                          <div className="absolute top-4 right-4">
-                            <AIChatIcon 
-                              onClick={() => {
-                                setChatContext({level: 'subarea', subArea: area.title});
-                                setShowAIChat(true);
-                              }}
-                              size="sm"
-                            />
-                          </div>
-                        <CardContent>
-                          <div className="space-y-3">
-                            {area.tasks.length > 0 ? (
-                               area.tasks.map(task => (
-                                 <div 
-                                   key={task.id} 
-                                   className="bg-white/80 rounded p-3 cursor-pointer hover:bg-white/90 transition-colors"
-                                   onClick={() => setExpandedTaskId(task.id)}
-                                 >
-                                   <TodoItem
-                                     todo={task}
-                                     onToggleStatus={(status) => handleTodoToggle(task.id, status)}
-                                   />
-                                 </div>
-                               ))
-                             ) : (
-                               <div className="space-y-3">
-                                 <p className="text-sm text-muted-foreground">No specific tasks for this area yet</p>
-                                 <GrowTaskButton
-                                   subArea={area.title}
-                                   impactArea="Environment"
-                                   onTaskGenerated={() => {
-                                     if (currentBusiness) {
-                                       loadTodos(currentBusiness.id);
-                                       loadImpactSummaries(currentBusiness.id);
-                                     }
-                                   }}
-                                 />
-                               </div>
-                             )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold">Environmental Impact Areas</h3>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setShowAddAreaModal(true)}
+                      className="flex items-center gap-2 hover:scale-105 transition-transform duration-200"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Area
+                    </Button>
                   </div>
+
+                  <DndContext
+                    sensors={sensors}
+                    onDragStart={handleDragStart}
+                    onDragEnd={handleDragEnd}
+                    collisionDetection={closestCorners}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {subAreas.map((subArea) => (
+                        <DroppableSubArea
+                          key={subArea.id}
+                          subArea={subArea}
+                          tasks={getTasksForSubArea(subArea.id)}
+                          icon={subArea.isUserCreated ? Plus : 
+                                subArea.title.toLowerCase().includes('energy') ? Zap :
+                                subArea.title.toLowerCase().includes('waste') ? Recycle :
+                                subArea.title.toLowerCase().includes('water') ? Droplets : Leaf}
+                          impactArea="Environment"
+                          onTaskToggle={handleTodoToggle}
+                          onTaskClick={setExpandedTaskId}
+                          onAIChatClick={(subAreaTitle) => {
+                            setChatContext({level: 'subarea', subArea: subAreaTitle});
+                            setShowAIChat(true);
+                          }}
+                          onTaskGenerated={handleTaskGenerated}
+                          className="animate-fade-in hover-scale"
+                        />
+                      ))}
+                    </div>
+
+                    <DragOverlay>
+                      {activeTask && (
+                        <div className="bg-white rounded-lg p-4 shadow-lg border-2 border-primary/30 animate-scale-in">
+                          <TodoItem
+                            todo={activeTask}
+                            onToggleStatus={() => {}}
+                            showImpact={false}
+                          />
+                        </div>
+                      )}
+                    </DragOverlay>
+                  </DndContext>
                 </section>
 
                 {/* All Environment Tasks */}
@@ -259,29 +306,23 @@ const Environment = () => {
                     <p className="text-sm text-muted-foreground">Drag & Drop tasks to organize them into areas above</p>
                   </div>
                   
-                  {environmentTodos.length > 0 ? (
+                  {unassignedTasks.length > 0 ? (
                     <div className="space-y-4">
-                      {environmentTodos.map(todo => (
-                        <div 
-                          key={todo.id} 
-                          className="bg-white/60 rounded-lg p-4 cursor-move hover:shadow-md transition-all duration-200 border-l-4 border-primary/20"
+                      {unassignedTasks.map(todo => (
+                        <DraggableTask
+                          key={todo.id}
+                          task={todo}
+                          onToggleStatus={handleTodoToggle}
                           onClick={() => setExpandedTaskId(todo.id)}
-                          draggable
-                        >
-                          <TodoItem
-                            todo={todo}
-                            onToggleStatus={(status) => handleTodoToggle(todo.id, status)}
-                            showImpact={false}
-                          />
-                        </div>
+                        />
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-12">
+                    <div className="text-center py-12 animate-fade-in">
                       <CheckSquare2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">No environment tasks available</p>
+                      <p className="text-muted-foreground">No unassigned environment tasks</p>
                       <p className="text-sm text-muted-foreground mt-2">
-                        Tasks will appear here after document analysis
+                        All tasks have been organized or generate new ones through document analysis
                       </p>
                     </div>
                   )}
@@ -353,6 +394,19 @@ const Environment = () => {
         onToggleStatus={(status) => {
           const todo = todos.find(t => t.id === expandedTaskId);
           if (todo) handleTodoToggle(todo.id, status);
+        }}
+      />
+
+      {/* Add Sub-Area Modal */}
+      <AddSubAreaModal
+        isOpen={showAddAreaModal}
+        onClose={() => setShowAddAreaModal(false)}
+        businessId={currentBusiness?.id || ''}
+        impactArea="Environment"
+        onSubAreaAdded={() => {
+          if (currentBusiness) {
+            loadSubAreasByImpact(currentBusiness.id, 'Environment');
+          }
         }}
       />
     </SidebarProvider>
