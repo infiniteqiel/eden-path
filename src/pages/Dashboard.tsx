@@ -60,10 +60,44 @@ const Dashboard = () => {
     }
   };
 
-  const handleTestReset = () => {
-    // Reset progress and add random priority tasks
+  const handleTestReset = async () => {
+    // Reset progress and generate baseline B Corp tasks
     if (currentBusiness) {
+      // Clear existing tasks
       resetTestData(currentBusiness.id);
+      
+      // Generate baseline B Corp tasks using the same system as new company creation
+      try {
+        const { supabase } = await import('@/integrations/supabase/client');
+        
+        const { data, error } = await supabase.functions.invoke('generate-baseline-tasks', {
+          body: {
+            businessId: currentBusiness.id,
+            businessData: {
+              name: currentBusiness.name,
+              description: currentBusiness.description,
+              industry: currentBusiness.industry,
+              legalForm: currentBusiness.legalForm,
+              country: currentBusiness.country,
+              operatingMonths: currentBusiness.operatingMonths,
+              workersCount: currentBusiness.workersCount
+            }
+          }
+        });
+
+        if (error) {
+          console.error('Failed to generate baseline tasks:', error);
+        } else {
+          console.log('Baseline tasks generated successfully:', data);
+          // Reload tasks to show the new baseline tasks
+          setTimeout(() => {
+            loadTodos(currentBusiness.id);
+            loadImpactSummaries(currentBusiness.id);
+          }, 1000);
+        }
+      } catch (error) {
+        console.error('Error generating baseline tasks:', error);
+      }
     }
   };
 
