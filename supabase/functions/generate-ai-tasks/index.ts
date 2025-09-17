@@ -27,25 +27,36 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
     // Get authorization header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
+      console.error('No authorization header provided');
       return new Response(
         JSON.stringify({ error: 'No authorization header' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Set auth for subsequent requests
-    supabase.auth.setSession({
-      access_token: authHeader.replace('Bearer ', ''),
-      refresh_token: ''
+    // Initialize Supabase client with service role key
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false }
     });
+
+    // Verify the user token by getting user info
+    const jwt = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+    
+    if (userError || !user) {
+      console.error('Authentication failed:', userError);
+      return new Response(
+        JSON.stringify({ error: 'Authentication failed' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Authenticated user:', user.id);
 
     // Generate B Corp tasks using OpenAI
     const prompt = `You are a B Corp certification expert. Based on this company description, generate 5-8 specific, actionable tasks to help them prepare for B Corp certification.
@@ -61,7 +72,8 @@ For each task, provide:
 
 Focus on the most important foundational tasks that every company needs for B Corp readiness.
 
-Respond in JSON format:
+IMPORTANT: Return ONLY valid JSON, no markdown formatting, no code blocks, no extra text. Start with { and end with }.
+
 {
   "tasks": [
     {
@@ -74,6 +86,7 @@ Respond in JSON format:
   ]
 }`;
 
+    console.log('Calling OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -83,7 +96,10 @@ Respond in JSON format:
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are an expert B Corp certification consultant who helps companies prepare for certification by identifying specific, actionable tasks.' },
+          { 
+            role: 'system', 
+            content: 'You are an expert B Corp certification consultant. Always respond with clean JSON only, no markdown, no code blocks, no extra text.' 
+          },
           { role: 'user', content: prompt }
         ],
         temperature: 0.7,
@@ -98,34 +114,54 @@ Respond in JSON format:
     }
 
     const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.choices[0]?.message?.content;
     
-    console.log('AI Response:', aiResponse);
+    if (!aiResponse) {
+      console.error('No content in OpenAI response:', data);
+      throw new Error('No content received from OpenAI');
+    }
+    
+    console.log('AI Response received, length:', aiResponse.length);
 
-    // Parse the JSON response
+    // Parse the JSON response with improved error handling
     let tasksData;
     try {
-      tasksData = JSON.parse(aiResponse);
+      // Try to parse the response directly
+      tasksData = JSON.parse(aiResponse.trim());
+      console.log('JSON parsed successfully');
     } catch (parseError) {
       console.error('Failed to parse AI response as JSON:', parseError);
-      // Fallback: extract JSON from response if it's wrapped in text
-      const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        tasksData = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('Invalid JSON response from AI');
+      console.log('Raw AI response:', aiResponse);
+      
+      // Fallback 1: Remove markdown code blocks if present
+      let cleanResponse = aiResponse.replace(/```json\s*/, '').replace(/```\s*$/, '').trim();
+      
+      try {
+        tasksData = JSON.parse(cleanResponse);
+        console.log('JSON parsed after removing markdown');
+      } catch (secondError) {
+        // Fallback 2: Extract JSON object from response
+        const jsonMatch = cleanResponse.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            tasksData = JSON.parse(jsonMatch[0]);
+            console.log('JSON parsed from extracted object');
+          } catch (thirdError) {
+            console.error('All JSON parsing attempts failed');
+            throw new Error(`Invalid JSON response from AI: ${thirdError.message}`);
+          }
+        } else {
+          throw new Error('No valid JSON found in AI response');
+        }
       }
     }
 
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      console.error('Auth error:', userError);
-      return new Response(
-        JSON.stringify({ error: 'Authentication failed' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // Validate the parsed data structure
+    if (!tasksData || !tasksData.tasks || !Array.isArray(tasksData.tasks)) {
+      throw new Error('Invalid response structure: expected {tasks: []}');
     }
+
+    console.log('Successfully parsed', tasksData.tasks.length, 'tasks');
 
     // Insert tasks into database
     const tasksToInsert = tasksData.tasks.map((task: any) => ({
@@ -138,6 +174,8 @@ Respond in JSON format:
       business_id: businessId,
       user_id: user.id,
     }));
+
+    console.log('Preparing to insert tasks:', tasksToInsert.length);
 
     const { data: insertedTasks, error: insertError } = await supabase
       .from('todos')
