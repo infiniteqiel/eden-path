@@ -8,7 +8,7 @@ import React from 'react';
 import { Building2, Home, FileText, CheckSquare2, Users, Leaf, Target, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { SimpleBusinessSwitcher } from '@/components/simple-business-switcher';
+import { BusinessSwitcher } from '@/components/business-switcher';
 import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { useBusinessStore } from '@/store/business';
 import { useBusinessContext } from '@/hooks/use-business-context';
@@ -58,7 +58,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <div className="p-2">
               {!isCollapsed && (
-                <SimpleBusinessSwitcher
+                <BusinessSwitcher
                   businesses={businesses}
                   currentBusiness={currentBusiness}
                   onBusinessChange={handleBusinessChange}

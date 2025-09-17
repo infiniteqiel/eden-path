@@ -6,6 +6,7 @@ import { ImpactCard } from "@/components/impact-card";
 import { UploadDropzone } from "@/components/upload-dropzone";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { CompanyCreationModal } from "@/components/company-creation-modal";
+import { BusinessLabelDropwDown } from '@/components/business-label-dropwdown';
 import { useAuthStore } from "@/store/auth";
 import { useBusinessStore } from "@/store/business";
 import { useAnalysisStore } from "@/store/analysis";
@@ -72,48 +73,11 @@ const Index = () => {
                 Transform your business into a force for good. Track your progress toward B Corporation certification with our comprehensive readiness platform.
               </p>
               <div className="inline-block">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-9 px-3 font-medium"
-                    >
-                      <Building2 className="h-4 w-4 mr-2 text-muted-foreground" />
-                      <span className="max-w-[200px] truncate">
-                        {currentBusiness?.name || 'Select business'}
-                      </span>
-                      <ChevronDown className="h-3 w-3 ml-2 text-muted-foreground" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-64 bg-background border border-border shadow-md z-[60]">
-                    {businesses.length > 0 ? (
-                      businesses.map((business) => (
-                        <DropdownMenuItem
-                          key={business.id}
-                          onClick={() => selectBusiness(business.id)}
-                          className="flex items-center justify-between"
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-medium">{business.name}</span>
-                            {business.companyNumber && (
-                              <span className="text-xs text-muted-foreground">
-                                {business.companyNumber}
-                              </span>
-                            )}
-                          </div>
-                          {currentBusiness?.id === business.id && (
-                            <Check className="h-4 w-4 text-primary" />
-                          )}
-                        </DropdownMenuItem>
-                      ))
-                    ) : (
-                      <DropdownMenuItem disabled className="text-muted-foreground">
-                        No businesses yet
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <BusinessLabelDropwDown 
+                  businesses={businesses}
+                  currentBusiness={currentBusiness}
+                  onBusinessChange={(business) => selectBusiness(business.id)}
+                />
               </div>
             </div>
 

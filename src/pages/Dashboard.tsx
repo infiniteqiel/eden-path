@@ -14,7 +14,7 @@ import { EmptyState } from '@/components/empty-state';
 import { UploadDropzone } from '@/components/upload-dropzone';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { UploadModal } from '@/components/upload-modal';
-import { SimpleBusinessSwitcher } from '@/components/simple-business-switcher';
+import { BusinessSwitcher } from '@/components/business-switcher';
 import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -122,7 +122,7 @@ const Dashboard = () => {
                 </Button>
                 <h1 className="font-bold text-sm md:text-lg">Dashboard - B Corp Progress</h1>
                 <div className="hidden md:block">
-                  <SimpleBusinessSwitcher
+                  <BusinessSwitcher
                     businesses={businesses}
                     currentBusiness={currentBusiness}
                     onBusinessChange={(business) => selectBusiness(business.id)}
