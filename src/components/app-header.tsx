@@ -83,6 +83,7 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
               businesses={businesses}
               currentBusiness={currentBusiness}
               onBusinessChange={handleBusinessChange}
+              onAddCompany={() => setCompanyModalOpen(true)}
             />
           )}
         </div>
