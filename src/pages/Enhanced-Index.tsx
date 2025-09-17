@@ -13,7 +13,7 @@ import { AppHeader } from '@/components/app-header';
 import { BroadChat } from '@/components/broad-chat';
 import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { UploadDropzone } from '@/components/upload-dropzone';
-import { BusinessSwitcher } from '@/components/business-switcher';
+import { SimpleBusinessSwitcher } from '@/components/simple-business-switcher';
 import { ImpactCard } from '@/components/impact-card';
 import { useAuthStore } from '@/store/auth';
 import { useBusinessStore } from '@/store/business';
@@ -121,7 +121,7 @@ export default function EnhancedIndex() {
               {user && businesses.length > 0 && (
                 <div className="animate-fade-in [animation-delay:0.7s] space-y-6">
                   <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                    <BusinessSwitcher 
+                    <SimpleBusinessSwitcher 
                       businesses={businesses}
                       currentBusiness={currentBusiness}
                       onBusinessChange={handleBusinessChange}

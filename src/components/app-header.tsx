@@ -7,7 +7,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { BusinessSwitcher } from '@/components/business-switcher';
+import { SimpleBusinessSwitcher } from '@/components/simple-business-switcher';
 import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { Upload, Copy, User, LogOut, Settings, Building } from 'lucide-react';
 import { 
@@ -79,7 +79,7 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
           </Link>
 
           {currentBusiness && (
-            <BusinessSwitcher 
+            <SimpleBusinessSwitcher 
               businesses={businesses}
               currentBusiness={currentBusiness}
               onBusinessChange={handleBusinessChange}
