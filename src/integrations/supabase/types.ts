@@ -432,6 +432,45 @@ export type Database = {
           },
         ]
       }
+      impact_sub_areas: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          description: string | null
+          icon_type: string | null
+          id: string
+          impact_area: string
+          is_user_created: boolean | null
+          sort_order: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          description?: string | null
+          icon_type?: string | null
+          id?: string
+          impact_area: string
+          is_user_created?: boolean | null
+          sort_order?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          description?: string | null
+          icon_type?: string | null
+          id?: string
+          impact_area?: string
+          is_user_created?: boolean | null
+          sort_order?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       knowledge_base_documents: {
         Row: {
           content: string
@@ -488,6 +527,7 @@ export type Database = {
           requirement_code: string | null
           status: string
           sub_area: string | null
+          sub_area_id: string | null
           title: string
           updated_at: string
           user_id: string
@@ -508,6 +548,7 @@ export type Database = {
           requirement_code?: string | null
           status: string
           sub_area?: string | null
+          sub_area_id?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -528,18 +569,30 @@ export type Database = {
           requirement_code?: string | null
           status?: string
           sub_area?: string | null
+          sub_area_id?: string | null
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "todos_sub_area_id_fkey"
+            columns: ["sub_area_id"]
+            isOneToOne: false
+            referencedRelation: "impact_sub_areas"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      seed_default_sub_areas: {
+        Args: { p_business_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
