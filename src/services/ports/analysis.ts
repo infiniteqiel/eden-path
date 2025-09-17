@@ -36,7 +36,12 @@ export interface IAnalysisService {
   /**
    * Update the status of a specific todo item
    */
-  updateTodoStatus(todoId: string, status: Todo['status']): Promise<Todo>;
+  updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<Todo>;
+
+  /**
+   * Assign a task to a sub-area
+   */
+  assignTaskToSubArea: (todoId: string, subAreaId: string | null) => Promise<Todo>;
 
   /**
    * Link evidence chunks to a todo item

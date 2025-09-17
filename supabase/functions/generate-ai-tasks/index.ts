@@ -58,20 +58,58 @@ serve(async (req) => {
     }
 
     console.log('Authenticated user:', user.id);
+    console.log('Starting AI analysis for business:', businessId, 'with context:', context);
 
-    // Generate B Corp tasks using OpenAI
-    const prompt = `You are a B Corp certification expert. Based on this company description, generate 5-8 specific, actionable tasks to help them prepare for B Corp certification.
+    // Query knowledge base documents for relevant B Corp standards
+    console.log('Querying knowledge base for relevant B Corp standards...');
+    const { data: knowledgeData, error: kbError } = await supabase
+      .from('knowledge_base_documents')
+      .select('title, content, impact_area, requirement_codes')
+      .or(`impact_area.is.null,impact_area.in.("Governance","Workers","Community","Environment","Customers")`)
+      .limit(50);
+
+    if (kbError) {
+      console.error('Error querying knowledge base:', kbError);
+    }
+
+    // Build knowledge context from B Corp standards
+    let knowledgeContext = '';
+    if (knowledgeData && knowledgeData.length > 0) {
+      console.log('Found', knowledgeData.length, 'relevant knowledge base documents');
+      knowledgeContext = `
+
+RELEVANT B CORP STANDARDS AND REQUIREMENTS:
+${knowledgeData.map(doc => `
+${doc.title}
+${doc.impact_area ? `Impact Area: ${doc.impact_area}` : ''}
+${doc.requirement_codes ? `Requirements: ${doc.requirement_codes.join(', ')}` : ''}
+Content: ${doc.content.substring(0, 1000)}${doc.content.length > 1000 ? '...' : ''}
+---`).join('\n')}`;
+    } else {
+      console.log('No knowledge base documents found, proceeding with general B Corp knowledge');
+    }
+
+    // Generate B Corp tasks using OpenAI with knowledge base context
+    const prompt = `You are a B Corp certification expert with access to the official B Corp 2026 Standards. Based on the business description and relevant B Corp standards provided, generate specific, actionable tasks to help this company meet certification requirements.
 
 Company Description: ${context}
+${knowledgeContext}
+
+Using the B Corp standards provided above, generate 5-8 specific tasks across the five B Corp impact areas:
+1. Governance - Mission & stakeholder oversight, legal requirements
+2. Workers - Employee wellbeing, compensation, development  
+3. Community - Local impact, supply chain, civic engagement
+4. Environment - Environmental management, resource conservation
+5. Customers - Product quality, customer service, data protection
 
 For each task, provide:
-1. A clear, specific title
-2. Which B Corp impact area it addresses (Governance, Workers, Community, Environment, Customers)
+1. A clear, specific title based on B Corp requirements
+2. Which B Corp impact area it addresses
 3. Priority level (High, Medium, Low)
 4. Effort level (Low, Medium, High)
-5. A brief description of why this task is important for B Corp certification
+5. A detailed description referencing specific B Corp standards where applicable
 
-Focus on the most important foundational tasks that every company needs for B Corp readiness.
+Focus on the most important foundational tasks that align with the B Corp standards provided.
 
 IMPORTANT: Return ONLY valid JSON, no markdown formatting, no code blocks, no extra text. Start with { and end with }.
 
@@ -82,7 +120,7 @@ IMPORTANT: Return ONLY valid JSON, no markdown formatting, no code blocks, no ex
       "impact_area": "Governance|Workers|Community|Environment|Customers",
       "priority": "High|Medium|Low",
       "effort": "Low|Medium|High",
-      "description": "Description of the task and its importance"
+      "description": "Description of the task with B Corp standard references"
     }
   ]
 }`;

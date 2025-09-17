@@ -1,10 +1,4 @@
-/**
- * Customers Impact Area Page
- * 
- * Detailed view for Customers impact area progress and tasks.
- */
-
-import React, { useEffect, useState } from 'react';
+import EnhancedCustomers from './enhanced-customers';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
@@ -339,4 +333,4 @@ const Customers = () => {
   );
 };
 
-export default Customers;
+export default EnhancedCustomers;

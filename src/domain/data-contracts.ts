@@ -97,6 +97,7 @@ export interface Todo {
   ownerUserId?: string;
   dueDate?: string;
   createdAt: string;
+  subAreaId?: string;  // Add sub-area assignment
 }
 
 export interface ImpactSummary {
