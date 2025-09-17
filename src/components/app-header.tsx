@@ -8,6 +8,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { BusinessSwitcher } from '@/components/business-switcher';
+import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { Upload, Copy, User, LogOut, Settings, Building } from 'lucide-react';
 import { 
   DropdownMenu,
@@ -30,6 +31,7 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
   const navigate = useNavigate();
   const { user, signOut } = useAuthStore();
   const { currentBusiness, businesses } = useBusinessStore();
+  const [companyModalOpen, setCompanyModalOpen] = React.useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -80,6 +82,7 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
               businesses={businesses}
               currentBusiness={currentBusiness}
               onBusinessChange={handleBusinessChange}
+              onAddCompany={() => setCompanyModalOpen(true)}
             />
           )}
         </div>
@@ -126,6 +129,11 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
           </DropdownMenu>
         </div>
       </div>
+      
+      <CompanyCreationModal
+        open={companyModalOpen}
+        onClose={() => setCompanyModalOpen(false)}
+      />
     </header>
   );
 }

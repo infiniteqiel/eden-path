@@ -86,7 +86,7 @@ const Dashboard = () => {
                 title="Welcome to bcstart.ai"
                 description="Let's get started by setting up your first business profile."
                 ctaLabel="Create Business"
-                onCta={() => {}}
+                onCta={() => setCompanyModalOpen(true)}
               />
             </main>
           </div>
@@ -364,7 +364,7 @@ const Dashboard = () => {
                     title="Select a Business"
                     description="Choose a business from the sidebar to view its dashboard."
                     ctaLabel="Create New Business"
-                    onCta={() => {}}
+                    onCta={() => setCompanyModalOpen(true)}
                   />
                 )}
               </div>
