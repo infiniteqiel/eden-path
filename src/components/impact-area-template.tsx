@@ -299,6 +299,19 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                         ))}
                     </div>
 
+                    <DragOverlay>
+                      {activeTask && (
+                        <div className="bg-white rounded-lg p-4 shadow-lg border-2 border-primary/30 animate-scale-in">
+                          <TodoItem
+                            todo={activeTask}
+                            onToggleStatus={() => {}}
+                            showImpact={false}
+                          />
+                        </div>
+                      )}
+                    </DragOverlay>
+                  </DndContext>
+
                 </section>
 
                 {/* All Tasks - INSIDE DndContext */}
