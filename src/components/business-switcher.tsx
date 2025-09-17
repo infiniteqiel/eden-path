@@ -47,7 +47,7 @@ export function BusinessSwitcher({
           <ChevronDown className="h-3 w-3 ml-2 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-64 bg-white z-50">
+      <DropdownMenuContent align="start" className="w-64 bg-background border border-border shadow-md z-[60]">
         {businesses.length > 0 ? (
           businesses.map((business) => (
             <DropdownMenuItem

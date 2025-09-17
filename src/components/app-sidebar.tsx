@@ -9,7 +9,10 @@ import { Building2, Home, FileText, CheckSquare2, Users, Leaf, Target, Plus } fr
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { BusinessSwitcher } from '@/components/business-switcher';
+import { CompanyCreationModal } from '@/components/company-creation-modal';
 import { useBusinessStore } from '@/store/business';
+import { useBusinessContext } from '@/hooks/use-business-context';
+import { Business } from '@/domain/data-contracts';
 import {
   Sidebar,
   SidebarContent,
@@ -24,9 +27,15 @@ import {
 } from '@/components/ui/sidebar';
 
 export function AppSidebar() {
-  const { businesses, currentBusiness, selectBusiness } = useBusinessStore();
+  const { businesses, selectBusiness } = useBusinessStore();
+  const { currentBusiness } = useBusinessContext();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
+  const [companyModalOpen, setCompanyModalOpen] = React.useState(false);
+
+  const handleBusinessChange = async (business: Business) => {
+    await selectBusiness(business.id);
+  };
 
   const navigationItems = [
     { title: 'Dashboard', url: '/dashboard', icon: Home },
@@ -52,7 +61,8 @@ export function AppSidebar() {
                 <BusinessSwitcher
                   businesses={businesses}
                   currentBusiness={currentBusiness}
-                  onBusinessChange={(business) => selectBusiness(business.id)}
+                  onBusinessChange={handleBusinessChange}
+                  onAddCompany={() => setCompanyModalOpen(true)}
                 />
               )}
               {isCollapsed && currentBusiness && (
@@ -161,6 +171,11 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      
+      <CompanyCreationModal
+        open={companyModalOpen}
+        onClose={() => setCompanyModalOpen(false)}
+      />
     </Sidebar>
   );
 }
