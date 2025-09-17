@@ -78,12 +78,20 @@ export function AppHeader({ mode, onUpload, onCopyText }: AppHeaderProps) {
             <span className="font-bold text-xl">bcpath.ai</span>
           </Link>
 
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setCompanyModalOpen(true)}
+            className="text-xs"
+          >
+            + Add Company
+          </Button>
+
           {currentBusiness && (
             <BusinessSwitcher 
               businesses={businesses}
               currentBusiness={currentBusiness}
               onBusinessChange={handleBusinessChange}
-              onAddCompany={() => setCompanyModalOpen(true)}
               hideAddCompany={true}
             />
           )}
