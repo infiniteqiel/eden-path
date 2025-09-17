@@ -21,6 +21,7 @@ serve(async (req) => {
     console.log('Starting AI analysis for business:', businessId, 'with context:', context);
 
     if (!businessId || !context) {
+      console.error('Missing required parameters:', { businessId: !!businessId, context: !!context });
       return new Response(
         JSON.stringify({ error: 'Missing businessId or context' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -194,7 +195,8 @@ IMPORTANT: Return ONLY valid JSON, no markdown formatting, no code blocks, no ex
         success: true, 
         tasksGenerated: insertedTasks?.length || 0,
         tasks: insertedTasks,
-        businessId: businessId
+        businessId: businessId,
+        message: `Successfully generated ${insertedTasks?.length || 0} B Corp tasks from company description analysis`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

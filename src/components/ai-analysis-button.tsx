@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Brain, Loader2, CheckCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuthStore } from '@/store/auth';
+import { useAnalysisStore } from '@/store/analysis';
 
 interface AiAnalysisButtonProps {
   businessId: string;
@@ -27,8 +29,19 @@ export function AiAnalysisButton({
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuthStore();
+  const { loadTodos } = useAnalysisStore();
 
   const handleAnalysis = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to analyze your company.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (!businessId) {
       toast({
         title: "No Business Selected",
@@ -84,6 +97,9 @@ export function AiAnalysisButton({
         description: `AI has analyzed your company description and generated ${data?.tasksGenerated || 0} new B Corp tasks.`,
       });
 
+      // Refresh tasks in the store to show new tasks immediately
+      await loadTodos(businessId);
+
       // Trigger refresh of tasks in the UI if callback provided
       if (onAnalysisComplete) {
         onAnalysisComplete();
@@ -115,7 +131,7 @@ export function AiAnalysisButton({
     );
   }
 
-  const isDisabled = isAnalyzing || !businessId || hasUnsavedChanges || !savedDescription?.trim();
+  const isDisabled = isAnalyzing || !user || !businessId || hasUnsavedChanges || !savedDescription?.trim();
 
   return (
     <Button 
@@ -123,11 +139,13 @@ export function AiAnalysisButton({
       disabled={isDisabled}
       className="min-w-[200px]"
       title={
-        hasUnsavedChanges 
-          ? "Save your description first" 
-          : !savedDescription?.trim() 
-            ? "No description saved" 
-            : undefined
+        !user 
+          ? "Please sign in first"
+          : hasUnsavedChanges 
+            ? "Save your description first" 
+            : !savedDescription?.trim() 
+              ? "No description saved" 
+              : undefined
       }
     >
       {isAnalyzing ? (

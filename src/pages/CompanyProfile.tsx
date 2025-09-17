@@ -10,13 +10,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { EnhancedUploadDropzone } from '@/components/enhanced-upload-dropzone';
 import { AiAnalysisButton } from '@/components/ai-analysis-button';
-import { Building2, Save, Upload, Brain } from 'lucide-react';
+import { Building2, Save, Upload, Brain, AlertCircle } from 'lucide-react';
 import { useBusinessStore } from '@/store/business';
+import { useAuthStore } from '@/store/auth';
 import { useToast } from '@/hooks/use-toast';
 import { Business } from '@/domain/data-contracts';
 
 export default function CompanyProfile() {
   const { currentBusiness, updateBusiness } = useBusinessStore();
+  const { user } = useAuthStore();
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -104,11 +106,55 @@ export default function CompanyProfile() {
     });
   };
 
+  if (!user) {
+    return (
+      <SidebarProvider>
+        <div className="flex h-screen w-full">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <AppHeader mode="auth" />
+            <div className="flex-1 flex items-center justify-center">
+              <Card className="max-w-md">
+                <CardContent className="flex flex-col items-center gap-4 pt-6">
+                  <AlertCircle className="h-12 w-12 text-amber-500" />
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold mb-2">Authentication Required</h2>
+                    <p className="text-muted-foreground">
+                      Please sign in to access your company profile and AI analysis features.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </SidebarProvider>
+    );
+  }
+
   if (!currentBusiness) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Please select a business to view its profile.</p>
-      </div>
+      <SidebarProvider>
+        <div className="flex h-screen w-full">
+          <AppSidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <AppHeader mode="auth" />
+            <div className="flex-1 flex items-center justify-center">
+              <Card className="max-w-md">
+                <CardContent className="flex flex-col items-center gap-4 pt-6">
+                  <Building2 className="h-12 w-12 text-muted-foreground" />
+                  <div className="text-center">
+                    <h2 className="text-xl font-semibold mb-2">No Business Selected</h2>
+                    <p className="text-muted-foreground">
+                      Please select a business to view its profile.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </SidebarProvider>
     );
   }
 
@@ -305,10 +351,14 @@ export default function CompanyProfile() {
                        triggerText="Analyze Company Description"
                        savedDescription={currentBusiness.description || ''}
                        hasUnsavedChanges={isDescriptionDirty}
-                       onAnalysisComplete={() => {
-                         // Could trigger a reload of tasks if needed
-                         console.log('Analysis completed, tasks should be visible in Tasks page');
-                       }}
+                        onAnalysisComplete={() => {
+                          // Refresh tasks data after analysis
+                          console.log('Analysis completed - tasks should now be visible in the Tasks page');
+                          toast({
+                            title: "Navigate to Tasks",
+                            description: "Visit the Tasks page to see your new AI-generated B Corp tasks.",
+                          });
+                        }}
                      />
                    </div>
                 </CardContent>
