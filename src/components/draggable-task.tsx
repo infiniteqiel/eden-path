@@ -41,10 +41,10 @@ export function DraggableTask({ task, onToggleStatus, onClick }: DraggableTaskPr
       ref={setNodeRef}
       style={style}
       className={cn(
-        "bg-white/80 rounded p-3 cursor-pointer hover:shadow-md transition-all duration-200",
-        isDragging && "opacity-50 scale-95 shadow-lg"
+        "bg-white/80 rounded p-3 cursor-grab active:cursor-grabbing hover:shadow-md transition-all duration-200",
+        isDragging && "opacity-30 scale-105 shadow-xl border-2 border-primary/50"
       )}
-      onClick={onClick}
+      onClick={!isDragging ? onClick : undefined}
       {...attributes}
       {...listeners}
     >

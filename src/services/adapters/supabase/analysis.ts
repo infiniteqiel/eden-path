@@ -103,7 +103,8 @@ export const listTodos = async (businessId: string): Promise<Todo[]> => {
     evidenceChunkIds: row.evidence_chunk_ids || [],
     ownerUserId: row.owner_user_id,
     dueDate: row.due_date,
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    subAreaId: row.sub_area_id
   }));
 };
 
@@ -144,7 +145,44 @@ export const updateTodoStatus = async (todoId: string, status: Todo['status']): 
     evidenceChunkIds: data.evidence_chunk_ids || [],
     ownerUserId: data.owner_user_id,
     dueDate: data.due_date,
-    createdAt: data.created_at
+    createdAt: data.created_at,
+    subAreaId: data.sub_area_id
+  };
+};
+
+export const assignTaskToSubArea = async (todoId: string, subAreaId: string | null): Promise<Todo> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data, error } = await supabase
+    .from('todos')
+    .update({ 
+      sub_area_id: subAreaId,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', todoId)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    businessId: data.business_id,
+    impact: data.impact as ImpactArea,
+    requirementCode: data.requirement_code,
+    kbActionId: data.kb_action_id,
+    title: data.title,
+    descriptionMd: data.description_md,
+    priority: data.priority as Todo['priority'],
+    effort: data.effort as Todo['effort'],
+    status: data.status as Todo['status'],
+    evidenceChunkIds: data.evidence_chunk_ids || [],
+    ownerUserId: data.owner_user_id,
+    dueDate: data.due_date,
+    createdAt: data.created_at,
+    subAreaId: data.sub_area_id
   };
 };
 
@@ -220,7 +258,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P1',
       effort: 'High',
       status: 'todo',
-      sub_area: 'Legal Requirements'
+      sub_area_id: 'Legal Requirements'
     },
     {
       user_id: user.id,
@@ -232,7 +270,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P1',
       effort: 'Medium',
       status: 'todo',
-      sub_area: 'Accountability'
+      sub_area_id: 'Accountability'
     },
     {
       user_id: user.id,
@@ -244,7 +282,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P1',
       effort: 'Medium',
       status: 'todo',
-      sub_area: 'Compensation & Benefits'
+      sub_area_id: 'Compensation & Benefits'
     },
     {
       user_id: user.id,
@@ -256,7 +294,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P2',
       effort: 'Medium',
       status: 'todo',
-      sub_area: 'Well-being & Safety'
+      sub_area_id: 'Well-being & Safety'
     },
     {
       user_id: user.id,
@@ -268,7 +306,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P2',
       effort: 'Medium',
       status: 'todo',
-      sub_area: 'Environmental Policy'
+      sub_area_id: 'Environmental Policy'
     },
     {
       user_id: user.id,
@@ -280,7 +318,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P2',
       effort: 'Low',
       status: 'todo',
-      sub_area: 'Energy & Carbon'
+      sub_area_id: 'Energy & Carbon'
     },
     {
       user_id: user.id,
@@ -292,7 +330,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P2',
       effort: 'Low',
       status: 'todo',
-      sub_area: 'Local Community'
+      sub_area_id: 'Local Community'
     },
     {
       user_id: user.id,
@@ -304,7 +342,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P2',
       effort: 'Medium',
       status: 'todo',
-      sub_area: 'Supply Chain'
+      sub_area_id: 'Supply Chain'
     },
     {
       user_id: user.id,
@@ -316,7 +354,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P2',
       effort: 'Medium',
       status: 'todo',
-      sub_area: 'Data Protection'
+      sub_area_id: 'Data Protection'
     },
     {
       user_id: user.id,
@@ -328,7 +366,7 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
       priority: 'P3',
       effort: 'Low',
       status: 'todo',
-      sub_area: 'Customer Experience'
+      sub_area_id: 'Customer Experience'
     }
   ];
 
@@ -355,7 +393,8 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
     evidenceChunkIds: row.evidence_chunk_ids || [],
     ownerUserId: row.owner_user_id,
     dueDate: row.due_date,
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    subAreaId: row.sub_area_id
   }));
 
   const summaries = await impactSummary(businessId);
