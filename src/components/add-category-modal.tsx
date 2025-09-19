@@ -16,8 +16,10 @@ import { toast } from 'sonner';
 import { Folder, FileText, Briefcase, Shield, Heart, Leaf, Star, Plus } from 'lucide-react';
 
 interface AddCategoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  businessId: string;
+}
   onCategoryAdded: () => void;
 }
 

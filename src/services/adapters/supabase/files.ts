@@ -33,7 +33,13 @@ export class SupabaseFileService implements IFileService {
           impact_area,
           extraction_status,
           uploaded_at,
-          created_at
+          created_at,
+          updated_at,
+          extracted_text,
+          extraction_method,
+          processed_at,
+          category_id,
+          is_deleted
         `)
         .eq('dataroom_id', dataroom.id)
         .order('uploaded_at', { ascending: false });
@@ -52,6 +58,15 @@ export class SupabaseFileService implements IFileService {
         ocrStatus: this.mapExtractionStatus(file.extraction_status),
         size: file.file_size_bytes ? Number(file.file_size_bytes) : undefined,
         impactArea: file.impact_area as ImpactArea || undefined,
+        categoryId: file.category_id || undefined,
+        isDeleted: file.is_deleted || false,
+        createdAt: file.created_at,
+        updatedAt: file.updated_at,
+        extractedText: file.extracted_text,
+        extractionStatus: file.extraction_status,
+        extractionMethod: file.extraction_method,
+        processedAt: file.processed_at,
+        fileSizeBytes: file.file_size_bytes ? Number(file.file_size_bytes) : undefined,
       }));
 
     } catch (error) {
@@ -86,7 +101,7 @@ export class SupabaseFileService implements IFileService {
 
       if (uploadError) throw uploadError;
 
-      // Insert file record into database
+      // Insert file record into database - no automatic categorization
       const fileKind = this.inferFileKind(file.name);
       const { data: fileRecord, error: dbError } = await supabase
         .from('files')
@@ -99,7 +114,9 @@ export class SupabaseFileService implements IFileService {
           content_type: file.type,
           file_size_bytes: file.size,
           impact_area: impactArea,
-          extraction_status: 'pending'
+          extraction_status: 'pending',
+          category_id: null, // No automatic categorization
+          is_deleted: false
         })
         .select()
         .single();
@@ -193,33 +210,20 @@ export class SupabaseFileService implements IFileService {
   }
 
   /**
-   * Remove a file from the dataroom
+   * Remove a file from the dataroom (soft delete)
    */
   async remove(fileId: string): Promise<void> {
     try {
-      // Get file record to find storage path
-      const { data: file, error: fetchError } = await supabase
+      // Soft delete by setting is_deleted flag
+      const { error } = await supabase
         .from('files')
-        .select('storage_bucket, storage_path')
-        .eq('id', fileId)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      // Delete from storage
-      const { error: storageError } = await supabase.storage
-        .from(file.storage_bucket)
-        .remove([file.storage_path]);
-
-      if (storageError) throw storageError;
-
-      // Delete from database (cascades to chunks and categories)
-      const { error: dbError } = await supabase
-        .from('files')
-        .delete()
+        .update({ 
+          is_deleted: true,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', fileId);
 
-      if (dbError) throw dbError;
+      if (error) throw error;
 
     } catch (error) {
       console.error('Error removing file:', error);
@@ -228,20 +232,16 @@ export class SupabaseFileService implements IFileService {
   }
 
   /**
-   * Update file metadata
+   * Update file category assignment
    */
-  async updateMetadata(
-    fileId: string, 
-    updates: Partial<Pick<DataFile, 'kind' | 'originalName'>>
-  ): Promise<DataFile> {
+  async updateFileCategory(fileId: string, categoryId: string | null): Promise<DataFile> {
     try {
-      const dbUpdates: any = {};
-      if (updates.kind) dbUpdates.file_kind = updates.kind;
-      if (updates.originalName) dbUpdates.original_name = updates.originalName;
-
       const { data: file, error } = await supabase
         .from('files')
-        .update(dbUpdates)
+        .update({ 
+          category_id: categoryId,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', fileId)
         .select(`
           id,
@@ -253,7 +253,14 @@ export class SupabaseFileService implements IFileService {
           file_size_bytes,
           impact_area,
           extraction_status,
-          uploaded_at
+          uploaded_at,
+          created_at,
+          updated_at,
+          extracted_text,
+          extraction_method,
+          processed_at,
+          category_id,
+          is_deleted
         `)
         .single();
 
@@ -270,6 +277,86 @@ export class SupabaseFileService implements IFileService {
         ocrStatus: this.mapExtractionStatus(file.extraction_status),
         size: file.file_size_bytes ? Number(file.file_size_bytes) : undefined,
         impactArea: file.impact_area as ImpactArea || undefined,
+        categoryId: file.category_id || undefined,
+        isDeleted: file.is_deleted || false,
+        createdAt: file.created_at,
+        updatedAt: file.updated_at,
+        extractedText: file.extracted_text,
+        extractionStatus: file.extraction_status,
+        extractionMethod: file.extraction_method,
+        processedAt: file.processed_at,
+        fileSizeBytes: file.file_size_bytes ? Number(file.file_size_bytes) : undefined,
+      };
+
+    } catch (error) {
+      console.error('Error updating file category:', error);
+      throw new Error('Failed to update file category');
+    }
+  }
+
+  /**
+   * Update file metadata
+   */
+  async updateMetadata(
+    fileId: string, 
+    updates: Partial<Pick<DataFile, 'kind' | 'originalName' | 'isDeleted'>>
+  ): Promise<DataFile> {
+    try {
+      const dbUpdates: any = {
+        updated_at: new Date().toISOString()
+      };
+      
+      if (updates.kind) dbUpdates.file_kind = updates.kind;
+      if (updates.originalName) dbUpdates.original_name = updates.originalName;
+      if (updates.isDeleted !== undefined) dbUpdates.is_deleted = updates.isDeleted;
+
+      const { data: file, error } = await supabase
+        .from('files')
+        .update(dbUpdates)
+        .eq('id', fileId)
+        .select(`
+          id,
+          dataroom_id,
+          storage_path,
+          original_name,
+          file_kind,
+          content_type,
+          file_size_bytes,
+          impact_area,
+          extraction_status,
+          uploaded_at,
+          created_at,
+          updated_at,
+          extracted_text,
+          extraction_method,
+          processed_at,
+          category_id,
+          is_deleted
+        `)
+        .single();
+
+      if (error) throw error;
+
+      return {
+        id: file.id,
+        dataroomId: file.dataroom_id,
+        kind: file.file_kind as FileKind,
+        originalName: file.original_name,
+        storagePath: file.storage_path,
+        contentType: file.content_type || undefined,
+        uploadedAt: file.uploaded_at,
+        ocrStatus: this.mapExtractionStatus(file.extraction_status),
+        size: file.file_size_bytes ? Number(file.file_size_bytes) : undefined,
+        impactArea: file.impact_area as ImpactArea || undefined,
+        categoryId: file.category_id || undefined,
+        isDeleted: file.is_deleted || false,
+        createdAt: file.created_at,
+        updatedAt: file.updated_at,
+        extractedText: file.extracted_text,
+        extractionStatus: file.extraction_status,
+        extractionMethod: file.extraction_method,
+        processedAt: file.processed_at,
+        fileSizeBytes: file.file_size_bytes ? Number(file.file_size_bytes) : undefined,
       };
 
     } catch (error) {

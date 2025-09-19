@@ -23,8 +23,8 @@ import * as SupabaseAuth from './adapters/supabase/auth';
 import * as SupabaseAnalysis from './adapters/supabase/analysis';
 import * as SupabaseBusiness from './adapters/supabase/business';
 import { supabaseFileService } from './adapters/supabase/files';
-import { supabaseTaskFileMappingService } from './adapters/supabase/task-file-mapping';
 import { supabaseDocumentCategoryService } from './adapters/supabase/document-categories';
+import { supabaseTaskFileMappingService } from './adapters/supabase/task-file-mapping';
 
 /**
  * Service implementations registry

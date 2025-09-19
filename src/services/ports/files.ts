@@ -36,7 +36,12 @@ export interface IFileService {
   /**
    * Update file metadata
    */
-  updateMetadata(fileId: string, updates: Partial<Pick<DataFile, 'kind' | 'originalName'>>): Promise<DataFile>;
+  updateMetadata(fileId: string, updates: Partial<Pick<DataFile, 'kind' | 'originalName' | 'isDeleted'>>): Promise<DataFile>;
+
+  /**
+   * Update file category assignment
+   */
+  updateFileCategory(fileId: string, categoryId: string | null): Promise<DataFile>;
 
   /**
    * Get file content for display/processing
