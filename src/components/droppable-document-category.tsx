@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FileCard } from '@/components/file-card';
+import { DraggableFile } from '@/components/draggable-file';
 import { DocumentCategory, DataFile } from '@/domain/data-contracts';
 import { Plus, X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -104,12 +105,12 @@ export function DroppableDocumentCategory({
         {files.length > 0 && !isOver && (
           <div className="space-y-3">
             {files.map((file) => (
-              <div key={file.id} className="bg-white/60 rounded-lg p-3">
-                <FileCard
-                  file={file}
-                  onDelete={() => console.log('Delete file:', file.id)}
-                />
-              </div>
+              <DraggableFile
+                key={file.id}
+                file={file}
+                onDelete={() => console.log('Delete file:', file.id)}
+                className="bg-white/60 rounded-lg"
+              />
             ))}
           </div>
         )}
