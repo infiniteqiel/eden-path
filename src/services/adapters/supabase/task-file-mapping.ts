@@ -9,27 +9,24 @@ import { ITaskFileMappingService, TaskFileMapping } from '@/services/ports/task-
 
 export class SupabaseTaskFileMappingService implements ITaskFileMappingService {
   async mapFilesToTask(taskId: string, fileIds: string[]): Promise<TaskFileMapping[]> {
+    // Get the current user ID once
+    const { data: { user } } = await supabase.auth.getUser();
+    const mappedBy = user?.id;
+
+    if (!mappedBy) {
+      throw new Error('User not authenticated');
+    }
+
+    // Create mappings with the user ID
     const mappings = fileIds.map(fileId => ({
       task_id: taskId,
       file_id: fileId,
-      mapped_by: (async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        return user?.id;
-      })()
+      mapped_by: mappedBy
     }));
-
-    // Resolve the mapped_by promises
-    const resolvedMappings = await Promise.all(
-      mappings.map(async (mapping) => ({
-        task_id: mapping.task_id,
-        file_id: mapping.file_id,
-        mapped_by: await mapping.mapped_by
-      }))
-    );
 
     const { data, error } = await supabase
       .from('task_file_mappings')
-      .upsert(resolvedMappings)
+      .upsert(mappings)
       .select('*');
 
     if (error) {
