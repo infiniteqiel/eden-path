@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { useBusinessStore } from '@/store/business';
 import { useDataroomStore } from '@/store/dataroom';
 import { useDocumentCategoryStore } from '@/store/document-categories';
@@ -29,10 +30,11 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 const Documents = () => {
   const { currentBusiness } = useBusinessStore();
   const { files, binnedFiles, loadFiles, loadBinnedFiles, removeFile, restoreFile } = useDataroomStore();
-  const { categories, loadCategories } = useDocumentCategoryStore();
+  const { categories, loadCategories, deleteCategory } = useDocumentCategoryStore();
   const [activeFile, setActiveFile] = useState<DataFile | null>(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [activeTab, setActiveTab] = useState('categories');
+  const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -100,6 +102,24 @@ const Documents = () => {
     } catch (error) {
       toast.error('Failed to restore file');
     }
+  };
+
+  const handleDeleteCategory = async (categoryId: string) => {
+    if (!currentBusiness) return;
+    
+    try {
+      await deleteCategory(categoryId);
+      await loadCategories(currentBusiness.id);
+      toast.success('Category deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete category');
+    } finally {
+      setDeletingCategoryId(null);
+    }
+  };
+
+  const confirmDeleteCategory = (categoryId: string) => {
+    setDeletingCategoryId(categoryId);
   };
 
   // Get files by category
@@ -208,7 +228,7 @@ const Documents = () => {
                                 category={category}
                                 files={categoryFiles}
                                 onEdit={undefined}
-                                onDelete={!category.isSystemCategory ? () => console.log('Delete category') : undefined}
+                                onDelete={!category.isSystemCategory ? () => confirmDeleteCategory(category.id) : undefined}
                                 className="bg-white/60"
                               />
                             );
@@ -364,6 +384,27 @@ const Documents = () => {
         onOpenChange={setShowAddCategory}
         businessId={currentBusiness?.id || ''}
       />
+      
+      <AlertDialog open={!!deletingCategoryId} onOpenChange={() => setDeletingCategoryId(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Category</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this category? This action cannot be undone.
+              Any files in this category will become uncategorized.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={() => deletingCategoryId && handleDeleteCategory(deletingCategoryId)}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarProvider>
   );
 };

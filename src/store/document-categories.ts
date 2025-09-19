@@ -83,20 +83,18 @@ export const useDocumentCategoryStore = create<DocumentCategoryState>((set, get)
   },
 
   deleteCategory: async (categoryId: string) => {
-    // Optimistically update UI
-    set(state => ({
-      categories: state.categories.filter(c => c.id !== categoryId),
-      error: null
-    }));
-
+    set({ error: null });
     try {
       await supabaseDocumentCategoryService.delete(categoryId);
+      // Update the state by removing the deleted category
+      set(state => ({
+        categories: state.categories.filter(c => c.id !== categoryId)
+      }));
     } catch (error) {
-      // Revert on error
-      await get().loadCategories(''); // Will need business ID passed in
       set({ 
         error: error instanceof Error ? error.message : 'Failed to delete category'
       });
+      throw error;
     }
   },
 
