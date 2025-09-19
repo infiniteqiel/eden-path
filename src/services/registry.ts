@@ -23,7 +23,6 @@ import * as SupabaseAnalysis from './adapters/supabase/analysis';
 import * as SupabaseBusiness from './adapters/supabase/business';
 import { supabaseFileService } from './adapters/supabase/files';
 import { supabaseTaskFileMappingService } from './adapters/supabase/task-file-mapping';
-import { supabaseDocumentCategoryService, IDocumentCategoryService } from './adapters/supabase/document-categories';
 
 /**
  * Service implementations registry
@@ -42,7 +41,6 @@ export const Services: {
   legal: ILegalService;
   auth: IAuthService;
   taskFileMapping: ITaskFileMappingService;
-  documentCategories: IDocumentCategoryService;
 } = {
   files: supabaseFileService as IFileService,
   analysis: SupabaseAnalysis as IAnalysisService,
@@ -51,7 +49,6 @@ export const Services: {
   legal: MockLegal as ILegalService,
   auth: SupabaseAuth as IAuthService,
   taskFileMapping: supabaseTaskFileMappingService as ITaskFileMappingService,
-  documentCategories: supabaseDocumentCategoryService as IDocumentCategoryService,
 };
 
 // Future implementation example:
@@ -81,4 +78,3 @@ export const riskService = Services.risk;
 export const legalService = Services.legal;
 export const authService = Services.auth;
 export const taskFileMappingService = Services.taskFileMapping;
-export const documentCategoryService = Services.documentCategories;
