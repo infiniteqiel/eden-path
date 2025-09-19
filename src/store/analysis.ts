@@ -10,6 +10,7 @@ import { analysisService } from '@/services/registry';
 
 interface AnalysisState {
   todos: Todo[];
+  binnedTodos: Todo[];
   impactSummaries: ImpactSummary[];
   findings: Finding[];
   currentJob: AnalysisJob | null;
@@ -24,9 +25,12 @@ interface AnalysisState {
 
   // Actions
   loadTodos: (businessId: string) => Promise<void>;
+  loadBinnedTodos: (businessId: string) => Promise<void>;
   loadImpactSummaries: (businessId: string) => Promise<void>;
   updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<void>;
   assignTaskToSubArea: (todoId: string, subAreaId: string | null) => Promise<void>;
+  deleteTask: (todoId: string) => Promise<void>;
+  restoreTask: (todoId: string) => Promise<void>;
   startAnalysis: (businessId: string) => Promise<void>;
   generateRoadmap: (businessId: string) => Promise<void>;
   resetTestData: (businessId: string) => Promise<void>;
@@ -38,6 +42,7 @@ interface AnalysisState {
 
 export const useAnalysisStore = create<AnalysisState>((set, get) => ({
   todos: [],
+  binnedTodos: [],
   impactSummaries: [],
   findings: [],
   currentJob: null,
@@ -273,6 +278,80 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
         isLoading: false
       }
     }));
+  },
+
+  loadBinnedTodos: async (businessId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const binnedTodos = await analysisService.listBinnedTodos(businessId);
+      set({ binnedTodos, isLoading: false });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to load binned todos', 
+        isLoading: false 
+      });
+    }
+  },
+
+  deleteTask: async (todoId: string) => {
+    const { todos } = get();
+    const taskToDelete = todos.find(t => t.id === todoId);
+    if (!taskToDelete) return;
+
+    // Optimistically update UI first
+    set(state => ({
+      todos: state.todos.filter(todo => todo.id !== todoId),
+      binnedTodos: [...state.binnedTodos, { ...taskToDelete, deletedAt: new Date().toISOString() }],
+      error: null
+    }));
+
+    try {
+      await analysisService.deleteTask(todoId);
+      
+      // Refresh impact summaries to reflect the change
+      const businessId = taskToDelete.businessId;
+      if (businessId) {
+        await get().loadImpactSummaries(businessId);
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      set(state => ({
+        todos: [...state.todos, taskToDelete],
+        binnedTodos: state.binnedTodos.filter(todo => todo.id !== todoId),
+        error: error instanceof Error ? error.message : 'Failed to delete task'
+      }));
+    }
+  },
+
+  restoreTask: async (todoId: string) => {
+    const { binnedTodos } = get();
+    const taskToRestore = binnedTodos.find(t => t.id === todoId);
+    if (!taskToRestore) return;
+
+    // Optimistically update UI first
+    const restoredTask = { ...taskToRestore, deletedAt: undefined };
+    set(state => ({
+      binnedTodos: state.binnedTodos.filter(todo => todo.id !== todoId),
+      todos: [...state.todos, restoredTask],
+      error: null
+    }));
+
+    try {
+      await analysisService.restoreTask(todoId);
+      
+      // Refresh impact summaries to reflect the change
+      const businessId = taskToRestore.businessId;
+      if (businessId) {
+        await get().loadImpactSummaries(businessId);
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      set(state => ({
+        todos: state.todos.filter(todo => todo.id !== todoId),
+        binnedTodos: [...state.binnedTodos, taskToRestore],
+        error: error instanceof Error ? error.message : 'Failed to restore task'
+      }));
+    }
   },
 
   clearError: () => set({ error: null }),

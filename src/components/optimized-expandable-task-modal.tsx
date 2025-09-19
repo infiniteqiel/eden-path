@@ -20,6 +20,7 @@ import { X, Upload, MessageSquare, FileText, Link } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDataroomStore } from '@/store/dataroom';
 import { useBusinessStore } from '@/store/business';
+import { useAnalysisStore } from '@/store/analysis';
 import { taskFileMappingService } from '@/services/registry';
 
 interface ExpandableTaskModalProps {
@@ -27,13 +28,15 @@ interface ExpandableTaskModalProps {
   onClose: () => void;
   todo: Todo | null;
   onToggleStatus?: (status: Todo['status']) => void;
+  onDelete?: () => void;
 }
 
 export function OptimizedExpandableTaskModal({ 
   isOpen, 
   onClose, 
   todo,
-  onToggleStatus 
+  onToggleStatus,
+  onDelete 
 }: ExpandableTaskModalProps) {
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
@@ -41,6 +44,7 @@ export function OptimizedExpandableTaskModal({
   const isMobile = useIsMobile();
   const { files, loadFiles } = useDataroomStore();
   const { currentBusiness } = useBusinessStore();
+  const { deleteTask } = useAnalysisStore();
 
   // Load mapped files when todo changes
   useEffect(() => {
@@ -228,6 +232,21 @@ export function OptimizedExpandableTaskModal({
                           >
                             <MessageSquare className="h-4 w-4 mr-2" />
                             Get AI Assistance
+                          </Button>
+                          
+                          <Button 
+                            onClick={async () => {
+                              if (confirm('Are you sure you want to delete this task? It will be moved to the bin and can be restored later.')) {
+                                await deleteTask(todo.id);
+                                onDelete?.();
+                                onClose();
+                              }
+                            }}
+                            variant="destructive"
+                            className="w-full"
+                          >
+                            <X className="h-4 w-4 mr-2" />
+                            Delete Task
                           </Button>
                         </CardContent>
                       </Card>

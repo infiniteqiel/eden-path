@@ -24,7 +24,7 @@ import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 const Tasks = () => {
   const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
-  const { todos, loadTodos, updateTodoStatus, resetTestData } = useAnalysisStore();
+  const { todos, binnedTodos, loadTodos, loadBinnedTodos, updateTodoStatus, resetTestData, restoreTask } = useAnalysisStore();
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [expandedTask, setExpandedTask] = useState<Todo | null>(null);
@@ -33,8 +33,9 @@ const Tasks = () => {
   useEffect(() => {
     if (currentBusiness) {
       loadTodos(currentBusiness.id);
+      loadBinnedTodos(currentBusiness.id);
     }
-  }, [currentBusiness, loadTodos]);
+  }, [currentBusiness, loadTodos, loadBinnedTodos]);
 
   const handleTodoToggle = async (todoId: string, status: Todo['status']) => {
     await updateTodoStatus(todoId, status);
@@ -200,6 +201,7 @@ const Tasks = () => {
                   <TabsList>
                     <TabsTrigger value="status">By Status</TabsTrigger>
                     <TabsTrigger value="impact">By Impact Area</TabsTrigger>
+                    <TabsTrigger value="binned">Binned Tasks</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="status" className="space-y-6">
@@ -252,6 +254,60 @@ const Tasks = () => {
                       ))}
                     </div>
                   </TabsContent>
+
+                  <TabsContent value="binned" className="space-y-6">
+                    <Card className="p-6 bg-white/60">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Deleted Tasks</h3>
+                        <Badge variant="outline">{binnedTodos.length} tasks</Badge>
+                      </div>
+                      {binnedTodos.length > 0 ? (
+                        <div className="space-y-4">
+                          {binnedTodos.map(todo => (
+                            <div key={todo.id} className="bg-white/80 rounded p-4 border-l-4 border-red-200">
+                              <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                  <TodoItem
+                                    todo={todo}
+                                    onToggleStatus={() => {}} // Disabled for binned tasks
+                                    showImpact
+                                    disabled={true}
+                                  />
+                                  {todo.deletedAt && (
+                                    <p className="text-xs text-muted-foreground mt-2">
+                                      Deleted on {new Date(todo.deletedAt).toLocaleDateString()}
+                                    </p>
+                                  )}
+                                </div>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={async () => {
+                                    await restoreTask(todo.id);
+                                    if (currentBusiness) {
+                                      loadTodos(currentBusiness.id);
+                                      loadBinnedTodos(currentBusiness.id);
+                                    }
+                                  }}
+                                  className="ml-4"
+                                >
+                                  <RotateCcw className="h-4 w-4 mr-2" />
+                                  Restore
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8">
+                          <p className="text-muted-foreground">No deleted tasks</p>
+                          <p className="text-sm text-muted-foreground mt-2">
+                            Deleted tasks will appear here and can be restored
+                          </p>
+                        </div>
+                      )}
+                    </Card>
+                  </TabsContent>
                 </Tabs>
               </div>
             </div>
@@ -267,6 +323,13 @@ const Tasks = () => {
           todo={expandedTask}
           onToggleStatus={(status) => {
             handleTodoToggle(expandedTask.id, status);
+            setExpandedTask(null);
+          }}
+          onDelete={() => {
+            if (currentBusiness) {
+              loadTodos(currentBusiness.id);
+              loadBinnedTodos(currentBusiness.id);
+            }
             setExpandedTask(null);
           }}
         />

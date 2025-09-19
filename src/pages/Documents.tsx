@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useDataroomStore } from '@/store/dataroom';
-import { FileText, Upload, Folder, Building, Users, Heart, Leaf, Star } from 'lucide-react';
+import { FileText, Upload, Folder, Building, Users, Heart, Leaf, Star, Plus } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { ImpactArea } from '@/domain/data-contracts';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
@@ -103,7 +103,17 @@ const Documents = () => {
 
                 {/* Document Categories */}
                 <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                  <h3 className="text-xl font-bold mb-6">Document Categories</h3>
+                  <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold">Document Categories</h3>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Category
+                    </Button>
+                  </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <Card className="bg-white/60">
                       <CardHeader>

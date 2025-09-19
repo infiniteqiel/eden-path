@@ -34,6 +34,11 @@ export interface IAnalysisService {
   listTodos(businessId: string): Promise<Todo[]>;
 
   /**
+   * List all deleted/binned todos for a business
+   */
+  listBinnedTodos(businessId: string): Promise<Todo[]>;
+
+  /**
    * Update the status of a specific todo item
    */
   updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<Todo>;
@@ -72,4 +77,14 @@ export interface IAnalysisService {
    * Reset all test data globally (dev only)
    */
   resetAllTestData(): Promise<void>;
+
+  /**
+   * Soft delete a task (move to bin)
+   */
+  deleteTask(todoId: string): Promise<void>;
+
+  /**
+   * Restore a deleted task from bin
+   */
+  restoreTask(todoId: string): Promise<void>;
 }

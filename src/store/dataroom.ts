@@ -10,15 +10,18 @@ import { fileService } from '@/services/registry';
 
 interface DataroomState {
   files: DataFile[];
+  binnedFiles: DataFile[];
   uploads: UploadProgress[];
   isLoading: boolean;
   error: string | null;
 
   // Actions
   loadFiles: (businessId: string) => Promise<void>;
+  loadBinnedFiles: (businessId: string) => Promise<void>;
   uploadFile: (businessId: string, file: File, impactArea?: ImpactArea) => Promise<void>;
   createVirtualFile: (businessId: string, name: string, text: string, kind?: FileKind) => Promise<void>;
   removeFile: (fileId: string) => Promise<void>;
+  restoreFile: (fileId: string) => Promise<void>;
   updateFileMetadata: (fileId: string, updates: Partial<Pick<DataFile, 'kind' | 'originalName'>>) => Promise<void>;
   getFileContent: (fileId: string) => Promise<string>;
   clearUploads: () => void;
@@ -27,6 +30,7 @@ interface DataroomState {
 
 export const useDataroomStore = create<DataroomState>((set, get) => ({
   files: [],
+  binnedFiles: [],
   uploads: [],
   isLoading: false,
   error: null,
@@ -34,11 +38,26 @@ export const useDataroomStore = create<DataroomState>((set, get) => ({
   loadFiles: async (businessId: string) => {
     set({ isLoading: true, error: null });
     try {
-      const files = await fileService.list(businessId);
+      const allFiles = await fileService.list(businessId);
+      const files = allFiles.filter(file => !file.isDeleted);
       set({ files, isLoading: false });
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to load files', 
+        isLoading: false 
+      });
+    }
+  },
+
+  loadBinnedFiles: async (businessId: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const allFiles = await fileService.list(businessId);
+      const binnedFiles = allFiles.filter(file => file.isDeleted);
+      set({ binnedFiles, isLoading: false });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to load binned files', 
         isLoading: false 
       });
     }
@@ -122,16 +141,51 @@ export const useDataroomStore = create<DataroomState>((set, get) => ({
   },
 
   removeFile: async (fileId: string) => {
-    set({ error: null });
+    const { files } = get();
+    const fileToDelete = files.find(f => f.id === fileId);
+    
+    // Optimistically update UI
+    set(state => ({
+      files: state.files.filter(f => f.id !== fileId),
+      binnedFiles: fileToDelete ? [...state.binnedFiles, { ...fileToDelete, isDeleted: true }] : state.binnedFiles,
+      error: null
+    }));
+
     try {
       await fileService.remove(fileId);
-      set(state => ({
-        files: state.files.filter(f => f.id !== fileId)
-      }));
     } catch (error) {
-      set({ 
-        error: error instanceof Error ? error.message : 'Failed to remove file'
-      });
+      // Revert on error
+      set(state => ({
+        files: fileToDelete ? [...state.files, fileToDelete] : state.files,
+        binnedFiles: state.binnedFiles.filter(f => f.id !== fileId),
+        error: error instanceof Error ? error.message : 'Failed to delete file'
+      }));
+    }
+  },
+
+  restoreFile: async (fileId: string) => {
+    const { binnedFiles } = get();
+    const fileToRestore = binnedFiles.find(f => f.id === fileId);
+    
+    if (!fileToRestore) return;
+    
+    // Optimistically update UI
+    const restoredFile = { ...fileToRestore, isDeleted: false };
+    set(state => ({
+      binnedFiles: state.binnedFiles.filter(f => f.id !== fileId),
+      files: [...state.files, restoredFile],
+      error: null
+    }));
+
+    try {
+      await fileService.updateMetadata(fileId, { isDeleted: false } as any);
+    } catch (error) {
+      // Revert on error
+      set(state => ({
+        files: state.files.filter(f => f.id !== fileId),
+        binnedFiles: [...state.binnedFiles, fileToRestore],
+        error: error instanceof Error ? error.message : 'Failed to restore file'
+      }));
     }
   },
 

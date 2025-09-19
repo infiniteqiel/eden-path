@@ -19,6 +19,7 @@ interface TodoItemProps {
   onUploadEvidence?: () => void;
   showImpact?: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 const statusColors = {
@@ -53,7 +54,8 @@ export function TodoItem({
   onViewEvidence,
   onUploadEvidence,
   showImpact = false,
-  className 
+  className,
+  disabled = false
 }: TodoItemProps) {
   const isCompleted = todo.status === 'done';
   const isBlocked = todo.status === 'blocked';
@@ -76,8 +78,8 @@ export function TodoItem({
       <div className="flex items-start space-x-3">
         <Checkbox
           checked={isCompleted}
-          onCheckedChange={handleStatusToggle}
-          disabled={isBlocked}
+          onCheckedChange={disabled ? undefined : handleStatusToggle}
+          disabled={isBlocked || disabled}
           className="mt-1"
           onClick={(e) => e.stopPropagation()}
         />
@@ -87,7 +89,8 @@ export function TodoItem({
             <div className="flex-1">
               <h4 className={cn(
                 "font-medium text-sm leading-tight",
-                isCompleted && "line-through text-muted-foreground"
+                isCompleted && "line-through text-muted-foreground",
+                disabled && "opacity-60"
               )}>
                 {todo.title}
               </h4>
@@ -136,20 +139,22 @@ export function TodoItem({
             </div>
 
             <div className="flex items-center space-x-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUploadEvidence?.();
-                }}
-                className="h-auto p-1 text-muted-foreground hover:text-foreground"
-              >
-                <Upload className="h-3 w-3 mr-1" />
-                <span className="text-xs">Evidence</span>
-              </Button>
+              {!disabled && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUploadEvidence?.();
+                  }}
+                  className="h-auto p-1 text-muted-foreground hover:text-foreground"
+                >
+                  <Upload className="h-3 w-3 mr-1" />
+                  <span className="text-xs">Evidence</span>
+                </Button>
+              )}
               
-              {hasEvidence && onViewEvidence && (
+              {hasEvidence && onViewEvidence && !disabled && (
                 <Button
                   variant="ghost"
                   size="sm"

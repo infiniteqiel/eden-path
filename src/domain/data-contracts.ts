@@ -60,6 +60,7 @@ export interface DataFile {
   size?: number;
   impactArea?: ImpactArea;
   linkedTodoId?: string;
+  isDeleted?: boolean;
 }
 
 export interface DocChunk {
@@ -97,6 +98,7 @@ export interface Todo {
   ownerUserId?: string;
   dueDate?: string;
   createdAt: string;
+  deletedAt?: string;
   subAreaId?: string;  // Add sub-area assignment
 }
 

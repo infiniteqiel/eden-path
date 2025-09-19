@@ -45,6 +45,7 @@ export const listTodos = async (businessId: string): Promise<Todo[]> => {
     .select('*')
     .eq('business_id', businessId)
     .eq('user_id', user.id)
+    .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -200,7 +201,7 @@ export const linkEvidence = async (todoId: string, chunkIds: string[]): Promise<
 };
 
 export const impactSummary = async (businessId: string): Promise<ImpactSummary[]> => {
-  const todos = await listTodos(businessId);
+  const todos = await listTodos(businessId); // Only count active todos
   
   const impactAreas: ImpactArea[] = ['Governance', 'Workers', 'Community', 'Environment', 'Customers'];
   
@@ -400,4 +401,110 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
   const summaries = await impactSummary(businessId);
   
   return { todos, impactSummaries: summaries };
+};
+
+export const listBinnedTodos = async (businessId: string): Promise<Todo[]> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data, error } = await supabase
+    .from('todos')
+    .select('*')
+    .eq('business_id', businessId)
+    .eq('user_id', user.id)
+    .not('deleted_at', 'is', null)
+    .order('deleted_at', { ascending: false });
+
+  if (error) throw error;
+
+  // Use same normalization logic as listTodos
+  const normalizeImpact = (impact: string): ImpactArea => {
+    const impactMap: Record<string, ImpactArea> = {
+      'governance': 'Governance',
+      'workers': 'Workers',
+      'community': 'Community', 
+      'environment': 'Environment',
+      'customers': 'Customers'
+    };
+    return impactMap[impact.toLowerCase()] || (impact as ImpactArea) || 'Other';
+  };
+
+  const normalizePriority = (priority: string): Todo['priority'] => {
+    const priorityMap: Record<string, Todo['priority']> = {
+      'high': 'P1',
+      'medium': 'P2',
+      'low': 'P3'
+    };
+    return priorityMap[priority.toLowerCase()] || (priority as Todo['priority']) || 'P2';
+  };
+
+  const normalizeEffort = (effort: string): Todo['effort'] => {
+    const effortMap: Record<string, Todo['effort']> = {
+      'low': 'Low',
+      'medium': 'Medium',
+      'high': 'High'
+    };
+    return effortMap[effort.toLowerCase()] || (effort as Todo['effort']) || 'Medium';
+  };
+
+  const normalizeStatus = (status: string): Todo['status'] => {
+    const statusMap: Record<string, Todo['status']> = {
+      'not_started': 'todo',
+      'in_progress': 'in_progress',
+      'blocked': 'blocked',
+      'done': 'done'
+    };
+    return statusMap[status] || (status as Todo['status']) || 'todo';
+  };
+
+  return (data || []).map(row => ({
+    id: row.id,
+    businessId: row.business_id,
+    impact: normalizeImpact(row.impact),
+    requirementCode: row.requirement_code,
+    kbActionId: row.kb_action_id,
+    title: row.title,
+    descriptionMd: row.description_md,
+    priority: normalizePriority(row.priority),
+    effort: normalizeEffort(row.effort),
+    status: normalizeStatus(row.status),
+    evidenceChunkIds: row.evidence_chunk_ids || [],
+    ownerUserId: row.owner_user_id,
+    dueDate: row.due_date,
+    createdAt: row.created_at,
+    deletedAt: row.deleted_at,
+    subAreaId: row.sub_area_id
+  }));
+};
+
+export const deleteTask = async (todoId: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('todos')
+    .update({ 
+      deleted_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', todoId)
+    .eq('user_id', user.id);
+
+  if (error) throw error;
+};
+
+export const restoreTask = async (todoId: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { error } = await supabase
+    .from('todos')
+    .update({ 
+      deleted_at: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', todoId)
+    .eq('user_id', user.id);
+
+  if (error) throw error;
 };
