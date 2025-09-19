@@ -253,6 +253,40 @@ const Documents = () => {
                     </div>
                   </section>
 
+                  {/* File Management Section */}
+                  <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
+                    <h3 className="text-xl font-bold mb-6">File Management</h3>
+                    
+                    {/* All Documents */}
+                    <div className="mb-6">
+                      <h4 className="text-lg font-semibold mb-4">All Documents</h4>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Drag files to categories above to organize them
+                      </p>
+                      
+                      {uncategorizedFiles.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {uncategorizedFiles.map((file) => (
+                            <DraggableFile
+                              key={file.id}
+                              file={file}
+                              onDelete={handleDeleteFile}
+                              className="bg-white/60 rounded-lg"
+                            />
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-center py-12">
+                          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                          <p className="text-muted-foreground">No uncategorized documents</p>
+                          <p className="text-sm text-muted-foreground mt-2">
+                            All files have been organized into categories
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </section>
+
                   {/* Documents by Impact Area */}
                   <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
                     <h3 className="text-xl font-bold mb-6">Documents by Impact Area</h3>
@@ -297,40 +331,6 @@ const Documents = () => {
                           </Card>
                         );
                       })}
-                    </div>
-                  </section>
-
-                  {/* File Management Section */}
-                  <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                    <h3 className="text-xl font-bold mb-6">File Management</h3>
-                    
-                    {/* All Documents */}
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold mb-4">All Documents</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Drag files to categories above to organize them
-                      </p>
-                      
-                      {uncategorizedFiles.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {uncategorizedFiles.map((file) => (
-                            <DraggableFile
-                              key={file.id}
-                              file={file}
-                              onDelete={handleDeleteFile}
-                              className="bg-white/60 rounded-lg"
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                          <p className="text-muted-foreground">No uncategorized documents</p>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            All files have been organized into categories
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </section>
                 </div>
