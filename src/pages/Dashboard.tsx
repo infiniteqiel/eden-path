@@ -331,6 +331,15 @@ const Dashboard = () => {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleTestReset}
+                            className="flex items-center gap-2 text-xs"
+                          >
+                            <RotateCcw className="w-3 h-3" />
+                            Test Reset
+                          </Button>
                           <AIChatIcon 
                             onClick={() => console.log('AI Chat for Dashboard')}
                             size="md"
