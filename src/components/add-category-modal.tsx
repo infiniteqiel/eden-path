@@ -10,8 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useBusinessStore } from '@/store/business';
-import { documentCategoryService } from '@/services/registry';
+import { useDocumentCategoryStore } from '@/store/document-categories';
 import { toast } from 'sonner';
 import { Folder, FileText, Briefcase, Shield, Heart, Leaf, Star, Plus } from 'lucide-react';
 
@@ -49,6 +48,7 @@ export function AddCategoryModal({ open, onOpenChange, businessId }: AddCategory
   const [selectedIcon, setSelectedIcon] = useState('folder');
   const [selectedColor, setSelectedColor] = useState('#3B82F6');
   const [isLoading, setIsLoading] = useState(false);
+  const { createCategory } = useDocumentCategoryStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +61,7 @@ export function AddCategoryModal({ open, onOpenChange, businessId }: AddCategory
     setIsLoading(true);
     
     try {
-      await documentCategoryService.create(businessId, {
+      await createCategory(businessId, {
         name: name.trim(),
         description: description.trim() || undefined,
         icon: selectedIcon,
