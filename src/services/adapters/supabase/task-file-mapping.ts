@@ -17,23 +17,53 @@ export class SupabaseTaskFileMappingService implements ITaskFileMappingService {
       throw new Error('User not authenticated');
     }
 
-    // Create mappings with the user ID
+    // Check for existing mappings
+    const { data: existingMappings } = await supabase
+      .from('task_file_mappings')
+      .select('file_id')
+      .in('file_id', fileIds)
+      .neq('task_id', taskId);
+
+    if (existingMappings && existingMappings.length > 0) {
+      const alreadyMapped = existingMappings.map(m => m.file_id);
+      const fileNames = await this.getFileNames(alreadyMapped);
+      throw new Error(`Files already mapped to other tasks: ${fileNames.join(', ')}`);
+    }
+
+    // Create mappings with the user ID (only for files not already mapped to this task)
     const mappings = fileIds.map(fileId => ({
       task_id: taskId,
       file_id: fileId,
       mapped_by: mappedBy
     }));
 
-    const { data, error } = await supabase
-      .from('task_file_mappings')
-      .upsert(mappings)
-      .select('*');
+    try {
+      const { data, error } = await supabase
+        .from('task_file_mappings')
+        .upsert(mappings, { onConflict: 'task_id,file_id' })
+        .select('*');
 
-    if (error) {
-      throw new Error(`Failed to map files to task: ${error.message}`);
+      if (error) {
+        throw new Error(`Failed to map files to task: ${error.message}`);
+      }
+
+      return data.map(this.mapDbToTaskFileMapping);
+    } catch (error: any) {
+      if (error.message.includes('unique_task_file_mapping')) {
+        throw new Error('Some files are already mapped to other tasks');
+      }
+      throw error;
     }
+  }
 
-    return data.map(this.mapDbToTaskFileMapping);
+  private async getFileNames(fileIds: string[]): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('files')
+      .select('original_name')
+      .in('id', fileIds);
+    
+    if (error) return fileIds; // Fallback to IDs if names can't be fetched
+    return data.map(f => f.original_name);
   }
 
   async unmapFilesFromTask(taskId: string, fileIds: string[]): Promise<void> {

@@ -178,3 +178,26 @@ export interface LegalStep {
   required: boolean;
   attachments?: string[];
 }
+
+// New types for enhanced file management
+export interface DocumentCategory {
+  id: string;
+  businessId: string;
+  name: string;
+  description?: string;
+  color: string;
+  icon: string;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface TaskFileMapping {
+  id: string;
+  taskId: string;
+  fileId: string;
+  mappedBy: string;
+  mappedAt: string;
+  createdAt: string;
+  updatedAt: string;
+}

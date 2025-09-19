@@ -369,6 +369,7 @@ export type Database = {
       }
       files: {
         Row: {
+          category_id: string | null
           content_type: string | null
           created_at: string | null
           dataroom_id: string
@@ -379,6 +380,7 @@ export type Database = {
           file_size_bytes: number | null
           id: string
           impact_area: string | null
+          is_deleted: boolean | null
           original_name: string
           processed_at: string | null
           storage_bucket: string
@@ -387,6 +389,7 @@ export type Database = {
           uploaded_at: string | null
         }
         Insert: {
+          category_id?: string | null
           content_type?: string | null
           created_at?: string | null
           dataroom_id: string
@@ -397,6 +400,7 @@ export type Database = {
           file_size_bytes?: number | null
           id?: string
           impact_area?: string | null
+          is_deleted?: boolean | null
           original_name: string
           processed_at?: string | null
           storage_bucket?: string
@@ -405,6 +409,7 @@ export type Database = {
           uploaded_at?: string | null
         }
         Update: {
+          category_id?: string | null
           content_type?: string | null
           created_at?: string | null
           dataroom_id?: string
@@ -415,6 +420,7 @@ export type Database = {
           file_size_bytes?: number | null
           id?: string
           impact_area?: string | null
+          is_deleted?: boolean | null
           original_name?: string
           processed_at?: string | null
           storage_bucket?: string
@@ -546,6 +552,7 @@ export type Database = {
           business_id: string
           completed_at: string | null
           created_at: string
+          deleted_at: string | null
           description_md: string | null
           due_date: string | null
           effort: string
@@ -570,6 +577,7 @@ export type Database = {
           business_id: string
           completed_at?: string | null
           created_at?: string
+          deleted_at?: string | null
           description_md?: string | null
           due_date?: string | null
           effort: string
@@ -594,6 +602,7 @@ export type Database = {
           business_id?: string
           completed_at?: string | null
           created_at?: string
+          deleted_at?: string | null
           description_md?: string | null
           due_date?: string | null
           effort?: string
