@@ -59,8 +59,15 @@ export interface DataFile {
   ocrStatus: OcrStatus;
   size?: number;
   impactArea?: ImpactArea;
-  linkedTodoId?: string;
+  categoryId?: string;
   isDeleted?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  extractedText?: string;
+  extractionStatus?: string;
+  extractionMethod?: string;
+  processedAt?: string;
+  fileSizeBytes?: number;
 }
 
 export interface DocChunk {

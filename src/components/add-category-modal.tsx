@@ -20,8 +20,6 @@ interface AddCategoryModalProps {
   onOpenChange: (open: boolean) => void;
   businessId: string;
 }
-  onCategoryAdded: () => void;
-}
 
 const iconOptions = [
   { name: 'Folder', icon: Folder, value: 'folder' },
@@ -45,18 +43,17 @@ const colorOptions = [
   { name: 'Gray', value: '#6B7280' },
 ];
 
-export function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: AddCategoryModalProps) {
+export function AddCategoryModal({ open, onOpenChange, businessId }: AddCategoryModalProps) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('folder');
   const [selectedColor, setSelectedColor] = useState('#3B82F6');
   const [isLoading, setIsLoading] = useState(false);
-  const { currentBusiness } = useBusinessStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!currentBusiness || !name.trim()) {
+    if (!businessId || !name.trim()) {
       toast.error('Please fill in the category name');
       return;
     }
@@ -64,7 +61,7 @@ export function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: AddCatego
     setIsLoading(true);
     
     try {
-      await documentCategoryService.create(currentBusiness.id, {
+      await documentCategoryService.create(businessId, {
         name: name.trim(),
         description: description.trim() || undefined,
         icon: selectedIcon,
@@ -74,7 +71,6 @@ export function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: AddCatego
       });
       
       toast.success('Category created successfully');
-      onCategoryAdded();
       handleClose();
     } catch (error) {
       console.error('Failed to create category:', error);
@@ -89,11 +85,11 @@ export function AddCategoryModal({ isOpen, onClose, onCategoryAdded }: AddCatego
     setDescription('');
     setSelectedIcon('folder');
     setSelectedColor('#3B82F6');
-    onClose();
+    onOpenChange(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Document Category</DialogTitle>

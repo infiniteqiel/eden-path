@@ -20,7 +20,9 @@ let mockFiles: DataFile[] = [
     uploadedAt: '2024-01-15T10:30:00Z',
     ocrStatus: 'done',
     size: 245760,
-    impactArea: 'Governance'
+    impactArea: 'Governance',
+    categoryId: undefined,
+    isDeleted: false
   },
   {
     id: '2',
@@ -32,7 +34,9 @@ let mockFiles: DataFile[] = [
     uploadedAt: '2024-01-20T14:22:00Z',
     ocrStatus: 'done',
     size: 156420,
-    impactArea: 'Workers'
+    impactArea: 'Workers',
+    categoryId: undefined,
+    isDeleted: false
   },
   {
     id: '3',
@@ -44,7 +48,9 @@ let mockFiles: DataFile[] = [
     uploadedAt: '2024-01-25T09:15:00Z',
     ocrStatus: 'done',
     size: 8920,
-    impactArea: 'Environment'
+    impactArea: 'Environment',
+    categoryId: undefined,
+    isDeleted: false
   }
 ];
 
@@ -71,7 +77,8 @@ export const upload = async (businessId: string, file: File, impactArea?: Impact
     ocrStatus: 'pending' as OcrStatus,
     size: file.size,
     impactArea,
-    linkedTodoId: undefined
+    categoryId: undefined,
+    isDeleted: false
   };
 
   mockFiles.push(newFile);
@@ -104,7 +111,9 @@ export const createVirtual = async (
     contentType: 'text/plain',
     uploadedAt: new Date().toISOString(),
     ocrStatus: 'done',
-    size: text.length
+    size: text.length,
+    categoryId: undefined,
+    isDeleted: false
   };
 
   mockFiles.push(newFile);
