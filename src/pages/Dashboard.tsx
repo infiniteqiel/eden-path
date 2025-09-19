@@ -34,6 +34,8 @@ const Dashboard = () => {
   const [companyModalOpen, setCompanyModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   
+  const [isResetting, setIsResetting] = React.useState(false);
+  
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, resetTestData, resetAllTestData } = useAnalysisStore();
 
@@ -61,43 +63,63 @@ const Dashboard = () => {
   };
 
   const handleTestReset = async () => {
-    // Reset progress and generate baseline B Corp tasks
-    if (currentBusiness) {
-      // Clear existing tasks
-      resetTestData(currentBusiness.id);
+    if (!currentBusiness || isResetting) return;
+    
+    setIsResetting(true);
+    
+    try {
+      console.log('Starting test reset for business:', currentBusiness.id);
       
-      // Generate baseline B Corp tasks using the same system as new company creation
-      try {
-        const { supabase } = await import('@/integrations/supabase/client');
-        
-        const { data, error } = await supabase.functions.invoke('generate-baseline-tasks', {
-          body: {
-            businessId: currentBusiness.id,
-            businessData: {
-              name: currentBusiness.name,
-              description: currentBusiness.description,
-              industry: currentBusiness.industry,
-              legalForm: currentBusiness.legalForm,
-              country: currentBusiness.country,
-              operatingMonths: currentBusiness.operatingMonths,
-              workersCount: currentBusiness.workersCount
-            }
+      // Step 1: Clear existing tasks and wait for completion
+      await resetTestData(currentBusiness.id);
+      console.log('✓ Existing tasks cleared');
+      
+      // Step 2: Generate baseline B Corp tasks
+      const { supabase } = await import('@/integrations/supabase/client');
+      
+      const { data, error } = await supabase.functions.invoke('generate-baseline-tasks', {
+        body: {
+          businessId: currentBusiness.id,
+          businessData: {
+            name: currentBusiness.name,
+            description: currentBusiness.description,
+            industry: currentBusiness.industry,
+            legalForm: currentBusiness.legalForm,
+            country: currentBusiness.country,
+            operatingMonths: currentBusiness.operatingMonths,
+            workersCount: currentBusiness.workersCount
           }
-        });
-
-        if (error) {
-          console.error('Failed to generate baseline tasks:', error);
-        } else {
-          console.log('Baseline tasks generated successfully:', data);
-          // Reload tasks to show the new baseline tasks
-          setTimeout(() => {
-            loadTodos(currentBusiness.id);
-            loadImpactSummaries(currentBusiness.id);
-          }, 1000);
         }
-      } catch (error) {
-        console.error('Error generating baseline tasks:', error);
+      });
+
+      if (error) {
+        console.error('Failed to generate baseline tasks:', error);
+        throw new Error(`Failed to generate baseline tasks: ${error.message}`);
       }
+      
+      console.log('✓ Baseline tasks generated:', data);
+      
+      // Step 3: Reload data immediately after successful generation
+      await Promise.all([
+        loadTodos(currentBusiness.id),
+        loadImpactSummaries(currentBusiness.id)
+      ]);
+      
+      console.log('✓ Data refreshed - Test reset complete');
+      
+    } catch (error) {
+      console.error('Test reset failed:', error);
+      // Ensure we reload data even on error to show current state
+      try {
+        await Promise.all([
+          loadTodos(currentBusiness.id),
+          loadImpactSummaries(currentBusiness.id)
+        ]);
+      } catch (reloadError) {
+        console.error('Failed to reload data after error:', reloadError);
+      }
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -335,10 +357,11 @@ const Dashboard = () => {
                             variant="outline"
                             size="sm"
                             onClick={handleTestReset}
+                            disabled={isResetting}
                             className="flex items-center gap-2 text-xs"
                           >
-                            <RotateCcw className="w-3 h-3" />
-                            Test Reset
+                            <RotateCcw className={`w-3 h-3 ${isResetting ? 'animate-spin' : ''}`} />
+                            {isResetting ? 'Resetting...' : 'Test Reset'}
                           </Button>
                           <AIChatIcon 
                             onClick={() => console.log('AI Chat for Dashboard')}

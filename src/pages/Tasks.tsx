@@ -28,6 +28,7 @@ const Tasks = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [expandedTask, setExpandedTask] = useState<Todo | null>(null);
+  const [isResetting, setIsResetting] = React.useState(false);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -42,9 +43,23 @@ const Tasks = () => {
     }
   };
 
-  const handleTestReset = () => {
-    if (currentBusiness) {
-      resetTestData(currentBusiness.id);
+  const handleTestReset = async () => {
+    if (!currentBusiness || isResetting) return;
+    
+    setIsResetting(true);
+    
+    try {
+      console.log('Starting test reset from Tasks page:', currentBusiness.id);
+      await resetTestData(currentBusiness.id);
+      
+      // Reload tasks after reset
+      await loadTodos(currentBusiness.id);
+      
+      console.log('✓ Tasks page test reset complete');
+    } catch (error) {
+      console.error('Tasks page test reset failed:', error);
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -129,10 +144,16 @@ const Tasks = () => {
                         Track and manage your B Corp readiness tasks across all impact areas
                       </p>
                     </div>
-                    <Button onClick={handleTestReset} variant="outline" size="sm" className="text-sm">
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      <span className="hidden sm:inline">Reset Tasks</span>
-                      <span className="sm:hidden">Reset</span>
+                    <Button 
+                      onClick={handleTestReset} 
+                      variant="outline" 
+                      size="sm" 
+                      className="text-sm"
+                      disabled={isResetting}
+                    >
+                      <RotateCcw className={`h-4 w-4 mr-2 ${isResetting ? 'animate-spin' : ''}`} />
+                      <span className="hidden sm:inline">{isResetting ? 'Resetting...' : 'Reset Tasks'}</span>
+                      <span className="sm:hidden">{isResetting ? 'Resetting' : 'Reset'}</span>
                     </Button>
                   </div>
 

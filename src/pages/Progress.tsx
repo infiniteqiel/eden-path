@@ -21,6 +21,7 @@ const Progress = () => {
   const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, resetTestData } = useAnalysisStore();
+  const [isResetting, setIsResetting] = React.useState(false);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -29,9 +30,26 @@ const Progress = () => {
     }
   }, [currentBusiness, loadImpactSummaries, loadTodos]);
 
-  const handleTestReset = () => {
-    if (currentBusiness) {
-      resetTestData(currentBusiness.id);
+  const handleTestReset = async () => {
+    if (!currentBusiness || isResetting) return;
+    
+    setIsResetting(true);
+    
+    try {
+      console.log('Starting test reset from Progress page:', currentBusiness.id);
+      await resetTestData(currentBusiness.id);
+      
+      // Reload data after reset
+      await Promise.all([
+        loadTodos(currentBusiness.id),
+        loadImpactSummaries(currentBusiness.id)
+      ]);
+      
+      console.log('✓ Progress page test reset complete');
+    } catch (error) {
+      console.error('Progress page test reset failed:', error);
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -79,9 +97,13 @@ const Progress = () => {
                         Track your B Corp certification readiness across all dimensions
                       </p>
                     </div>
-                    <Button onClick={handleTestReset} variant="outline">
-                      <RotateCcw className="h-4 w-4 mr-2" />
-                      Reset Progress
+                    <Button 
+                      onClick={handleTestReset} 
+                      variant="outline"
+                      disabled={isResetting}
+                    >
+                      <RotateCcw className={`h-4 w-4 mr-2 ${isResetting ? 'animate-spin' : ''}`} />
+                      {isResetting ? 'Resetting...' : 'Reset Progress'}
                     </Button>
                   </div>
 
