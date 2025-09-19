@@ -67,15 +67,22 @@ serve(async (req) => {
     const companyDescription = business.description.trim();
     console.log('Company description length:', companyDescription.length);
 
-    // 3. Get existing tasks to avoid duplicates
+    // 3. Get existing tasks to avoid duplicates (enhanced with descriptions for semantic similarity)
     const { data: existingTasks } = await supabaseUser
       .from('todos')
-      .select('title')
+      .select('title, description_md')
       .eq('business_id', businessId);
 
     const existingTitles = new Set(
       (existingTasks || []).map(task => normalizeTitle(task.title))
     );
+
+    // Store existing tasks with their embeddings for semantic comparison
+    const existingTasksForSimilarity = (existingTasks || []).map(task => ({
+      title: task.title,
+      description: task.description_md || task.title,
+      normalized_title: normalizeTitle(task.title)
+    }));
 
     // 4. Generate embedding for company description
     const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
@@ -199,28 +206,152 @@ Return ONLY a JSON object with this exact structure:
     const tasks: Task[] = aiResult.tasks;
     console.log('Generated tasks:', tasks.length);
 
-    // 9. Validate and filter tasks
-    const validTasks = tasks.filter(task => {
+    // 9. Enhanced validation and deduplication with semantic similarity
+    const validTasks = [];
+    const rejectedTasks = [];
+    const SIMILARITY_THRESHOLD = 0.85; // Threshold for considering tasks too similar
+    
+    for (const task of tasks) {
+      // Basic validation
       if (!task.title || !task.description_md || !task.anchor_quote) {
-        console.log('Skipping invalid task:', task.title);
-        return false;
+        rejectedTasks.push({
+          task: task.title || 'Untitled',
+          reason: 'Missing required fields (title, description, or anchor_quote)'
+        });
+        continue;
       }
       
       const normalizedTitle = normalizeTitle(task.title);
+      
+      // Check for exact title duplicates
       if (existingTitles.has(normalizedTitle)) {
-        console.log('Skipping duplicate task:', task.title);
-        return false;
+        rejectedTasks.push({
+          task: task.title,
+          reason: 'Exact duplicate title found'
+        });
+        continue;
       }
       
-      return true;
-    }).slice(0, 12); // Limit to 12 tasks max
+      // Check for semantic similarity with existing tasks
+      let isTooSimilar = false;
+      let similarTask = '';
+      
+      if (existingTasksForSimilarity.length > 0) {
+        // Generate embedding for this new task's content
+        const taskContent = `${task.title} ${task.description_md}`;
+        
+        try {
+          const taskEmbeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${OPENAI_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'text-embedding-3-small',
+              input: taskContent,
+            }),
+          });
+          
+          const taskEmbeddingData = await taskEmbeddingResponse.json();
+          if (taskEmbeddingResponse.ok && taskEmbeddingData.data?.[0]?.embedding) {
+            const taskEmbedding = taskEmbeddingData.data[0].embedding;
+            
+            // Compare with existing tasks
+            for (const existing of existingTasksForSimilarity) {
+              const existingContent = `${existing.title} ${existing.description}`;
+              
+              // Generate embedding for existing task
+              const existingEmbeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${OPENAI_API_KEY}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  model: 'text-embedding-3-small',
+                  input: existingContent,
+                }),
+              });
+              
+              const existingEmbeddingData = await existingEmbeddingResponse.json();
+              if (existingEmbeddingResponse.ok && existingEmbeddingData.data?.[0]?.embedding) {
+                const existingEmbedding = existingEmbeddingData.data[0].embedding;
+                
+                // Calculate cosine similarity
+                const similarity = calculateCosineSimilarity(taskEmbedding, existingEmbedding);
+                
+                if (similarity > SIMILARITY_THRESHOLD) {
+                  isTooSimilar = true;
+                  similarTask = existing.title;
+                  break;
+                }
+              }
+            }
+          }
+        } catch (embedError) {
+          console.warn('Failed to generate embeddings for similarity check:', embedError);
+          // Continue without semantic similarity check if embeddings fail
+        }
+      }
+      
+      if (isTooSimilar) {
+        rejectedTasks.push({
+          task: task.title,
+          reason: `Too similar to existing task: "${similarTask}" (similarity > ${SIMILARITY_THRESHOLD})`
+        });
+        continue;
+      }
+      
+      // Additional checks for task variations using text similarity
+      const taskWords = new Set(normalizedTitle.split(' ').filter(word => word.length > 2));
+      let hasHighWordOverlap = false;
+      
+      for (const existingTitle of existingTitles) {
+        const existingWords = new Set(existingTitle.split(' ').filter(word => word.length > 2));
+        const intersection = new Set([...taskWords].filter(x => existingWords.has(x)));
+        const union = new Set([...taskWords, ...existingWords]);
+        
+        const wordOverlap = intersection.size / union.size;
+        if (wordOverlap > 0.6 && taskWords.size > 2) {
+          hasHighWordOverlap = true;
+          rejectedTasks.push({
+            task: task.title,
+            reason: `High word overlap with existing task (${Math.round(wordOverlap * 100)}%)`
+          });
+          break;
+        }
+      }
+      
+      if (hasHighWordOverlap) {
+        continue;
+      }
+      
+      // Task passed all checks
+      validTasks.push(task);
+      // Add to existing titles to prevent duplicates within this generation
+      existingTitles.add(normalizedTitle);
+    }
+    
+    // Limit to 12 tasks max
+    const finalTasks = validTasks.slice(0, 12);
+    
+    // Log rejection summary
+    if (rejectedTasks.length > 0) {
+      console.log('Rejected tasks summary:');
+      rejectedTasks.forEach(rejected => {
+        console.log(`- "${rejected.task}": ${rejected.reason}`);
+      });
+    }
+    
+    console.log(`Generated: ${tasks.length}, Valid: ${finalTasks.length}, Rejected: ${rejectedTasks.length}`);
 
-    if (validTasks.length === 0) {
-      throw new Error('No valid tasks generated');
+    if (finalTasks.length === 0) {
+      throw new Error('No valid tasks generated after deduplication checks');
     }
 
     // 10. Insert tasks into database
-    const dbTasks = validTasks.map(task => ({
+    const dbTasks = finalTasks.map(task => ({
       business_id: businessId,
       user_id: user.id,
       title: task.title.substring(0, 180),
@@ -248,8 +379,11 @@ Return ONLY a JSON object with this exact structure:
 
     return new Response(JSON.stringify({
       success: true,
-      generated: validTasks.length,
+      generated: tasks.length,
+      valid: finalTasks.length,
       inserted: insertedTasks.length,
+      rejected: rejectedTasks.length,
+      rejectionReasons: rejectedTasks,
       tasks: insertedTasks
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -272,4 +406,27 @@ function normalizeTitle(title: string): string {
     .replace(/[^\w\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+// Calculate cosine similarity between two vectors
+function calculateCosineSimilarity(vecA: number[], vecB: number[]): number {
+  if (vecA.length !== vecB.length) {
+    throw new Error('Vectors must have the same length');
+  }
+  
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+  
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  
+  if (normA === 0 || normB === 0) {
+    return 0;
+  }
+  
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
