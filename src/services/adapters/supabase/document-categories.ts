@@ -74,6 +74,17 @@ export class SupabaseDocumentCategoryService implements IDocumentCategoryService
   }
 
   async delete(categoryId: string): Promise<void> {
+    // First, move all files in this category to uncategorized (set category_id to NULL)
+    const { error: filesError } = await supabase
+      .from('files')
+      .update({ category_id: null })
+      .eq('category_id', categoryId);
+
+    if (filesError) {
+      throw new Error(`Failed to uncategorize files: ${filesError.message}`);
+    }
+
+    // Then delete the category
     const { error } = await supabase
       .from('user_document_categories')
       .delete()

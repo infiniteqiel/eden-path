@@ -110,7 +110,9 @@ const Documents = () => {
     try {
       await deleteCategory(categoryId);
       await loadCategories(currentBusiness.id);
-      toast.success('Category deleted successfully');
+      // Reload files to show the files that were moved to uncategorized
+      await loadFiles(currentBusiness.id);
+      toast.success('Category deleted successfully. Files moved to All Documents.');
     } catch (error) {
       toast.error('Failed to delete category');
     } finally {
@@ -391,7 +393,7 @@ const Documents = () => {
             <AlertDialogTitle>Delete Category</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete this category? This action cannot be undone.
-              Any files in this category will become uncategorized.
+              All files in this category will be moved to "All Documents" (uncategorized).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
