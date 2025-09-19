@@ -218,7 +218,7 @@ export function OptimizedExpandableTaskModal({
                             className="w-full"
                           >
                             <Link className="h-4 w-4 mr-2" />
-                            Map Files to Task
+                            Manage Task Files
                           </Button>
                           
                           <Button 

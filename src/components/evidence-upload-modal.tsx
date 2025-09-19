@@ -10,11 +10,11 @@ import { Button } from '@/components/ui/button';
 import { UploadDropzone } from '@/components/upload-dropzone';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { FileText, X, Link } from 'lucide-react';
+import { FileText, X, Save } from 'lucide-react';
 import { Todo, ImpactArea } from '@/domain/data-contracts';
 import { useDataroomStore } from '@/store/dataroom';
 import { useBusinessStore } from '@/store/business';
-import { FileList } from '@/components/file-list';
+import { EnhancedFileList } from '@/components/enhanced-file-list';
 import { taskFileMappingService } from '@/services/registry';
 import { toast } from 'sonner';
 
@@ -29,6 +29,7 @@ export function EvidenceUploadModal({ isOpen, onClose, todo }: EvidenceUploadMod
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const [mappedFiles, setMappedFiles] = useState<string[]>([]);
   const [isMapping, setIsMapping] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const { currentBusiness } = useBusinessStore();
   const { uploadFile, files, loadFiles } = useDataroomStore();
 
@@ -75,9 +76,9 @@ export function EvidenceUploadModal({ isOpen, onClose, todo }: EvidenceUploadMod
     }
   };
 
-  const handleMapFiles = async () => {
+  const handleSaveTaskFiles = async () => {
     if (selectedFiles.length === 0) {
-      toast.error('Please select files to map');
+      toast.error('No changes to save');
       return;
     }
 
@@ -85,7 +86,12 @@ export function EvidenceUploadModal({ isOpen, onClose, todo }: EvidenceUploadMod
     try {
       await taskFileMappingService.mapFilesToTask(todo.id, selectedFiles);
       await loadMappedFiles();
+      // Also reload files to get updated impact areas
+      if (currentBusiness) {
+        await loadFiles(currentBusiness.id);
+      }
       setSelectedFiles([]);
+      setHasChanges(false);
       toast.success(`${selectedFiles.length} file${selectedFiles.length !== 1 ? 's' : ''} mapped to task`);
     } catch (error) {
       console.error('Failed to map files:', error);
@@ -95,12 +101,30 @@ export function EvidenceUploadModal({ isOpen, onClose, todo }: EvidenceUploadMod
     }
   };
 
+  const handleFileUnmap = async (fileId: string) => {
+    try {
+      await taskFileMappingService.unmapFilesFromTask(todo.id, [fileId]);
+      await loadMappedFiles();
+      // Also reload files to get updated impact areas
+      if (currentBusiness) {
+        await loadFiles(currentBusiness.id);
+      }
+      toast.success('File unmapped from task');
+    } catch (error) {
+      console.error('Failed to unmap file:', error);
+      toast.error('Failed to unmap file from task');
+    }
+  };
+
   const handleFileSelect = (fileId: string, selected: boolean) => {
-    setSelectedFiles(prev => 
-      selected 
+    setSelectedFiles(prev => {
+      const newSelection = selected 
         ? [...prev, fileId]
-        : prev.filter(id => id !== fileId)
-    );
+        : prev.filter(id => id !== fileId);
+      
+      setHasChanges(newSelection.length > 0);
+      return newSelection;
+    });
   };
 
   const impactAreaColors: Record<ImpactArea, string> = {
@@ -190,30 +214,33 @@ export function EvidenceUploadModal({ isOpen, onClose, todo }: EvidenceUploadMod
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-medium">Map Existing Files</h3>
                   <Button
-                    onClick={handleMapFiles}
-                    disabled={selectedFiles.length === 0 || isMapping}
+                    onClick={handleSaveTaskFiles}
+                    disabled={!hasChanges || isMapping}
                     size="sm"
-                    variant="outline"
+                    variant={hasChanges ? "default" : "outline"}
                   >
-                    <Link className="h-4 w-4 mr-2" />
-                    Map Files ({selectedFiles.length})
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Task Files {hasChanges && `(${selectedFiles.length})`}
                   </Button>
                 </div>
                 
-                <FileList
+                <EnhancedFileList
                   files={files}
+                  currentTaskId={todo.id}
+                  currentTaskTitle={todo.title}
                   maxHeight="400px"
-                  selectable={true}
                   selectedFiles={selectedFiles}
                   onFileSelect={handleFileSelect}
-                  highlightedFiles={mappedFiles}
+                  onFileUnmap={handleFileUnmap}
                   emptyMessage="No files available. Upload some files first."
                   className="border"
                 />
                 
-                <p className="text-xs text-muted-foreground mt-2">
-                  Green highlighted files are already mapped to this task.
-                </p>
+                <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                  <p>✅ Green ticks = Mapped to this task (click to unmap)</p>
+                  <p>🔒 Gray locks = Already mapped to other tasks</p>
+                  <p>☐ Checkboxes = Available to map to this task</p>
+                </div>
               </div>
             </div>
           </div>
