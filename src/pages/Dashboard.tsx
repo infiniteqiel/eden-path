@@ -16,12 +16,15 @@ import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { UploadModal } from '@/components/upload-modal';
 import { BusinessSwitcher } from '@/components/business-switcher';
 import { CompanyCreationModal } from '@/components/company-creation-modal';
+import { EnhancedUploadDropzone } from '@/components/enhanced-upload-dropzone';
+import { FileList } from '@/components/file-list';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
+import { useDataroomStore } from '@/store/dataroom';
 import { Todo } from '@/domain/data-contracts';
 import { Upload, FileText, ArrowRight, Building, Leaf, Users, RotateCcw, Home } from 'lucide-react';
 import { AIChatIcon } from '@/components/ai-chat-icon';
@@ -38,6 +41,7 @@ const Dashboard = () => {
   
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, resetTestData, resetAllTestData } = useAnalysisStore();
+  const { files, loadFiles } = useDataroomStore();
 
   // Get quick todos (top 5 priority P1/P2 not done)
   const quickTodos = todos
@@ -52,8 +56,15 @@ const Dashboard = () => {
     if (currentBusiness) {
       loadImpactSummaries(currentBusiness.id);
       loadTodos(currentBusiness.id);
+      loadFiles(currentBusiness.id);
     }
-  }, [currentBusiness, loadImpactSummaries, loadTodos]);
+  }, [currentBusiness, loadImpactSummaries, loadTodos, loadFiles]);
+
+  const handleUploadComplete = () => {
+    if (currentBusiness) {
+      loadFiles(currentBusiness.id);
+    }
+  };
 
   const handleTodoToggle = async (todoId: string, status: Todo['status']) => {
     await updateTodoStatus(todoId, status);

@@ -44,7 +44,7 @@ export const useDataroomStore = create<DataroomState>((set, get) => ({
     }
   },
 
-  uploadFile: async (businessId: string, file: File, impactArea?: ImpactArea) => {
+  uploadFile: async (businessId: string, file: File, impactArea: ImpactArea = "Other") => {
     const uploadId = `upload-${Date.now()}-${Math.random()}`;
     
     // Add upload progress tracking

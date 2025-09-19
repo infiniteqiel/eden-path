@@ -510,6 +510,36 @@ export type Database = {
         }
         Relationships: []
       }
+      task_file_mappings: {
+        Row: {
+          created_at: string
+          file_id: string
+          id: string
+          mapped_at: string
+          mapped_by: string | null
+          task_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          file_id: string
+          id?: string
+          mapped_at?: string
+          mapped_by?: string | null
+          task_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          file_id?: string
+          id?: string
+          mapped_at?: string
+          mapped_by?: string | null
+          task_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       todos: {
         Row: {
           anchor_quote: string | null

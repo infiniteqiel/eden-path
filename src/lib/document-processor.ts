@@ -49,9 +49,9 @@ export async function processDocumentsWithProgress(
         progress.status = 'uploading';
         onProgress?.(Array.from(progressMap.values()));
 
-        // Use the file service for upload (this will create the database record and queue extraction)
+        // Use the file service for upload without impact area (defaults to "Other")
         const { fileService } = await import('@/services/registry');
-        const uploadedFile = await fileService.upload(businessId, file);
+        const uploadedFile = await fileService.upload(businessId, file, "Other");
 
         progress.fileId = uploadedFile.id;
         progress.progress = 50;

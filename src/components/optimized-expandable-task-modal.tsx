@@ -4,7 +4,7 @@
  * Full screen task view with unified AI Chat integration and improved mobile UX
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -14,9 +14,13 @@ import { TodoItem } from '@/components/todo-item';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { ChatInterface } from '@/components/common/chat-interface';
-import { Todo } from '@/domain/data-contracts';
-import { X, Upload, MessageSquare, FileText } from 'lucide-react';
+import { FileList } from '@/components/file-list';
+import { Todo, DataFile } from '@/domain/data-contracts';
+import { X, Upload, MessageSquare, FileText, Link } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDataroomStore } from '@/store/dataroom';
+import { useBusinessStore } from '@/store/business';
+import { taskFileMappingService } from '@/services/registry';
 
 interface ExpandableTaskModalProps {
   isOpen: boolean;
@@ -33,7 +37,38 @@ export function OptimizedExpandableTaskModal({
 }: ExpandableTaskModalProps) {
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
+  const [mappedFiles, setMappedFiles] = useState<DataFile[]>([]);
   const isMobile = useIsMobile();
+  const { files, loadFiles } = useDataroomStore();
+  const { currentBusiness } = useBusinessStore();
+
+  // Load mapped files when todo changes
+  useEffect(() => {
+    if (todo && currentBusiness) {
+      loadMappedFiles();
+      loadFiles(currentBusiness.id);
+    }
+  }, [todo, currentBusiness]);
+
+  const loadMappedFiles = async () => {
+    if (!todo) return;
+    
+    try {
+      const mappedFileIds = await taskFileMappingService.getTaskFiles(todo.id);
+      const allFiles = files.length > 0 ? files : await (async () => {
+        if (currentBusiness) {
+          await loadFiles(currentBusiness.id);
+          return files;
+        }
+        return [];
+      })();
+      
+      const mapped = allFiles.filter(file => mappedFileIds.includes(file.id));
+      setMappedFiles(mapped);
+    } catch (error) {
+      console.error('Failed to load mapped files:', error);
+    }
+  };
 
   if (!todo) return null;
 
@@ -124,6 +159,41 @@ export function OptimizedExpandableTaskModal({
                                 Priority: {todo.priority} | Status: {todo.status.replace('_', ' ')}
                               </p>
                             </div>
+
+                            <div>
+                              <h4 className="font-medium mb-3">Mapped Files</h4>
+                              {mappedFiles.length > 0 ? (
+                                <div className="space-y-2">
+                                  {mappedFiles.map((file) => (
+                                    <Button
+                                      key={file.id}
+                                      variant="ghost"
+                                      className="w-full justify-start h-auto p-2 text-left"
+                                      onClick={() => {
+                                        // Handle file click - could open file viewer
+                                        console.log('File clicked:', file);
+                                      }}
+                                    >
+                                      <div className="flex items-center space-x-2 w-full">
+                                        <FileText className="h-4 w-4 flex-shrink-0" />
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-medium truncate">
+                                            {file.originalName}
+                                          </p>
+                                          <p className="text-xs text-muted-foreground">
+                                            {file.contentType || 'Unknown type'}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </Button>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-muted-foreground">
+                                  No files mapped to this task yet.
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -140,6 +210,15 @@ export function OptimizedExpandableTaskModal({
                           >
                             <Upload className="h-4 w-4 mr-2" />
                             Upload Evidence
+                          </Button>
+                          
+                          <Button 
+                            onClick={() => setShowEvidenceModal(true)}
+                            variant="outline"
+                            className="w-full"
+                          >
+                            <Link className="h-4 w-4 mr-2" />
+                            Map Files to Task
                           </Button>
                           
                           <Button 
@@ -222,7 +301,11 @@ export function OptimizedExpandableTaskModal({
       {showEvidenceModal && (
         <EvidenceUploadModal
           isOpen={showEvidenceModal}
-          onClose={() => setShowEvidenceModal(false)}
+          onClose={() => {
+            setShowEvidenceModal(false);
+            // Refresh mapped files when modal closes
+            loadMappedFiles();
+          }}
           todo={todo}
         />
       )}

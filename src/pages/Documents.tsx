@@ -8,6 +8,7 @@ import React, { useEffect } from 'react';
 import { AppSidebar } from '@/components/app-sidebar';
 import { EnhancedUploadDropzone } from '@/components/enhanced-upload-dropzone';
 import { FileCard } from '@/components/file-card';
+import { FileList } from '@/components/file-list';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
