@@ -180,6 +180,19 @@ export interface LegalStep {
 }
 
 // New types for enhanced file management
+export interface DocumentCategory {
+  id: string;
+  businessId: string;
+  name: string;
+  description?: string;
+  color: string;
+  icon: string;
+  sortOrder: number;
+  isSystemCategory: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface TaskFileMapping {
   id: string;
   taskId: string;
@@ -188,4 +201,16 @@ export interface TaskFileMapping {
   mappedAt: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface FileAuditLog {
+  id: string;
+  fileId: string;
+  businessId: string;
+  operation: 'created' | 'deleted' | 'mapped' | 'unmapped' | 'categorized';
+  oldValues: Record<string, unknown>;
+  newValues: Record<string, unknown>;
+  userId: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
 }

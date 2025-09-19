@@ -367,6 +367,42 @@ export type Database = {
           },
         ]
       }
+      file_audit_log: {
+        Row: {
+          business_id: string
+          created_at: string
+          file_id: string
+          id: string
+          metadata: Json | null
+          new_values: Json | null
+          old_values: Json | null
+          operation: string
+          user_id: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          file_id: string
+          id?: string
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          operation: string
+          user_id: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          file_id?: string
+          id?: string
+          metadata?: Json | null
+          new_values?: Json | null
+          old_values?: Json | null
+          operation?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       files: {
         Row: {
           category_id: string | null
@@ -632,6 +668,45 @@ export type Database = {
           },
         ]
       }
+      user_document_categories: {
+        Row: {
+          business_id: string
+          color: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          is_system_category: boolean
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_system_category?: boolean
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          is_system_category?: boolean
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -691,6 +766,17 @@ export type Database = {
       }
       l2_normalize: {
         Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: string
+      }
+      log_file_operation: {
+        Args: {
+          p_business_id: string
+          p_file_id: string
+          p_metadata?: Json
+          p_new_values?: Json
+          p_old_values?: Json
+          p_operation: string
+        }
         Returns: string
       }
       match_knowledge_documents: {
