@@ -118,6 +118,16 @@ export class SupabaseDocumentCategoryService implements IDocumentCategoryService
     }
   }
 
+  async seedDefaults(businessId: string): Promise<void> {
+    const { error } = await supabase.rpc('seed_default_document_categories', {
+      p_business_id: businessId
+    });
+
+    if (error) {
+      throw new Error(`Failed to seed default categories: ${error.message}`);
+    }
+  }
+
   private mapDbToDocumentCategory(row: any): DocumentCategory {
     return {
       id: row.id,

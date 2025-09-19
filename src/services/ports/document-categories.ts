@@ -42,4 +42,9 @@ export interface IDocumentCategoryService {
    * Reorder categories for a business
    */
   reorder(businessId: string, categoryIds: string[]): Promise<void>;
+
+  /**
+   * Seed default categories for a business
+   */
+  seedDefaults(businessId: string): Promise<void>;
 }

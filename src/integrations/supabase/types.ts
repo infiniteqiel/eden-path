@@ -795,6 +795,10 @@ export type Database = {
           title: string
         }[]
       }
+      seed_default_document_categories: {
+        Args: { p_business_id: string }
+        Returns: undefined
+      }
       seed_default_sub_areas: {
         Args: { p_business_id: string }
         Returns: undefined

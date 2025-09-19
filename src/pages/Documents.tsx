@@ -14,6 +14,7 @@ import { AddCategoryModal } from '@/components/add-category-modal';
 import { FileCard } from '@/components/file-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useDataroomStore } from '@/store/dataroom';
@@ -31,6 +32,7 @@ const Documents = () => {
   const { categories, loadCategories } = useDocumentCategoryStore();
   const [activeFile, setActiveFile] = useState<DataFile | null>(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
+  const [activeTab, setActiveTab] = useState('categories');
 
   useEffect(() => {
     if (currentBusiness) {
@@ -175,116 +177,122 @@ const Documents = () => {
                     />
                   </section>
 
-                  {/* Document Categories */}
+                  {/* Document Management Tabs */}
                   <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-xl font-bold">Document Categories</h3>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => setShowAddCategory(true)}
-                        className="flex items-center gap-2"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add Category
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {categories.map((category) => {
-                        const categoryFiles = getFilesByCategory(category.id);
-                        return (
-                          <DroppableDocumentCategory
-                            key={category.id}
-                            category={category}
-                            files={categoryFiles}
-                            className="bg-white/60"
-                          />
-                        );
-                      })}
+                    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="categories">Document Categories</TabsTrigger>
+                        <TabsTrigger value="bins">Document Bins</TabsTrigger>
+                      </TabsList>
                       
-                      {/* File Bin Category */}
-                      <Card className="bg-white/60">
-                        <CardHeader>
-                          <CardTitle className="flex items-center gap-2">
-                            <Trash2 className="h-5 w-5 text-red-500" />
-                            File Bin
-                          </CardTitle>
-                          <CardDescription>
-                            Deleted files (can be restored)
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-sm text-muted-foreground mb-3">
-                            {binnedFiles.length} files
+                      <TabsContent value="categories" className="mt-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <h3 className="text-xl font-bold">Document Categories</h3>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => setShowAddCategory(true)}
+                            className="flex items-center gap-2"
+                          >
+                            <Plus className="h-4 w-4" />
+                            Add Category
+                          </Button>
+                        </div>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                          {categories.map((category) => {
+                            const categoryFiles = getFilesByCategory(category.id);
+                            return (
+                              <DroppableDocumentCategory
+                                key={category.id}
+                                category={category}
+                                files={categoryFiles}
+                                onEdit={undefined}
+                                onDelete={!category.isSystemCategory ? () => console.log('Delete category') : undefined}
+                                className="bg-white/60"
+                              />
+                            );
+                          })}
+                        </div>
+
+                        {/* All Documents - Uncategorized Files */}
+                        {uncategorizedFiles.length > 0 && (
+                          <div>
+                            <h4 className="text-lg font-semibold mb-4">All Documents</h4>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              Drag files to categories above to organize them
+                            </p>
+                            
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {uncategorizedFiles.map((file) => (
+                                <DraggableFile
+                                  key={file.id}
+                                  file={file}
+                                  onDelete={handleDeleteFile}
+                                  className="bg-white/60 rounded-lg"
+                                />
+                              ))}
+                            </div>
                           </div>
-                          
-                          {binnedFiles.length > 0 ? (
-                            <ScrollArea className="h-32">
-                              <div className="space-y-2 pr-2">
-                                {binnedFiles.slice(0, 3).map((file) => (
-                                  <div key={file.id} className="flex items-center gap-2 p-2 rounded border bg-white/40">
-                                    <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
-                                    <span className="text-xs truncate flex-1">{file.originalName}</span>
+                        )}
+                      </TabsContent>
+                      
+                      <TabsContent value="bins" className="mt-6">
+                        <div className="mb-6">
+                          <h3 className="text-xl font-bold mb-2">Document Bins</h3>
+                          <p className="text-muted-foreground">
+                            Deleted files that can be restored or permanently removed
+                          </p>
+                        </div>
+                        
+                        <Card className="bg-white/60">
+                          <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                              <Trash2 className="h-5 w-5 text-red-500" />
+                              Bin
+                            </CardTitle>
+                            <CardDescription>
+                              {binnedFiles.length} deleted files
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            {binnedFiles.length > 0 ? (
+                              <div className="space-y-3">
+                                {binnedFiles.map((file) => (
+                                  <div key={file.id} className="flex items-center justify-between p-3 rounded border bg-white/40">
+                                    <div className="flex items-center gap-3 flex-1">
+                                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-medium truncate">{file.originalName}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          {file.size ? `${(file.size / 1024).toFixed(1)} KB` : 'Unknown size'}
+                                        </p>
+                                      </div>
+                                    </div>
                                     <Button
                                       variant="ghost"
                                       size="sm"
                                       onClick={() => handleRestoreFile(file.id)}
-                                      className="h-6 w-6 p-0 text-green-600 hover:text-green-800"
+                                      className="text-green-600 hover:text-green-800"
                                     >
-                                      <RotateCcw className="h-3 w-3" />
+                                      <RotateCcw className="h-4 w-4" />
                                     </Button>
                                   </div>
                                 ))}
-                                {binnedFiles.length > 3 && (
-                                  <div className="text-xs text-muted-foreground text-center py-1">
-                                    +{binnedFiles.length - 3} more files
-                                  </div>
-                                )}
                               </div>
-                            </ScrollArea>
-                          ) : (
-                            <div className="text-center py-4 text-xs text-muted-foreground">
-                              No files in bin
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </section>
-
-                  {/* File Management Section */}
-                  <section className="bg-white/80 backdrop-blur-sm rounded-xl p-6">
-                    <h3 className="text-xl font-bold mb-6">File Management</h3>
-                    
-                    {/* All Documents */}
-                    <div className="mb-6">
-                      <h4 className="text-lg font-semibold mb-4">All Documents</h4>
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Drag files to categories above to organize them
-                      </p>
-                      
-                      {uncategorizedFiles.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {uncategorizedFiles.map((file) => (
-                            <DraggableFile
-                              key={file.id}
-                              file={file}
-                              onDelete={handleDeleteFile}
-                              className="bg-white/60 rounded-lg"
-                            />
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="text-center py-12">
-                          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                          <p className="text-muted-foreground">No uncategorized documents</p>
-                          <p className="text-sm text-muted-foreground mt-2">
-                            All files have been organized into categories
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                            ) : (
+                              <div className="text-center py-12">
+                                <Trash2 className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                                <p className="text-muted-foreground">No files in bin</p>
+                                <p className="text-sm text-muted-foreground mt-2">
+                                  Deleted files will appear here and can be restored
+                                </p>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </TabsContent>
+                    </Tabs>
                   </section>
 
                   {/* Documents by Impact Area */}

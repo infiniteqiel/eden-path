@@ -37,7 +37,15 @@ export const useDocumentCategoryStore = create<DocumentCategoryState>((set, get)
     set({ isLoading: true, error: null });
     try {
       const categories = await supabaseDocumentCategoryService.list(businessId);
-      set({ categories, isLoading: false });
+      
+      // Seed default categories if none exist
+      if (categories.length === 0) {
+        await supabaseDocumentCategoryService.seedDefaults(businessId);
+        const seededCategories = await supabaseDocumentCategoryService.list(businessId);
+        set({ categories: seededCategories, isLoading: false });
+      } else {
+        set({ categories, isLoading: false });
+      }
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to load categories', 

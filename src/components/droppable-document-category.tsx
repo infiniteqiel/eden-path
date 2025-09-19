@@ -8,8 +8,9 @@ import { useDroppable } from '@dnd-kit/core';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { FileCard } from '@/components/file-card';
 import { DocumentCategory, DataFile } from '@/domain/data-contracts';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DroppableDocumentCategoryProps {
@@ -47,7 +48,7 @@ export function DroppableDocumentCategory({
         className
       )}
     >
-      <CardHeader className="pb-3">
+      <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 flex-1">
             <div 
@@ -101,24 +102,24 @@ export function DroppableDocumentCategory({
         )}
         
         {files.length > 0 && !isOver && (
-          <div className="space-y-2">
-            {files.slice(0, 3).map((file) => (
-              <div key={file.id} className="flex items-center gap-2 p-2 rounded border bg-white/40">
-                <div className="w-2 h-2 rounded-full bg-muted-foreground/50" />
-                <span className="text-xs truncate flex-1">{file.originalName}</span>
+          <div className="space-y-3">
+            {files.map((file) => (
+              <div key={file.id} className="bg-white/60 rounded-lg p-3">
+                <FileCard
+                  file={file}
+                  onDelete={() => console.log('Delete file:', file.id)}
+                />
               </div>
             ))}
-            {files.length > 3 && (
-              <div className="text-xs text-muted-foreground text-center py-1">
-                +{files.length - 3} more files
-              </div>
-            )}
           </div>
         )}
         
         {files.length === 0 && !isOver && (
-          <div className="text-center py-4 text-xs text-muted-foreground">
-            No files in this category
+          <div className="text-center py-8 border-2 border-dashed border-muted-foreground/20 rounded-lg">
+            <FileText className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground">
+              Drop files here to categorize
+            </p>
           </div>
         )}
       </CardContent>
