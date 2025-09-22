@@ -52,15 +52,17 @@ const Tasks = () => {
     setIsResetting(true);
     
     try {
-      console.log('Starting test reset from Tasks page:', currentBusiness.id);
+      console.log('Starting tasks-only reset from Tasks page:', currentBusiness.id);
+      
+      // Only reset tasks, don't touch sub-areas
       await resetTestData(currentBusiness.id);
       
-      // Reload tasks after reset
+      // Reload only task-related data, avoid triggering sub-area operations
       await loadTodos(currentBusiness.id);
       
-      console.log('✓ Tasks page test reset complete');
+      console.log('✓ Tasks page tasks-only reset complete');
     } catch (error) {
-      console.error('Tasks page test reset failed:', error);
+      console.error('Tasks page tasks reset failed:', error);
     } finally {
       setIsResetting(false);
     }

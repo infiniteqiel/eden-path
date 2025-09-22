@@ -287,156 +287,28 @@ export const resetTestData = async (businessId: string): Promise<{ todos: Todo[]
     .eq('business_id', businessId)
     .eq('user_id', user.id);
 
-  const baselineTodos = [
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Governance',
-      requirement_code: 'GOV-001',
-      title: 'Update Articles of Association with mission lock language',
-      description_md: 'Your Articles of Association must include specific B Corp mission lock language to meet certification requirements.',
-      priority: 'P1',
-      effort: 'High',
-      status: 'todo',
-      sub_area_id: 'Legal Requirements'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Governance',
-      requirement_code: 'GOV-002',
-      title: 'Establish stakeholder governance framework',
-      description_md: 'Create formal processes for considering all stakeholders in business decisions.',
-      priority: 'P1',
-      effort: 'Medium',
-      status: 'todo',
-      sub_area_id: 'Accountability'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Workers',
-      requirement_code: 'WOR-001',
-      title: 'Implement fair compensation policy',
-      description_md: 'Establish and document fair wage policies, including living wage considerations.',
-      priority: 'P1',
-      effort: 'Medium',
-      status: 'todo',
-      sub_area_id: 'Compensation & Benefits'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Workers',
-      requirement_code: 'WOR-002',
-      title: 'Create employee handbook with health and safety policies',
-      description_md: 'Develop comprehensive employee handbook covering health, safety, and wellbeing policies.',
-      priority: 'P2',
-      effort: 'Medium',
-      status: 'todo',
-      sub_area_id: 'Well-being & Safety'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Environment',
-      requirement_code: 'ENV-001',
-      title: 'Establish environmental management system',
-      description_md: 'Create formal environmental policies and begin tracking key environmental metrics.',
-      priority: 'P2',
-      effort: 'Medium',
-      status: 'todo',
-      sub_area_id: 'Environmental Policy'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Environment',
-      requirement_code: 'ENV-002',
-      title: 'Implement carbon footprint tracking',
-      description_md: 'Begin measuring and tracking your company\'s carbon emissions and energy usage.',
-      priority: 'P2',
-      effort: 'Low',
-      status: 'todo',
-      sub_area_id: 'Energy & Carbon'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Community',
-      requirement_code: 'COM-001',
-      title: 'Document community impact initiatives',
-      description_md: 'Formally document your community involvement and social impact programs.',
-      priority: 'P2',
-      effort: 'Low',
-      status: 'todo',
-      sub_area_id: 'Local Community'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Community',
-      requirement_code: 'COM-002',
-      title: 'Develop supplier diversity program',
-      description_md: 'Create policies and practices to work with diverse suppliers and local businesses.',
-      priority: 'P2',
-      effort: 'Medium',
-      status: 'todo',
-      sub_area_id: 'Supply Chain'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Customers',
-      requirement_code: 'CUS-001',
-      title: 'Implement customer feedback and data protection systems',
-      description_md: 'Establish customer feedback collection and ensure GDPR-compliant data protection.',
-      priority: 'P2',
-      effort: 'Medium',
-      status: 'todo',
-      sub_area_id: 'Data Protection'
-    },
-    {
-      user_id: user.id,
-      business_id: businessId,
-      impact: 'Customers',
-      requirement_code: 'CUS-002',
-      title: 'Create customer satisfaction measurement system',
-      description_md: 'Implement systems to regularly measure and improve customer satisfaction.',
-      priority: 'P3',
-      effort: 'Low',
-      status: 'todo',
-      sub_area_id: 'Customer Experience'
+  // Generate baseline tasks using the edge function to maintain consistency
+  try {
+    const { data, error } = await supabase.functions.invoke('generate-baseline-tasks', {
+      body: {
+        businessId,
+        businessData: null
+      }
+    });
+
+    if (error) {
+      console.error('Failed to generate baseline tasks via edge function:', error);
+      throw error;
     }
-  ];
 
-  // Insert baseline todos
-  const { data: insertedTodos, error } = await supabase
-    .from('todos')
-    .insert(baselineTodos)
-    .select();
+    console.log('Baseline tasks generated via edge function successfully:', data);
+  } catch (error) {
+    console.error('Error generating baseline tasks via edge function:', error);
+    throw error;
+  }
 
-  if (error) throw error;
-
-  // Convert to domain objects
-  const todos: Todo[] = (insertedTodos || []).map(row => ({
-    id: row.id,
-    businessId: row.business_id,
-    impact: row.impact as ImpactArea,
-    requirementCode: row.requirement_code,
-    kbActionId: row.kb_action_id,
-    title: row.title,
-    descriptionMd: row.description_md,
-    priority: row.priority as Todo['priority'],
-    effort: row.effort as Todo['effort'],
-    status: row.status as Todo['status'],
-    evidenceChunkIds: row.evidence_chunk_ids || [],
-    ownerUserId: row.owner_user_id,
-    dueDate: row.due_date,
-    createdAt: row.created_at,
-    subAreaId: row.sub_area_id
-  }));
-
+  // Load the newly created todos
+  const todos = await listTodos(businessId);
   const summaries = await impactSummary(businessId);
   
   return { todos, impactSummaries: summaries };

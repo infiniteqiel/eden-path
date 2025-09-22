@@ -79,56 +79,20 @@ const Dashboard = () => {
     setIsResetting(true);
     
     try {
-      console.log('Starting test reset for business:', currentBusiness.id);
+      console.log('Starting tasks-only reset from Dashboard:', currentBusiness.id);
       
-      // Step 1: Clear existing tasks and wait for completion
+      // Only reset tasks, don't touch sub-areas
       await resetTestData(currentBusiness.id);
-      console.log('✓ Existing tasks cleared');
       
-      // Step 2: Generate baseline B Corp tasks
-      const { supabase } = await import('@/integrations/supabase/client');
-      
-      const { data, error } = await supabase.functions.invoke('generate-baseline-tasks', {
-        body: {
-          businessId: currentBusiness.id,
-          businessData: {
-            name: currentBusiness.name,
-            description: currentBusiness.description,
-            industry: currentBusiness.industry,
-            legalForm: currentBusiness.legalForm,
-            country: currentBusiness.country,
-            operatingMonths: currentBusiness.operatingMonths,
-            workersCount: currentBusiness.workersCount
-          }
-        }
-      });
-
-      if (error) {
-        console.error('Failed to generate baseline tasks:', error);
-        throw new Error(`Failed to generate baseline tasks: ${error.message}`);
-      }
-      
-      console.log('✓ Baseline tasks generated:', data);
-      
-      // Step 3: Reload data immediately after successful generation
+      // Reload only task-related data, avoid triggering sub-area operations
       await Promise.all([
         loadTodos(currentBusiness.id),
         loadImpactSummaries(currentBusiness.id)
       ]);
       
-      console.log('✓ Data refreshed - Test reset complete');
-      
+      console.log('✓ Dashboard tasks-only reset complete');
     } catch (error) {
-      console.error('Test reset failed:', error);
-      // Ensure we reload data even on error to show current state
-      try {
-        await Promise.all([
-          loadTodos(currentBusiness.id),
-          loadImpactSummaries(currentBusiness.id)
-        ]);
-      } catch (reloadError) {
-        console.error('Failed to reload data after error:', reloadError);
-      }
+      console.error('Dashboard tasks reset failed:', error);
     } finally {
       setIsResetting(false);
     }

@@ -43,18 +43,20 @@ const Progress = () => {
     setIsResetting(true);
     
     try {
-      console.log('Starting test reset from Progress page:', currentBusiness.id);
+      console.log('Starting tasks-only reset from Progress page:', currentBusiness.id);
+      
+      // Only reset tasks, don't touch sub-areas
       await resetTestData(currentBusiness.id);
       
-      // Reload data after reset
+      // Reload only task-related data, avoid triggering sub-area operations
       await Promise.all([
         loadTodos(currentBusiness.id),
         loadImpactSummaries(currentBusiness.id)
       ]);
       
-      console.log('✓ Progress page test reset complete');
+      console.log('✓ Progress page tasks-only reset complete');
     } catch (error) {
-      console.error('Progress page test reset failed:', error);
+      console.error('Progress page tasks reset failed:', error);
     } finally {
       setIsResetting(false);
     }

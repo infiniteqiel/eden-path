@@ -57,8 +57,18 @@ export const useSubAreasStore = create<SubAreasState>((set, get) => ({
     try {
       // Seed defaults only once per business to prevent duplicates (server seeds all areas)
       const allSubAreas = await subAreasService.getSubAreas(businessId);
-      if (allSubAreas.length === 0) {
+      
+      // More robust check - ensure we have sub-areas for each impact area
+      const impactAreas = ['Governance', 'Workers', 'Community', 'Environment', 'Customers'];
+      const existingImpacts = new Set(allSubAreas.map(sa => sa.impactArea));
+      const missingImpacts = impactAreas.filter(ia => !existingImpacts.has(ia));
+      
+      // Only seed if we're completely missing sub-areas for any impact area
+      if (allSubAreas.length === 0 || missingImpacts.length > 0) {
+        console.log('Seeding default sub-areas for business:', businessId, 'Missing impacts:', missingImpacts);
         await subAreasService.seedDefaultSubAreas(businessId);
+      } else {
+        console.log('Sub-areas already exist for business:', businessId, 'Count:', allSubAreas.length);
       }
       
       // Load and set all sub-areas
