@@ -484,6 +484,16 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
         />
       )}
 
+      {/* Task Modal from File Click */}
+      {selectedTaskFromFile && (
+        <ExpandableTaskModal
+          isOpen={true}
+          todo={selectedTaskFromFile}
+          onClose={() => setSelectedTaskFromFile(null)}
+          onToggleStatus={(status) => handleTodoToggle(selectedTaskFromFile.id, status)}
+        />
+      )}
+
       {/* Add Sub-Area Modal */}
       <AddSubAreaModal
         isOpen={showAddAreaModal}
