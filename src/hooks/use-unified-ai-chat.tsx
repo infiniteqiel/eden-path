@@ -189,6 +189,20 @@ export function useUnifiedAIChat({
     setIsLoading(true);
 
     try {
+      // Fetch current tasks for Impact Area Specialist context
+      let currentTasks = [];
+      if (contextLevel === 'overview' && impactArea) {
+        const { data: tasks } = await supabase
+          .from('todos')
+          .select('id, title, description_md, status, priority, effort, sub_area, requirement_code, completed_at')
+          .eq('business_id', currentBusiness.id)
+          .eq('impact', impactArea)
+          .is('deleted_at', null)
+          .order('created_at', { ascending: false });
+        
+        currentTasks = tasks || [];
+      }
+
       const response = await supabase.functions.invoke('unified-ai-chat', {
         body: {
           sessionId,
@@ -199,7 +213,8 @@ export function useUnifiedAIChat({
           impactArea,
           subArea,
           subAreaId,
-          taskId
+          taskId,
+          currentTasks: contextLevel === 'overview' ? currentTasks : undefined
         }
       });
 
