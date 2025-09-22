@@ -105,7 +105,8 @@ export const listTodos = async (businessId: string): Promise<Todo[]> => {
     ownerUserId: row.owner_user_id,
     dueDate: row.due_date,
     createdAt: row.created_at,
-    subAreaId: row.sub_area_id
+    subAreaId: row.sub_area_id,
+    isImpactLocked: (row as any).is_impact_locked || false
   }));
 };
 
@@ -147,7 +148,8 @@ export const updateTodoStatus = async (todoId: string, status: Todo['status']): 
     ownerUserId: data.owner_user_id,
     dueDate: data.due_date,
     createdAt: data.created_at,
-    subAreaId: data.sub_area_id
+    subAreaId: data.sub_area_id,
+    isImpactLocked: (data as any).is_impact_locked || false
   };
 };
 
@@ -219,7 +221,8 @@ export const updateTaskImpactArea = async (todoId: string, impactArea: ImpactAre
     ownerUserId: data.owner_user_id,
     dueDate: data.due_date,
     createdAt: data.created_at,
-    subAreaId: data.sub_area_id
+    subAreaId: data.sub_area_id,
+    isImpactLocked: (data as any).is_impact_locked || false
   };
 };
 
@@ -509,7 +512,8 @@ export const listBinnedTodos = async (businessId: string): Promise<Todo[]> => {
     dueDate: row.due_date,
     createdAt: row.created_at,
     deletedAt: row.deleted_at,
-    subAreaId: row.sub_area_id
+    subAreaId: row.sub_area_id,
+    isImpactLocked: (row as any).is_impact_locked || false
   }));
 };
 
@@ -543,4 +547,41 @@ export const restoreTask = async (todoId: string): Promise<void> => {
     .eq('user_id', user.id);
 
   if (error) throw error;
+};
+
+export const updateTaskLockState = async (todoId: string, isLocked: boolean): Promise<Todo> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data, error } = await supabase
+    .from('todos')
+    .update({ 
+      is_impact_locked: isLocked,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', todoId)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    businessId: data.business_id,
+    impact: data.impact as ImpactArea,
+    requirementCode: data.requirement_code,
+    kbActionId: data.kb_action_id,
+    title: data.title,
+    descriptionMd: data.description_md,
+    priority: data.priority as Todo['priority'],
+    effort: data.effort as Todo['effort'],
+    status: data.status as Todo['status'],
+    evidenceChunkIds: data.evidence_chunk_ids || [],
+    ownerUserId: data.owner_user_id,
+    dueDate: data.due_date,
+    createdAt: data.created_at,
+    subAreaId: data.sub_area_id,
+    isImpactLocked: (data as any).is_impact_locked
+  };
 };

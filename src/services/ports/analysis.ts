@@ -92,4 +92,9 @@ export interface IAnalysisService {
    * Restore a deleted task from bin
    */
   restoreTask(todoId: string): Promise<void>;
+
+  /**
+   * Update task lock state
+   */
+  updateTaskLockState: (todoId: string, isLocked: boolean) => Promise<Todo>;
 }

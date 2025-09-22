@@ -30,6 +30,7 @@ interface AnalysisState {
   updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<void>;
   assignTaskToSubArea: (todoId: string, subAreaId: string | null) => Promise<void>;
   updateTaskImpactArea: (todoId: string, impactArea: ImpactArea) => Promise<void>;
+  updateTaskLockState: (todoId: string, isLocked: boolean) => Promise<void>;
   deleteTask: (todoId: string) => Promise<void>;
   restoreTask: (todoId: string) => Promise<void>;
   startAnalysis: (businessId: string) => Promise<void>;
@@ -188,6 +189,39 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
           todo.id === todoId ? originalTodo : todo
         ),
         error: error instanceof Error ? error.message : 'Failed to update task impact area'
+      }));
+    }
+  },
+
+  updateTaskLockState: async (todoId: string, isLocked: boolean) => {
+    const { todos } = get();
+    const originalTodo = todos.find(t => t.id === todoId);
+    if (!originalTodo) return;
+
+    // Optimistically update UI first
+    set(state => ({
+      todos: state.todos.map(todo => 
+        todo.id === todoId ? { ...todo, isImpactLocked: isLocked } : todo
+      ),
+      error: null
+    }));
+
+    try {
+      const updatedTodo = await analysisService.updateTaskLockState(todoId, isLocked);
+      
+      // Confirm the update with server response
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? updatedTodo : todo
+        )
+      }));
+    } catch (error) {
+      // Revert optimistic update on error
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? originalTodo : todo
+        ),
+        error: error instanceof Error ? error.message : 'Failed to update task lock state'
       }));
     }
   },

@@ -4,7 +4,7 @@
  * Displays uploaded files in the data room.
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,6 +28,8 @@ import {
 import { DataFile, FileKind } from '@/domain/data-contracts';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { taskFileMappingService } from '@/services/registry';
+import { toast } from 'sonner';
 
 interface FileCardProps {
   file: DataFile;
@@ -92,8 +94,60 @@ const ocrStatusConfig = {
 };
 
 export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCardProps) {
+  const [isMapped, setIsMapped] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const FileIcon = getFileIcon(file.contentType);
   const OcrIcon = ocrStatusConfig[file.ocrStatus].icon;
+
+  // Check if file is mapped to any task
+  useEffect(() => {
+    const checkFileMapping = async () => {
+      try {
+        const taskIds = await taskFileMappingService.getFileTasks(file.id);
+        setIsMapped(taskIds.length > 0);
+      } catch (error) {
+        console.error('Failed to check file mapping:', error);
+        setIsMapped(false);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkFileMapping();
+  }, [file.id]);
+
+  const handleDelete = async () => {
+    if (isMapped) {
+      toast.error('Cannot delete mapped files. Unmap from tasks first.');
+      return;
+    }
+    onDelete?.();
+  };
+
+  const getFileMappingLabel = () => {
+    if (isLoading) {
+      return (
+        <Badge variant="secondary" className="text-xs">
+          Checking...
+        </Badge>
+      );
+    }
+    
+    if (isMapped) {
+      return (
+        <Badge variant="default" className="text-xs bg-green-100 text-green-800 border-green-200">
+          Mapped
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">
+          Unmapped
+        </Badge>
+      );
+    }
+  };
   
   return (
     <Card className={cn("file-card", className)}>
@@ -110,9 +164,12 @@ export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCa
               <h4 className="font-medium text-sm leading-tight truncate">
                 {file.originalName}
               </h4>
-              <Badge variant="secondary" className="mt-1 text-xs">
-                {fileKindLabels[file.kind]}
-              </Badge>
+              <div className="flex gap-1 mt-1">
+                <Badge variant="secondary" className="text-xs">
+                  {fileKindLabels[file.kind]}
+                </Badge>
+                {getFileMappingLabel()}
+              </div>
             </div>
 
             <DropdownMenu>
@@ -139,9 +196,16 @@ export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCa
                   </DropdownMenuItem>
                 )}
                 {onDelete && (
-                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
+                  <DropdownMenuItem 
+                    onClick={handleDelete} 
+                    className={cn(
+                      "text-destructive",
+                      isMapped && "opacity-50 cursor-not-allowed"
+                    )}
+                    disabled={isMapped}
+                  >
                     <Trash2 className="mr-2 h-4 w-4" />
-                    Delete
+                    {isMapped ? "Cannot Delete (Mapped)" : "Delete"}
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>

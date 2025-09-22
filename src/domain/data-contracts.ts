@@ -107,6 +107,7 @@ export interface Todo {
   createdAt: string;
   deletedAt?: string;
   subAreaId?: string;  // Add sub-area assignment
+  isImpactLocked?: boolean;  // Add impact area lock state
 }
 
 export interface ImpactSummary {

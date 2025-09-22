@@ -42,15 +42,16 @@ export function OptimizedExpandableTaskModal({
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [mappedFiles, setMappedFiles] = useState<DataFile[]>([]);
-  const [isImpactLocked, setIsImpactLocked] = useState(false);
+  const [currentTodo, setCurrentTodo] = useState<Todo | null>(todo);
   const isMobile = useIsMobile();
   const { files, loadFiles } = useDataroomStore();
   const { currentBusiness } = useBusinessStore();
-  const { deleteTask, updateTaskImpactArea } = useAnalysisStore();
+  const { deleteTask, updateTaskImpactArea, updateTaskLockState } = useAnalysisStore();
 
-  // Load mapped files when todo changes
+  // Load mapped files and sync todo state when todo changes
   useEffect(() => {
     if (todo && currentBusiness) {
+      setCurrentTodo(todo);
       loadMappedFiles();
       loadFiles(currentBusiness.id);
     }
@@ -77,21 +78,44 @@ export function OptimizedExpandableTaskModal({
   };
 
   const handleImpactChange = async (newImpact: ImpactArea) => {
-    if (!todo || !onToggleStatus) return;
+    if (!currentTodo) return;
     
     try {
-      await updateTaskImpactArea(todo.id, newImpact);
+      // Update the local state immediately
+      setCurrentTodo(prev => prev ? { ...prev, impact: newImpact } : null);
+      
+      await updateTaskImpactArea(currentTodo.id, newImpact);
+      
       // Reload mapped files since impact area changed
       loadMappedFiles();
       if (currentBusiness) {
         loadFiles(currentBusiness.id);
       }
     } catch (error) {
+      // Revert local state on error
+      setCurrentTodo(todo);
       console.error('Failed to update task impact area:', error);
     }
   };
 
-  if (!todo) return null;
+  const handleToggleLock = async () => {
+    if (!currentTodo) return;
+    
+    const newLockState = !currentTodo.isImpactLocked;
+    
+    try {
+      // Update the local state immediately
+      setCurrentTodo(prev => prev ? { ...prev, isImpactLocked: newLockState } : null);
+      
+      await updateTaskLockState(currentTodo.id, newLockState);
+    } catch (error) {
+      // Revert local state on error
+      setCurrentTodo(todo);
+      console.error('Failed to update task lock state:', error);
+    }
+  };
+
+  if (!currentTodo) return null;
 
   const priorityColors = {
     P1: 'bg-red-100 text-red-800 border-red-200',
@@ -106,7 +130,7 @@ export function OptimizedExpandableTaskModal({
     done: 'bg-green-100 text-green-800 border-green-200',
   };
 
-  const initialMessage = `Hi! I'm here to help you with "${todo.title}". I can provide step-by-step guidance, explain B Corp requirements, and suggest best practices. What specific aspect would you like help with?`;
+  const initialMessage = `Hi! I'm here to help you with "${currentTodo?.title || 'this task'}". I can provide step-by-step guidance, explain B Corp requirements, and suggest best practices. What specific aspect would you like help with?`;
 
   return (
     <>
@@ -116,21 +140,21 @@ export function OptimizedExpandableTaskModal({
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <DialogTitle className="text-lg md:text-xl font-bold mb-2">
-                  {todo.title}
+                  {currentTodo.title}
                 </DialogTitle>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <Badge className={priorityColors[todo.priority]}>
-                    {todo.priority}
+                  <Badge className={priorityColors[currentTodo.priority]}>
+                    {currentTodo.priority}
                   </Badge>
-                  <Badge className={statusColors[todo.status]}>
-                    {todo.status.replace('_', ' ')}
+                  <Badge className={statusColors[currentTodo.status]}>
+                    {currentTodo.status.replace('_', ' ')}
                   </Badge>
                   <ImpactAreaSelector 
-                    currentImpact={todo.impact} 
-                    taskId={todo.id}
+                    currentImpact={currentTodo.impact} 
+                    taskId={currentTodo.id}
                     onImpactChange={handleImpactChange}
-                    isLocked={isImpactLocked}
-                    onToggleLock={() => setIsImpactLocked(!isImpactLocked)}
+                    isLocked={currentTodo.isImpactLocked || false}
+                    onToggleLock={handleToggleLock}
                   />
                 </div>
               </div>
@@ -164,7 +188,7 @@ export function OptimizedExpandableTaskModal({
                         </CardHeader>
                         <CardContent>
                           <TodoItem
-                            todo={todo}
+                            todo={currentTodo}
                             onToggleStatus={onToggleStatus}
                             onUploadEvidence={() => setShowEvidenceModal(true)}
                             showImpact={false}
@@ -174,14 +198,14 @@ export function OptimizedExpandableTaskModal({
                             <div>
                               <h4 className="font-medium mb-2">Description</h4>
                               <p className="text-sm text-muted-foreground">
-                                {todo.descriptionMd || "No description available"}
+                                {currentTodo.descriptionMd || "No description available"}
                               </p>
                             </div>
                             
                             <div>
                               <h4 className="font-medium mb-2">Priority & Status</h4>
                               <p className="text-sm text-muted-foreground">
-                                Priority: {todo.priority} | Status: {todo.status.replace('_', ' ')}
+                                Priority: {currentTodo.priority} | Status: {currentTodo.status.replace('_', ' ')}
                               </p>
                             </div>
 
@@ -258,7 +282,7 @@ export function OptimizedExpandableTaskModal({
                           <Button 
                             onClick={async () => {
                               if (confirm('Are you sure you want to delete this task? It will be moved to the bin and can be restored later.')) {
-                                await deleteTask(todo.id);
+                                await deleteTask(currentTodo.id);
                                 onDelete?.();
                                 onClose();
                               }
@@ -280,7 +304,7 @@ export function OptimizedExpandableTaskModal({
                           <div className="space-y-3">
                             <Button variant="ghost" className="w-full justify-start">
                               <FileText className="h-4 w-4 mr-2" />
-                              B Corp Guidelines - {todo.impact}
+                              B Corp Guidelines - {currentTodo.impact}
                             </Button>
                             <Button variant="ghost" className="w-full justify-start">
                               <FileText className="h-4 w-4 mr-2" />
@@ -322,10 +346,10 @@ export function OptimizedExpandableTaskModal({
                         initialMessage={initialMessage}
                         contextType="task"
                         contextData={{
-                          taskTitle: todo.title,
-                          impactArea: todo.impact
+                          taskTitle: currentTodo.title,
+                          impactArea: currentTodo.impact
                         }}
-                        placeholder={`Ask about "${todo.title}"...`}
+                        placeholder={`Ask about "${currentTodo.title}"...`}
                         height="h-full"
                       />
                     </div>
@@ -346,7 +370,7 @@ export function OptimizedExpandableTaskModal({
             // Refresh mapped files when modal closes
             loadMappedFiles();
           }}
-          todo={todo}
+          todo={currentTodo}
         />
       )}
     </>
