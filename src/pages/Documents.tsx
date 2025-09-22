@@ -447,6 +447,7 @@ const Documents = () => {
           isOpen={!!selectedTaskForModal}
           onClose={() => setSelectedTaskForModal(null)}
           todo={selectedTaskForModal}
+          onToggleStatus={() => {}}
         />
       )}
 
