@@ -20,6 +20,7 @@ interface UseUnifiedAIChatProps {
   contextLevel: 'home' | 'overview' | 'subarea' | 'task';
   impactArea?: string;
   subArea?: string;
+  subAreaId?: string;
   taskId?: string;
   initialMessage?: string;
 }
@@ -28,6 +29,7 @@ export function useUnifiedAIChat({
   contextLevel,
   impactArea,
   subArea,
+  subAreaId,
   taskId,
   initialMessage
 }: UseUnifiedAIChatProps) {
@@ -51,7 +53,7 @@ export function useUnifiedAIChat({
   // Load chat session and history
   useEffect(() => {
     loadChatSession();
-  }, [contextLevel, impactArea, subArea, taskId, currentBusiness]);
+  }, [contextLevel, impactArea, subArea, subAreaId, taskId, currentBusiness]);
 
   const loadChatSession = async () => {
     if (!currentBusiness) return;
@@ -60,7 +62,7 @@ export function useUnifiedAIChat({
     if (!user) return;
 
     try {
-      // Build query with proper null handling
+      // Build query with strict context separation
       let query = supabase
         .from('chat_sessions')
         .select('*')
@@ -68,24 +70,24 @@ export function useUnifiedAIChat({
         .eq('business_id', currentBusiness.id)
         .eq('level', contextLevel);
 
-      // Handle impact_area properly (null vs empty string)
-      if (impactArea) {
-        query = query.eq('impact_area', impactArea);
-      } else {
-        query = query.is('impact_area', null);
-      }
-
-      // Handle specific_area properly (null vs empty string)
-      if (subArea) {
-        query = query.eq('specific_area', subArea);
-      } else {
+      // Strict separation based on context level
+      if (contextLevel === 'overview') {
+        // Impact area overview chats - only match impact area, no sub-area
+        query = query.eq('impact_area', impactArea || null);
         query = query.is('specific_area', null);
-      }
-
-      // Handle task_id properly (null vs empty string)
-      if (taskId) {
-        query = query.eq('task_id', taskId);
-      } else {
+        query = query.is('task_id', null);
+      } else if (contextLevel === 'subarea') {
+        // Sub-area chats - match both impact area AND sub-area name
+        query = query.eq('impact_area', impactArea || null);
+        query = query.eq('specific_area', subArea || null);
+        query = query.is('task_id', null);
+      } else if (contextLevel === 'task') {
+        // Task-specific chats
+        query = query.eq('task_id', taskId || null);
+      } else if (contextLevel === 'home') {
+        // Home level chats
+        query = query.is('impact_area', null);
+        query = query.is('specific_area', null);
         query = query.is('task_id', null);
       }
 
@@ -186,6 +188,7 @@ export function useUnifiedAIChat({
           userId: user.id,
           impactArea,
           subArea,
+          subAreaId,
           taskId
         }
       });

@@ -391,6 +391,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                             onTaskToggle={handleTodoToggle}
                             onTaskClick={setExpandedTaskId}
                             onAIChatClick={(subAreaTitle) => {
+                              const subAreaData = subAreas.find(sa => sa.title === subAreaTitle);
                               setChatContext({level: 'subarea', subArea: subAreaTitle});
                               setShowAIChat(true);
                             }}
@@ -470,6 +471,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
         onClose={() => setShowAIChat(false)}
         impactArea={config.impactArea}
         subArea={chatContext.subArea}
+        subAreaId={chatContext.subArea ? subAreas.find(sa => sa.title === chatContext.subArea)?.id : undefined}
         taskTitle={chatContext.taskTitle}
         contextLevel={chatContext.level}
       />

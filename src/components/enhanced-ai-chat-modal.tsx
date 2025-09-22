@@ -40,6 +40,7 @@ interface EnhancedAIChatModalProps {
   onClose: () => void;
   impactArea: ImpactArea;
   subArea?: string;
+  subAreaId?: string;
   taskTitle?: string;
   taskId?: string;
   contextLevel?: 'overview' | 'subarea' | 'task';
@@ -50,6 +51,7 @@ export function EnhancedAIChatModal({
   onClose, 
   impactArea, 
   subArea, 
+  subAreaId,
   taskTitle,
   taskId, 
   contextLevel = 'overview' 
@@ -57,7 +59,7 @@ export function EnhancedAIChatModal({
   const { currentBusiness } = useBusinessStore();
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
   const [selectedContext, setSelectedContext] = useState<string>(`${contextLevel}-${impactArea}-${subArea || 'main'}`);
-  const [showHistory, setShowHistory] = useState(false);
+  const [showHistory, setShowHistory] = useState(true);
   const {
     messages,
     inputValue,
@@ -70,6 +72,7 @@ export function EnhancedAIChatModal({
     contextLevel,
     impactArea,
     subArea,
+    subAreaId,
     taskId: taskId || taskTitle
   });
 
@@ -84,11 +87,25 @@ export function EnhancedAIChatModal({
     const { data: { user } } = await supabase.auth.getUser();
     if (!user || !currentBusiness) return;
 
-    const { data: sessions } = await supabase
+    // Filter sessions to only show relevant ones for current context
+    let query = supabase
       .from('chat_sessions')
       .select('*')
       .eq('user_id', user.id)
-      .eq('business_id', currentBusiness.id)
+      .eq('business_id', currentBusiness.id);
+
+    // Apply context-specific filters
+    if (contextLevel === 'overview') {
+      query = query.eq('impact_area', impactArea);
+      query = query.is('specific_area', null);
+    } else if (contextLevel === 'subarea') {
+      query = query.eq('impact_area', impactArea);
+      query = query.eq('specific_area', subArea);
+    } else if (contextLevel === 'task') {
+      query = query.eq('task_id', taskId);
+    }
+
+    const { data: sessions } = await query
       .order('updated_at', { ascending: false });
 
     if (sessions) {
@@ -148,9 +165,7 @@ export function EnhancedAIChatModal({
               </div>
               <ScrollArea className="flex-1">
                 <div className="p-2 space-y-1">
-                  {chatSessions
-                    .filter(session => session.impact_area === impactArea || (!session.impact_area && contextLevel === 'overview'))
-                    .map((session) => (
+                  {chatSessions.map((session) => (
                       <Button
                         key={session.id}
                         variant="ghost"

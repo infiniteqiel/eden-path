@@ -25,6 +25,7 @@ interface ChatRequest {
   userId: string;
   impactArea?: string;
   subArea?: string;
+  subAreaId?: string;
   taskId?: string;
 }
 
@@ -51,10 +52,11 @@ serve(async (req) => {
       userId,
       impactArea,
       subArea,
+      subAreaId,
       taskId
     }: ChatRequest = await req.json();
 
-    console.log('Processing chat request:', { contextLevel, businessId, impactArea, subArea, taskId });
+    console.log('Processing chat request:', { contextLevel, businessId, impactArea, subArea, subAreaId, taskId });
 
     // 1. Get or create session
     let session: ChatSession;
@@ -66,7 +68,7 @@ serve(async (req) => {
         .single();
       session = data;
     } else {
-      // Find existing session or create new one
+      // Find existing session or create new one with strict context separation
       let query = supabase
         .from('chat_sessions')
         .select('*')
@@ -74,9 +76,22 @@ serve(async (req) => {
         .eq('business_id', businessId)
         .eq('level', contextLevel);
 
-      if (impactArea) query = query.eq('impact_area', impactArea);
-      if (subArea) query = query.eq('specific_area', subArea);
-      if (taskId) query = query.eq('task_id', taskId);
+      // Apply strict filtering based on context level
+      if (contextLevel === 'overview') {
+        query = query.eq('impact_area', impactArea || null);
+        query = query.is('specific_area', null);
+        query = query.is('task_id', null);
+      } else if (contextLevel === 'subarea') {
+        query = query.eq('impact_area', impactArea || null);
+        query = query.eq('specific_area', subArea || null);
+        query = query.is('task_id', null);
+      } else if (contextLevel === 'task') {
+        query = query.eq('task_id', taskId || null);
+      } else if (contextLevel === 'home') {
+        query = query.is('impact_area', null);
+        query = query.is('specific_area', null);
+        query = query.is('task_id', null);
+      }
 
       const { data: existingSessions } = await query
         .order('updated_at', { ascending: false })
@@ -91,9 +106,9 @@ serve(async (req) => {
             user_id: userId,
             business_id: businessId,
             level: contextLevel,
-            impact_area: impactArea,
-            specific_area: subArea,
-            task_id: taskId
+            impact_area: contextLevel === 'overview' || contextLevel === 'subarea' ? impactArea : null,
+            specific_area: contextLevel === 'subarea' ? subArea : null,
+            task_id: contextLevel === 'task' ? taskId : null
           })
           .select()
           .single();
@@ -169,19 +184,55 @@ serve(async (req) => {
         contextInfo += `Priority breakdown: P1: ${areaTodos.filter(t => t.priority === 'P1').length}, P2: ${areaTodos.filter(t => t.priority === 'P2').length}, P3: ${areaTodos.filter(t => t.priority === 'P3').length}\n`;
       }
     } else if (contextLevel === 'subarea' && subArea) {
-      // Get sub-area specific info
+      // Get sub-area specific info with tasks
       contextInfo += `Sub-Area: ${subArea} (within ${impactArea})\n`;
       
-      const { data: subAreaTodos } = await supabase
-        .from('todos')
+      // Get sub-area details if available
+      const { data: subAreaDetails } = await supabase
+        .from('impact_sub_areas')
         .select('*')
         .eq('business_id', businessId)
-        .eq('sub_area', subArea);
+        .eq('impact_area', impactArea)
+        .eq('title', subArea)
+        .single();
 
-      if (subAreaTodos) {
-        contextInfo += `Tasks in this area: ${subAreaTodos.length}\n`;
+      if (subAreaDetails) {
+        contextInfo += `Description: ${subAreaDetails.description || 'No description available'}\n`;
+      }
+
+      // Get tasks for this sub-area using sub_area_id if we have it, or title match
+      let subAreaTodos;
+      if (subAreaId) {
+        const { data } = await supabase
+          .from('todos')
+          .select('*')
+          .eq('business_id', businessId)
+          .eq('sub_area_id', subAreaId);
+        subAreaTodos = data;
+      } else {
+        const { data } = await supabase
+          .from('todos')
+          .select('*')
+          .eq('business_id', businessId)
+          .eq('sub_area', subArea);
+        subAreaTodos = data;
+      }
+
+      if (subAreaTodos && subAreaTodos.length > 0) {
+        const completed = subAreaTodos.filter(t => t.status === 'done').length;
         const pending = subAreaTodos.filter(t => t.status !== 'done').length;
-        contextInfo += `Pending tasks: ${pending}\n`;
+        contextInfo += `Tasks in this sub-area: ${subAreaTodos.length} (${completed} completed, ${pending} pending)\n`;
+        
+        // List current tasks for context
+        contextInfo += "\nCurrent tasks in this sub-area:\n";
+        subAreaTodos.forEach((task, idx) => {
+          contextInfo += `${idx + 1}. [${task.status.toUpperCase()}] ${task.title} (Priority: ${task.priority}, Effort: ${task.effort})\n`;
+          if (task.description_md) {
+            contextInfo += `   Description: ${task.description_md.substring(0, 100)}...\n`;
+          }
+        });
+      } else {
+        contextInfo += `No tasks currently assigned to this sub-area.\n`;
       }
     } else if (contextLevel === 'task' && taskId) {
       // Get task specific info
@@ -259,7 +310,7 @@ serve(async (req) => {
         systemPrompt = `You are an AI specialist for the ${impactArea} impact area of B Corp certification. Focus on ${impactArea}-specific requirements, best practices, and implementation strategies. Provide detailed guidance relevant to this impact area.`;
         break;
       case 'subarea':
-        systemPrompt = `You are an AI specialist for ${subArea} within the ${impactArea} impact area. Provide focused, specialized guidance on ${subArea} requirements and best practices for B Corp certification.`;
+        systemPrompt = `You are an AI specialist for ${subArea} within the ${impactArea} impact area. You have detailed context about the current tasks and progress in this specific sub-area. Provide focused, specialized guidance on ${subArea} requirements and best practices for B Corp certification. Reference the specific tasks and their status when relevant to provide personalized advice.`;
         break;
       case 'task':
         systemPrompt = `You are an AI assistant helping with a specific B Corp task. Provide practical, actionable guidance to help complete this specific task effectively.`;
