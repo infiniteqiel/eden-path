@@ -20,10 +20,13 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useBusinessStore } from '@/store/business';
 import { useDataroomStore } from '@/store/dataroom';
 import { useDocumentCategoryStore } from '@/store/document-categories';
+import { useAnalysisStore } from '@/store/analysis';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import { FileText, Upload, Folder, Building, Users, Heart, Leaf, Star, Plus, Trash2, RotateCcw } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ImpactArea, DataFile } from '@/domain/data-contracts';
-import { fileService } from '@/services/registry';
+import { Badge } from '@/components/ui/badge';
+import { ImpactArea, DataFile, Todo } from '@/domain/data-contracts';
+import { fileService, taskFileMappingService } from '@/services/registry';
 import { toast } from 'sonner';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
@@ -31,18 +34,21 @@ const Documents = () => {
   const { currentBusiness } = useBusinessStore();
   const { files, binnedFiles, loadFiles, loadBinnedFiles, removeFile, restoreFile } = useDataroomStore();
   const { categories, loadCategories, deleteCategory } = useDocumentCategoryStore();
+  const { todos, loadTodos } = useAnalysisStore();
   const [activeFile, setActiveFile] = useState<DataFile | null>(null);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [activeTab, setActiveTab] = useState('categories');
   const [deletingCategoryId, setDeletingCategoryId] = useState<string | null>(null);
+  const [selectedTaskForModal, setSelectedTaskForModal] = useState<Todo | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
       loadFiles(currentBusiness.id);
       loadBinnedFiles(currentBusiness.id);
       loadCategories(currentBusiness.id);
+      loadTodos(currentBusiness.id);
     }
-  }, [currentBusiness, loadFiles, loadBinnedFiles, loadCategories]);
+  }, [currentBusiness, loadFiles, loadBinnedFiles, loadCategories, loadTodos]);
 
   const handleUploadComplete = () => {
     if (currentBusiness) {
@@ -122,6 +128,42 @@ const Documents = () => {
 
   const confirmDeleteCategory = (categoryId: string) => {
     setDeletingCategoryId(categoryId);
+  };
+
+  const handleFileClick = async (file: DataFile) => {
+    try {
+      const taskIds = await taskFileMappingService.getFileTasks(file.id);
+      if (taskIds.length > 0) {
+        // Find the task and open the modal
+        const task = todos.find(t => t.id === taskIds[0]);
+        if (task) {
+          setSelectedTaskForModal(task);
+        } else {
+          toast.info('Mapped task not found');
+        }
+      } else {
+        toast.info('This file is not mapped to any task yet');
+      }
+    } catch (error) {
+      console.error('Failed to get file tasks:', error);
+      toast.error('Failed to open mapped task');
+    }
+  };
+
+  const getFileMappingLabel = (file: DataFile) => {
+    if (file.impactArea && file.impactArea !== 'Other') {
+      return (
+        <Badge variant="outline" className="text-xs mt-1">
+          {file.impactArea}
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="outline" className="text-xs mt-1 bg-yellow-50 text-yellow-700 border-yellow-200">
+          Unmapped
+        </Badge>
+      );
+    }
   };
 
   // Get files by category
@@ -245,16 +287,20 @@ const Documents = () => {
                               Drag files to categories above to organize them
                             </p>
                             
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                              {uncategorizedFiles.map((file) => (
-                                <DraggableFile
-                                  key={file.id}
-                                  file={file}
-                                  onDelete={handleDeleteFile}
-                                  className="bg-white/60 rounded-lg"
-                                />
-                              ))}
-                            </div>
+                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                               {uncategorizedFiles.map((file) => (
+                                 <div key={file.id} className="relative">
+                                   <DraggableFile
+                                     file={file}
+                                     onDelete={handleDeleteFile}
+                                     className="bg-white/60 rounded-lg"
+                                   />
+                                   <div className="absolute top-2 right-2">
+                                     {getFileMappingLabel(file)}
+                                   </div>
+                                 </div>
+                               ))}
+                             </div>
                           </div>
                         )}
                       </TabsContent>
@@ -343,13 +389,21 @@ const Documents = () => {
                               
                               {areaFiles.length > 0 ? (
                                 <ScrollArea className="h-32">
-                                  <div className="space-y-2 pr-2">
-                                    {areaFiles.map((file) => (
-                                      <div key={file.id} className="flex items-center gap-2 p-2 rounded border bg-white/40">
-                                        <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
-                                        <span className="text-xs truncate flex-1">{file.originalName}</span>
-                                      </div>
-                                    ))}
+                                   <div className="space-y-2 pr-2">
+                                     {areaFiles.map((file) => (
+                                       <div 
+                                         key={file.id} 
+                                         className="flex items-center gap-2 p-2 rounded border bg-white/40 cursor-pointer hover:bg-white/60 transition-colors"
+                                         onClick={() => handleFileClick(file)}
+                                         title="Click to open mapped task"
+                                       >
+                                         <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
+                                         <div className="flex-1 min-w-0">
+                                           <span className="text-xs truncate block">{file.originalName}</span>
+                                           {getFileMappingLabel(file)}
+                                         </div>
+                                       </div>
+                                     ))}
                                   </div>
                                 </ScrollArea>
                               ) : (
@@ -387,6 +441,15 @@ const Documents = () => {
         businessId={currentBusiness?.id || ''}
       />
       
+      {/* Task Modal */}
+      {selectedTaskForModal && (
+        <ExpandableTaskModal
+          isOpen={!!selectedTaskForModal}
+          onClose={() => setSelectedTaskForModal(null)}
+          todo={selectedTaskForModal}
+        />
+      )}
+
       <AlertDialog open={!!deletingCategoryId} onOpenChange={() => setDeletingCategoryId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

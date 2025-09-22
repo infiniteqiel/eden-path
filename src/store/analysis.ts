@@ -5,7 +5,7 @@
  */
 
 import { create } from 'zustand';
-import { Todo, ImpactSummary, AnalysisJob, Finding, EvidenceExcerpt } from '@/domain/data-contracts';
+import { Todo, ImpactSummary, AnalysisJob, Finding, EvidenceExcerpt, ImpactArea } from '@/domain/data-contracts';
 import { analysisService } from '@/services/registry';
 
 interface AnalysisState {
@@ -29,6 +29,7 @@ interface AnalysisState {
   loadImpactSummaries: (businessId: string) => Promise<void>;
   updateTodoStatus: (todoId: string, status: Todo['status']) => Promise<void>;
   assignTaskToSubArea: (todoId: string, subAreaId: string | null) => Promise<void>;
+  updateTaskImpactArea: (todoId: string, impactArea: ImpactArea) => Promise<void>;
   deleteTask: (todoId: string) => Promise<void>;
   restoreTask: (todoId: string) => Promise<void>;
   startAnalysis: (businessId: string) => Promise<void>;
@@ -148,6 +149,45 @@ export const useAnalysisStore = create<AnalysisState>((set, get) => ({
           todo.id === todoId ? originalTodo : todo
         ),
         error: error instanceof Error ? error.message : 'Failed to assign task to sub-area'
+      }));
+    }
+  },
+
+  updateTaskImpactArea: async (todoId: string, impactArea: ImpactArea) => {
+    const { todos } = get();
+    const originalTodo = todos.find(t => t.id === todoId);
+    if (!originalTodo) return;
+
+    // Optimistically update UI first
+    set(state => ({
+      todos: state.todos.map(todo => 
+        todo.id === todoId ? { ...todo, impact: impactArea } : todo
+      ),
+      error: null
+    }));
+
+    try {
+      const updatedTodo = await analysisService.updateTaskImpactArea(todoId, impactArea);
+      
+      // Confirm the update with server response
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? updatedTodo : todo
+        )
+      }));
+
+      // Refresh impact summaries to reflect the change
+      const businessId = originalTodo.businessId;
+      if (businessId) {
+        await get().loadImpactSummaries(businessId);
+      }
+    } catch (error) {
+      // Revert optimistic update on error
+      set(state => ({
+        todos: state.todos.map(todo => 
+          todo.id === todoId ? originalTodo : todo
+        ),
+        error: error instanceof Error ? error.message : 'Failed to update task impact area'
       }));
     }
   },

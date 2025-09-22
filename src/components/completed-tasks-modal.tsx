@@ -8,7 +8,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { CheckCircle, FileText } from 'lucide-react';
+import { CheckCircle, FileText, ExternalLink } from 'lucide-react';
 import { Todo, ImpactArea } from '@/domain/data-contracts';
 
 interface CompletedTasksModalProps {
@@ -16,13 +16,15 @@ interface CompletedTasksModalProps {
   onClose: () => void;
   completedTasks: Todo[];
   impactArea?: ImpactArea;
+  onTaskClick?: (task: Todo) => void;
 }
 
 export function CompletedTasksModal({ 
   isOpen, 
   onClose, 
   completedTasks, 
-  impactArea 
+  impactArea,
+  onTaskClick 
 }: CompletedTasksModalProps) {
   const filteredTasks = impactArea 
     ? completedTasks.filter(task => task.impact === impactArea)
@@ -50,9 +52,16 @@ export function CompletedTasksModal({
             </div>
           ) : (
             filteredTasks.map((task) => (
-              <Card key={task.id} className={`border ${task.status === 'done' ? 'border-success/20 bg-success/5' : 'border-border bg-background'}`}>
+              <Card 
+                key={task.id} 
+                className={`border cursor-pointer hover:shadow-md transition-shadow ${
+                  task.status === 'done' ? 'border-success/20 bg-success/5' : 'border-border bg-background'
+                }`}
+                onClick={() => onTaskClick?.(task)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
+                    <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                     <div className="flex-1">
                       <h4 className="font-medium text-foreground mb-1">{task.title}</h4>
                       <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">

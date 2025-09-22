@@ -12,6 +12,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
+import { ImpactFileMiniCard } from '@/components/impact-file-mini-card';
 import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
 import { DroppableSubArea } from '@/components/droppable-sub-area';
 import { DroppableUnassignedArea } from '@/components/droppable-unassigned-area';
@@ -59,6 +60,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [showAddAreaModal, setShowAddAreaModal] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedTaskFromFile, setSelectedTaskFromFile] = useState<Todo | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -325,6 +327,19 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                            />
                          )}
                        </div>
+                       
+                       <ImpactFileMiniCard 
+                         impactArea={config.impactArea}
+                         onFileClick={(file, task) => {
+                           if (task) {
+                             setSelectedTaskFromFile(task);
+                           } else {
+                             // Handle unmapped file
+                             console.log('File not mapped to any task:', file.originalName);
+                           }
+                         }}
+                         className="bg-white/60"
+                       />
                      </div>
                   </div>
                 </section>

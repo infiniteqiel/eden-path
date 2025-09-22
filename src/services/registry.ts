@@ -20,7 +20,25 @@ import * as MockBusiness from './adapters/mock/business';
 import * as MockRisk from './adapters/mock/risk';
 import * as MockLegal from './adapters/mock/legal';
 import * as SupabaseAuth from './adapters/supabase/auth';
-import * as SupabaseAnalysis from './adapters/supabase/analysis';
+import { 
+  listTodos, 
+  updateTodoStatus, 
+  assignTaskToSubArea,
+  updateTaskImpactArea,
+  linkEvidence, 
+  impactSummary, 
+  getEvidence, 
+  startIngestion, 
+  getJob, 
+  listFindings, 
+  generateRoadmap, 
+  reanalyze, 
+  resetTestData, 
+  resetAllTestData,
+  listBinnedTodos,
+  deleteTask,
+  restoreTask
+} from './adapters/supabase/analysis';
 import * as SupabaseBusiness from './adapters/supabase/business';
 import { supabaseFileService } from './adapters/supabase/files';
 import { supabaseDocumentCategoryService } from './adapters/supabase/document-categories';
@@ -46,7 +64,25 @@ export const Services: {
   documentCategories: IDocumentCategoryService;
 } = {
   files: supabaseFileService as IFileService,
-  analysis: SupabaseAnalysis as IAnalysisService,
+  analysis: {
+    startIngestion,
+    getJob,
+    listFindings,
+    generateRoadmap,
+    listTodos,
+    updateTodoStatus,
+    assignTaskToSubArea,
+    updateTaskImpactArea,
+    linkEvidence,
+    impactSummary,
+    getEvidence,
+    reanalyze,
+    resetTestData,
+    resetAllTestData,
+    listBinnedTodos,
+    deleteTask,
+    restoreTask
+  } as IAnalysisService,
   business: SupabaseBusiness as IBusinessService,
   risk: MockRisk as IRiskService,
   legal: MockLegal as ILegalService,

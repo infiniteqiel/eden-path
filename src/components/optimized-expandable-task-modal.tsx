@@ -15,7 +15,8 @@ import { AIChatIcon } from '@/components/ai-chat-icon';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { ChatInterface } from '@/components/common/chat-interface';
 import { FileList } from '@/components/file-list';
-import { Todo, DataFile } from '@/domain/data-contracts';
+import { ImpactAreaSelector } from '@/components/impact-area-selector';
+import { Todo, DataFile, ImpactArea } from '@/domain/data-contracts';
 import { X, Upload, MessageSquare, FileText, Link } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDataroomStore } from '@/store/dataroom';
@@ -41,10 +42,11 @@ export function OptimizedExpandableTaskModal({
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [mappedFiles, setMappedFiles] = useState<DataFile[]>([]);
+  const [isImpactLocked, setIsImpactLocked] = useState(false);
   const isMobile = useIsMobile();
   const { files, loadFiles } = useDataroomStore();
   const { currentBusiness } = useBusinessStore();
-  const { deleteTask } = useAnalysisStore();
+  const { deleteTask, updateTaskImpactArea } = useAnalysisStore();
 
   // Load mapped files when todo changes
   useEffect(() => {
@@ -71,6 +73,21 @@ export function OptimizedExpandableTaskModal({
       setMappedFiles(mapped);
     } catch (error) {
       console.error('Failed to load mapped files:', error);
+    }
+  };
+
+  const handleImpactChange = async (newImpact: ImpactArea) => {
+    if (!todo || !onToggleStatus) return;
+    
+    try {
+      await updateTaskImpactArea(todo.id, newImpact);
+      // Reload mapped files since impact area changed
+      loadMappedFiles();
+      if (currentBusiness) {
+        loadFiles(currentBusiness.id);
+      }
+    } catch (error) {
+      console.error('Failed to update task impact area:', error);
     }
   };
 
@@ -108,9 +125,13 @@ export function OptimizedExpandableTaskModal({
                   <Badge className={statusColors[todo.status]}>
                     {todo.status.replace('_', ' ')}
                   </Badge>
-                  <Badge variant="outline">
-                    {todo.impact}
-                  </Badge>
+                  <ImpactAreaSelector 
+                    currentImpact={todo.impact} 
+                    taskId={todo.id}
+                    onImpactChange={handleImpactChange}
+                    isLocked={isImpactLocked}
+                    onToggleLock={() => setIsImpactLocked(!isImpactLocked)}
+                  />
                 </div>
               </div>
               <AIChatIcon 

@@ -145,9 +145,11 @@ export function TodoItem({
                   size="sm"
                   onClick={(e) => {
                     e.stopPropagation();
+                    e.preventDefault();
                     onUploadEvidence?.();
                   }}
                   className="h-auto p-1 text-muted-foreground hover:text-foreground"
+                  title="Upload Evidence"
                 >
                   <Upload className="h-3 w-3 mr-1" />
                   <span className="text-xs">Evidence</span>

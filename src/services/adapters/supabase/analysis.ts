@@ -187,6 +187,42 @@ export const assignTaskToSubArea = async (todoId: string, subAreaId: string | nu
   };
 };
 
+export const updateTaskImpactArea = async (todoId: string, impactArea: ImpactArea): Promise<Todo> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('Not authenticated');
+
+  const { data, error } = await supabase
+    .from('todos')
+    .update({ 
+      impact: impactArea,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', todoId)
+    .eq('user_id', user.id)
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  return {
+    id: data.id,
+    businessId: data.business_id,
+    impact: data.impact as ImpactArea,
+    requirementCode: data.requirement_code,
+    kbActionId: data.kb_action_id,
+    title: data.title,
+    descriptionMd: data.description_md,
+    priority: data.priority as Todo['priority'],
+    effort: data.effort as Todo['effort'],
+    status: data.status as Todo['status'],
+    evidenceChunkIds: data.evidence_chunk_ids || [],
+    ownerUserId: data.owner_user_id,
+    dueDate: data.due_date,
+    createdAt: data.created_at,
+    subAreaId: data.sub_area_id
+  };
+};
+
 export const linkEvidence = async (todoId: string, chunkIds: string[]): Promise<void> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');

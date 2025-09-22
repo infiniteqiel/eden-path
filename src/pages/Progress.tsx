@@ -4,16 +4,19 @@
  * Detailed progress tracking and analytics for B Corp readiness.
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppSidebar } from '@/components/app-sidebar';
 import { ImpactCard } from '@/components/impact-card';
+import { CompletedTasksModal } from '@/components/completed-tasks-modal';
+import { ExpandableTaskModal } from '@/components/expandable-task-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress as ProgressBar } from '@/components/ui/progress';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useBusinessStore } from '@/store/business';
 import { useAnalysisStore } from '@/store/analysis';
+import { Todo } from '@/domain/data-contracts';
 import { TrendingUp, Target, Calendar, Award, RotateCcw, MessageSquare } from 'lucide-react';
 import singaporeCityscape from '@/assets/singapore-cityscape.jpg';
 
@@ -21,7 +24,9 @@ const Progress = () => {
   const navigate = useNavigate();
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, resetTestData } = useAnalysisStore();
-  const [isResetting, setIsResetting] = React.useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+  const [showTasksModal, setShowTasksModal] = useState<{ isOpen: boolean; impactArea?: string }>({ isOpen: false });
+  const [selectedTask, setSelectedTask] = useState<Todo | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -149,8 +154,17 @@ const Progress = () => {
                         <Award className="h-4 w-4 text-muted-foreground" />
                       </CardHeader>
                       <CardContent>
-                        <div className="text-2xl font-bold">{Math.round(overallProgress * 0.8)}/80</div>
-                        <p className="text-xs text-muted-foreground">Estimated BIA points</p>
+                        <div className="mb-2">
+                          <a 
+                            href="mailto:consultant@bcorp.com" 
+                            className="text-lg font-bold text-blue-600 hover:text-blue-800 underline"
+                          >
+                            Contact a Verified B-Corp Consultant
+                          </a>
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          A verified B-Corp Consultant can give a dedicated assessment of your path.
+                        </p>
                       </CardContent>
                     </Card>
                   </div>
@@ -164,7 +178,7 @@ const Progress = () => {
                       <div key={summary.impact} className="bg-white/60 rounded-lg p-4">
                         <ImpactCard
                           summary={summary}
-                          onViewTasks={() => navigate(`/impact/${summary.impact.toLowerCase()}`)}
+                          onViewTasks={() => setShowTasksModal({ isOpen: true, impactArea: summary.impact })}
                         />
                       </div>
                     ))}
@@ -293,6 +307,27 @@ const Progress = () => {
           </main>
         </div>
       </div>
+
+      {/* Tasks Modal */}
+      <CompletedTasksModal
+        isOpen={showTasksModal.isOpen}
+        onClose={() => setShowTasksModal({ isOpen: false })}
+        completedTasks={todos}
+        impactArea={showTasksModal.impactArea as any}
+        onTaskClick={(task) => {
+          setSelectedTask(task);
+          setShowTasksModal({ isOpen: false });
+        }}
+      />
+
+      {/* Task Details Modal */}
+      {selectedTask && (
+        <ExpandableTaskModal
+          isOpen={!!selectedTask}
+          onClose={() => setSelectedTask(null)}
+          todo={selectedTask}
+        />
+      )}
     </SidebarProvider>
   );
 };

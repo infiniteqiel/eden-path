@@ -5,7 +5,7 @@
  * This will later be implemented by AI agents.
  */
 
-import { AnalysisJob, Finding, Todo, ImpactSummary, EvidenceExcerpt } from '@/domain/data-contracts';
+import { AnalysisJob, Finding, Todo, ImpactSummary, EvidenceExcerpt, ImpactArea } from '@/domain/data-contracts';
 
 export interface IAnalysisService {
   /**
@@ -47,6 +47,11 @@ export interface IAnalysisService {
    * Assign a task to a sub-area
    */
   assignTaskToSubArea: (todoId: string, subAreaId: string | null) => Promise<Todo>;
+
+  /**
+   * Update task impact area
+   */
+  updateTaskImpactArea: (todoId: string, impactArea: ImpactArea) => Promise<Todo>;
 
   /**
    * Link evidence chunks to a todo item
