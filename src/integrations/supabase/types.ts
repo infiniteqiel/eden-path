@@ -595,6 +595,7 @@ export type Database = {
           evidence_chunk_ids: string[] | null
           id: string
           impact: string
+          is_impact_locked: boolean
           kb_action_id: string | null
           kb_refs: Json | null
           owner_user_id: string | null
@@ -620,6 +621,7 @@ export type Database = {
           evidence_chunk_ids?: string[] | null
           id?: string
           impact: string
+          is_impact_locked?: boolean
           kb_action_id?: string | null
           kb_refs?: Json | null
           owner_user_id?: string | null
@@ -645,6 +647,7 @@ export type Database = {
           evidence_chunk_ids?: string[] | null
           id?: string
           impact?: string
+          is_impact_locked?: boolean
           kb_action_id?: string | null
           kb_refs?: Json | null
           owner_user_id?: string | null

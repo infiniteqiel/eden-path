@@ -51,7 +51,7 @@ export interface IAnalysisService {
   /**
    * Update task impact area
    */
-  updateTaskImpactArea: (todoId: string, impactArea: ImpactArea) => Promise<Todo>;
+  updateTaskImpactArea: (todoId: string, impactArea: ImpactArea, isLocked?: boolean) => Promise<Todo>;
 
   /**
    * Link evidence chunks to a todo item

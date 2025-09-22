@@ -1,23 +1,27 @@
 /**
  * Optimized Expandable Task Modal
  * 
- * Full screen task view with unified AI Chat integration and improved mobile UX
+ * Full-screen modal for detailed task management with AI chat integration
  */
 
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { X, Upload, MessageSquare, Trash2, FileText } from 'lucide-react';
+import { Todo, DataFile, ImpactArea } from '@/domain/data-contracts';
 import { TodoItem } from '@/components/todo-item';
-import { AIChatIcon } from '@/components/ai-chat-icon';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { ChatInterface } from '@/components/common/chat-interface';
-import { FileList } from '@/components/file-list';
 import { ImpactAreaSelector } from '@/components/impact-area-selector';
-import { Todo, DataFile, ImpactArea } from '@/domain/data-contracts';
-import { X, Upload, MessageSquare, FileText, Link } from 'lucide-react';
+import { AIChatIcon } from '@/components/ai-chat-icon';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDataroomStore } from '@/store/dataroom';
 import { useBusinessStore } from '@/store/business';
@@ -26,31 +30,32 @@ import { taskFileMappingService } from '@/services/registry';
 
 interface ExpandableTaskModalProps {
   isOpen: boolean;
+  todo: Todo;
   onClose: () => void;
-  todo: Todo | null;
-  onToggleStatus?: (status: Todo['status']) => void;
+  onToggleStatus: (status: Todo['status']) => void;
   onDelete?: () => void;
 }
 
 export function OptimizedExpandableTaskModal({ 
   isOpen, 
+  todo, 
   onClose, 
-  todo,
-  onToggleStatus,
+  onToggleStatus, 
   onDelete 
 }: ExpandableTaskModalProps) {
   const [showEvidenceModal, setShowEvidenceModal] = useState(false);
   const [showAIChat, setShowAIChat] = useState(false);
   const [mappedFiles, setMappedFiles] = useState<DataFile[]>([]);
-  const [isImpactLocked, setIsImpactLocked] = useState(false);
+  const [localTodo, setLocalTodo] = useState(todo);
   const isMobile = useIsMobile();
   const { files, loadFiles } = useDataroomStore();
   const { currentBusiness } = useBusinessStore();
-  const { deleteTask, updateTaskImpactArea } = useAnalysisStore();
+  const { deleteTask, updateTaskImpactArea, loadTodos } = useAnalysisStore();
 
-  // Load mapped files when todo changes
+  // Load mapped files when todo changes and sync local state
   useEffect(() => {
     if (todo && currentBusiness) {
+      setLocalTodo(todo);
       loadMappedFiles();
       loadFiles(currentBusiness.id);
     }
@@ -77,68 +82,81 @@ export function OptimizedExpandableTaskModal({
   };
 
   const handleImpactChange = async (newImpact: ImpactArea) => {
-    if (!todo || !onToggleStatus) return;
-    
     try {
-      await updateTaskImpactArea(todo.id, newImpact);
-      // Reload mapped files since impact area changed
+      // Update local state immediately for instant UI feedback
+      const updatedTodo = { ...localTodo, impact: newImpact };
+      setLocalTodo(updatedTodo);
+      
+      // Update in database
+      await updateTaskImpactArea(todo.id, newImpact, localTodo.isImpactLocked);
+      
+      // Reload files to update the impact area categorization
       loadMappedFiles();
-      if (currentBusiness) {
-        loadFiles(currentBusiness.id);
-      }
+      loadFiles(currentBusiness.id);
+      
+      // Refresh the analysis store to update other components
+      await loadTodos(currentBusiness?.id || '');
     } catch (error) {
       console.error('Failed to update task impact area:', error);
+      // Revert local state on error
+      setLocalTodo(todo);
+    }
+  };
+
+  const handleToggleLock = async () => {
+    try {
+      const newLockState = !localTodo.isImpactLocked;
+      
+      // Update local state immediately
+      const updatedTodo = { ...localTodo, isImpactLocked: newLockState };
+      setLocalTodo(updatedTodo);
+      
+      // Update in database
+      await updateTaskImpactArea(todo.id, localTodo.impact, newLockState);
+      
+      // Refresh the analysis store
+      await loadTodos(currentBusiness?.id || '');
+    } catch (error) {
+      console.error('Failed to toggle lock state:', error);
+      // Revert local state on error
+      setLocalTodo(todo);
     }
   };
 
   if (!todo) return null;
 
-  const priorityColors = {
-    P1: 'bg-red-100 text-red-800 border-red-200',
-    P2: 'bg-orange-100 text-orange-800 border-orange-200', 
-    P3: 'bg-blue-100 text-blue-800 border-blue-200',
-  };
-
-  const statusColors = {
-    todo: 'bg-gray-100 text-gray-800 border-gray-200',
-    in_progress: 'bg-blue-100 text-blue-800 border-blue-200',
-    blocked: 'bg-red-100 text-red-800 border-red-200',
-    done: 'bg-green-100 text-green-800 border-green-200',
-  };
-
-  const initialMessage = `Hi! I'm here to help you with "${todo.title}". I can provide step-by-step guidance, explain B Corp requirements, and suggest best practices. What specific aspect would you like help with?`;
-
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl h-[85vh] flex flex-col bg-white">
-          <DialogHeader className="flex-shrink-0">
+      <Dialog open={isOpen} onOpenChange={() => {}}>
+        <DialogContent className="max-w-[95vw] w-full h-[95vh] flex flex-col p-0">
+          <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4 border-b">
             <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <DialogTitle className="text-lg md:text-xl font-bold mb-2">
-                  {todo.title}
+              <div className="flex-1 min-w-0 pr-4">
+                <DialogTitle className="text-xl font-semibold leading-tight mb-2">
+                  {localTodo.title}
                 </DialogTitle>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge className={priorityColors[todo.priority]}>
-                    {todo.priority}
-                  </Badge>
-                  <Badge className={statusColors[todo.status]}>
-                    {todo.status.replace('_', ' ')}
-                  </Badge>
-                  <ImpactAreaSelector 
-                    currentImpact={todo.impact} 
-                    taskId={todo.id}
-                    onImpactChange={handleImpactChange}
-                    isLocked={isImpactLocked}
-                    onToggleLock={() => setIsImpactLocked(!isImpactLocked)}
-                  />
-                </div>
+                <ImpactAreaSelector
+                  currentImpact={localTodo.impact}
+                  taskId={localTodo.id}
+                  onImpactChange={handleImpactChange}
+                  isLocked={localTodo.isImpactLocked || false}
+                  onToggleLock={handleToggleLock}
+                />
               </div>
+              <div className="flex items-center gap-2">
               <AIChatIcon 
                 onClick={() => setShowAIChat(!showAIChat)}
-                size="md"
-                className="ml-4 flex-shrink-0"
+                className="flex-shrink-0"
               />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="ml-4 flex-shrink-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </DialogHeader>
 
@@ -164,7 +182,7 @@ export function OptimizedExpandableTaskModal({
                         </CardHeader>
                         <CardContent>
                           <TodoItem
-                            todo={todo}
+                            todo={localTodo}
                             onToggleStatus={onToggleStatus}
                             onUploadEvidence={() => setShowEvidenceModal(true)}
                             showImpact={false}
@@ -174,14 +192,14 @@ export function OptimizedExpandableTaskModal({
                             <div>
                               <h4 className="font-medium mb-2">Description</h4>
                               <p className="text-sm text-muted-foreground">
-                                {todo.descriptionMd || "No description available"}
+                                {localTodo.descriptionMd || "No description available"}
                               </p>
                             </div>
                             
                             <div>
                               <h4 className="font-medium mb-2">Priority & Status</h4>
                               <p className="text-sm text-muted-foreground">
-                                Priority: {todo.priority} | Status: {todo.status.replace('_', ' ')}
+                                Priority: {localTodo.priority} | Status: {localTodo.status.replace('_', ' ')}
                               </p>
                             </div>
 
@@ -200,7 +218,7 @@ export function OptimizedExpandableTaskModal({
                                       }}
                                     >
                                       <div className="flex items-center space-x-2 w-full">
-                                        <FileText className="h-4 w-4 flex-shrink-0" />
+                                        <FileText className="h-4 w-4 text-muted-foreground flex-shrink-0" />
                                         <div className="flex-1 min-w-0">
                                           <p className="text-sm font-medium truncate">
                                             {file.originalName}
@@ -209,87 +227,61 @@ export function OptimizedExpandableTaskModal({
                                             {file.contentType || 'Unknown type'}
                                           </p>
                                         </div>
+                                        <Badge variant="outline" className="text-xs">
+                                          Mapped
+                                        </Badge>
                                       </div>
                                     </Button>
                                   ))}
                                 </div>
                               ) : (
                                 <p className="text-sm text-muted-foreground">
-                                  No files mapped to this task yet.
+                                  No files mapped to this task
                                 </p>
                               )}
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
 
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Quick Actions</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-3">
-                          <Button 
-                            onClick={() => setShowEvidenceModal(true)}
-                            variant="outline"
-                            className="w-full"
-                          >
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload Evidence
-                          </Button>
-                          
-                          <Button 
-                            onClick={() => setShowEvidenceModal(true)}
-                            variant="outline"
-                            className="w-full"
-                          >
-                            <Link className="h-4 w-4 mr-2" />
-                            Manage Task Files
-                          </Button>
-                          
-                          <Button 
-                            onClick={() => setShowAIChat(true)}
-                            variant="outline"
-                            className="w-full"
-                          >
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Get AI Assistance
-                          </Button>
-                          
-                          <Button 
-                            onClick={async () => {
-                              if (confirm('Are you sure you want to delete this task? It will be moved to the bin and can be restored later.')) {
-                                await deleteTask(todo.id);
-                                onDelete?.();
-                                onClose();
-                              }
-                            }}
-                            variant="destructive"
-                            className="w-full"
-                          >
-                            <X className="h-4 w-4 mr-2" />
-                            Delete Task
-                          </Button>
-                        </CardContent>
-                      </Card>
+                            <div className="space-y-2">
+                              <h4 className="font-medium">Quick Actions</h4>
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowEvidenceModal(true)}
+                                >
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  Upload Evidence
+                                </Button>
+                                
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setShowAIChat(true)}
+                                >
+                                  <MessageSquare className="h-4 w-4 mr-2" />
+                                  AI Assistance
+                                </Button>
 
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Related Resources</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
-                            <Button variant="ghost" className="w-full justify-start">
-                              <FileText className="h-4 w-4 mr-2" />
-                              B Corp Guidelines - {todo.impact}
-                            </Button>
-                            <Button variant="ghost" className="w-full justify-start">
-                              <FileText className="h-4 w-4 mr-2" />
-                              Implementation Template
-                            </Button>
-                            <Button variant="ghost" className="w-full justify-start">
-                              <FileText className="h-4 w-4 mr-2" />
-                              Best Practices Guide
-                            </Button>
+                                {onDelete && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={onDelete}
+                                    className="text-destructive hover:text-destructive"
+                                  >
+                                    <Trash2 className="h-4 w-4 mr-2" />
+                                    Delete Task
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+
+                            <div>
+                              <h4 className="font-medium mb-2">Related Resources</h4>
+                              <p className="text-sm text-muted-foreground">
+                                Additional resources and documentation for this task would appear here.
+                              </p>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -298,35 +290,36 @@ export function OptimizedExpandableTaskModal({
                 </div>
               </div>
 
-              {/* AI Chat Container */}
+              {/* AI Chat Container - Responsive behavior */}
               {showAIChat && (
                 <div 
-                  className="flex-1 border-l border-gray-200 pl-4 transition-all duration-300 ease-in-out"
+                  className={`transition-all duration-300 ease-in-out border-l ${
+                    isMobile ? 'flex-1' : 'flex-1 max-w-md'
+                  }`}
                   data-container="ai-chat"
                 >
                   <div className="h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                      <h3 className="font-semibold">AI Task Assistant</h3>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowAIChat(false)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
+                    <div className="flex-shrink-0 p-4 border-b">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold">AI Assistant</h3>
+                        {isMobile && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setShowAIChat(false)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Get help with this specific task
+                      </p>
                     </div>
                     
-                    <div className="flex-1 min-h-0">
+                    <div className="flex-1 overflow-hidden">
                       <ChatInterface
-                        initialMessage={initialMessage}
-                        contextType="task"
-                        contextData={{
-                          taskTitle: todo.title,
-                          impactArea: todo.impact
-                        }}
-                        placeholder={`Ask about "${todo.title}"...`}
-                        height="h-full"
+                        className="h-full"
                       />
                     </div>
                   </div>
@@ -336,17 +329,12 @@ export function OptimizedExpandableTaskModal({
           </div>
         </DialogContent>
       </Dialog>
-      
+
       {/* Evidence Upload Modal */}
       {showEvidenceModal && (
         <EvidenceUploadModal
           isOpen={showEvidenceModal}
-          onClose={() => {
-            setShowEvidenceModal(false);
-            // Refresh mapped files when modal closes
-            loadMappedFiles();
-          }}
-          todo={todo}
+          onClose={() => setShowEvidenceModal(false)}
         />
       )}
     </>
