@@ -60,17 +60,36 @@ export function useUnifiedAIChat({
     if (!user) return;
 
     try {
-      // Find or create session
-      const { data: existingSession } = await supabase
+      // Build query with proper null handling
+      let query = supabase
         .from('chat_sessions')
         .select('*')
         .eq('user_id', user.id)
         .eq('business_id', currentBusiness.id)
-        .eq('level', contextLevel)
-        .eq('impact_area', impactArea || '')
-        .eq('specific_area', subArea || '')
-        .eq('task_id', taskId || '')
-        .maybeSingle();
+        .eq('level', contextLevel);
+
+      // Handle impact_area properly (null vs empty string)
+      if (impactArea) {
+        query = query.eq('impact_area', impactArea);
+      } else {
+        query = query.is('impact_area', null);
+      }
+
+      // Handle specific_area properly (null vs empty string)
+      if (subArea) {
+        query = query.eq('specific_area', subArea);
+      } else {
+        query = query.is('specific_area', null);
+      }
+
+      // Handle task_id properly (null vs empty string)
+      if (taskId) {
+        query = query.eq('task_id', taskId);
+      } else {
+        query = query.is('task_id', null);
+      }
+
+      const { data: existingSession } = await query.maybeSingle();
 
       if (existingSession) {
         setSessionId(existingSession.id);
@@ -90,21 +109,21 @@ export function useUnifiedAIChat({
             timestamp: new Date(msg.created_at)
           }));
           setMessages(chatMessages);
-        } else if (initialMessage) {
+        } else {
           // Add initial message if no history exists
           const welcomeMessage: ChatMessage = {
             id: 'welcome',
-            content: initialMessage,
+            content: getInitialMessage(),
             role: 'assistant',
             timestamp: new Date()
           };
           setMessages([welcomeMessage]);
         }
-      } else if (initialMessage) {
+      } else {
         // New session - show initial message
         const welcomeMessage: ChatMessage = {
           id: 'welcome',
-          content: initialMessage,
+          content: getInitialMessage(),
           role: 'assistant',
           timestamp: new Date()
         };
@@ -112,15 +131,14 @@ export function useUnifiedAIChat({
       }
     } catch (error) {
       console.error('Failed to load chat session:', error);
-      if (initialMessage) {
-        const welcomeMessage: ChatMessage = {
-          id: 'welcome',
-          content: initialMessage,
-          role: 'assistant',
-          timestamp: new Date()
-        };
-        setMessages([welcomeMessage]);
-      }
+      // Show initial message on error
+      const welcomeMessage: ChatMessage = {
+        id: 'welcome',
+        content: getInitialMessage(),
+        role: 'assistant',
+        timestamp: new Date()
+      };
+      setMessages([welcomeMessage]);
     }
   };
 

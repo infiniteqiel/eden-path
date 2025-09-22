@@ -4,13 +4,14 @@
  * Individual todo item with status, priority, and evidence linking.
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FileText, Eye, Clock, AlertCircle, Upload } from 'lucide-react';
 import { Todo, TodoStatus } from '@/domain/data-contracts';
 import { cn } from '@/lib/utils';
+import { QuickEvidenceUpload } from './quick-evidence-upload';
 
 interface TodoItemProps {
   todo: Todo;
@@ -57,6 +58,7 @@ export function TodoItem({
   className,
   disabled = false
 }: TodoItemProps) {
+  const [showQuickUpload, setShowQuickUpload] = useState(false);
   const isCompleted = todo.status === 'done';
   const isBlocked = todo.status === 'blocked';
   const hasEvidence = todo.evidenceChunkIds && todo.evidenceChunkIds.length > 0;
@@ -146,7 +148,11 @@ export function TodoItem({
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();
-                    onUploadEvidence?.();
+                    if (onUploadEvidence) {
+                      onUploadEvidence();
+                    } else {
+                      setShowQuickUpload(true);
+                    }
                   }}
                   className="h-auto p-1 text-muted-foreground hover:text-foreground"
                   title="Upload Evidence"
@@ -174,6 +180,13 @@ export function TodoItem({
           </div>
         </div>
       </div>
+
+      <QuickEvidenceUpload
+        isOpen={showQuickUpload}
+        onClose={() => setShowQuickUpload(false)}
+        taskId={todo.id}
+        taskTitle={todo.title}
+      />
     </div>
   );
 }
