@@ -326,7 +326,6 @@ const Progress = () => {
           isOpen={!!selectedTask}
           onClose={() => setSelectedTask(null)}
           todo={selectedTask}
-          onToggleStatus={() => {}}
         />
       )}
     </SidebarProvider>

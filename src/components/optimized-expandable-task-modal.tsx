@@ -82,15 +82,13 @@ export function OptimizedExpandableTaskModal({
   };
 
   const handleImpactChange = async (newImpact: ImpactArea) => {
-    if (!currentBusiness) return;
-    
     try {
       // Update local state immediately for instant UI feedback
       const updatedTodo = { ...localTodo, impact: newImpact };
       setLocalTodo(updatedTodo);
       
-      // Update in database (store method only takes 2 args)
-      await updateTaskImpactArea(todo.id, newImpact);
+      // Update in database
+      await updateTaskImpactArea(todo.id, newImpact, localTodo.isImpactLocked);
       
       // Reload files to update the impact area categorization
       loadMappedFiles();
@@ -113,8 +111,8 @@ export function OptimizedExpandableTaskModal({
       const updatedTodo = { ...localTodo, isImpactLocked: newLockState };
       setLocalTodo(updatedTodo);
       
-      // Update in database (store method only takes 2 args)
-      await updateTaskImpactArea(todo.id, localTodo.impact);
+      // Update in database
+      await updateTaskImpactArea(todo.id, localTodo.impact, newLockState);
       
       // Refresh the analysis store
       await loadTodos(currentBusiness?.id || '');
@@ -337,7 +335,6 @@ export function OptimizedExpandableTaskModal({
         <EvidenceUploadModal
           isOpen={showEvidenceModal}
           onClose={() => setShowEvidenceModal(false)}
-          todo={localTodo}
         />
       )}
     </>
