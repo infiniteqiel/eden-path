@@ -40,6 +40,18 @@ export function useUnifiedAIChat({
   const [sessionId, setSessionId] = useState<string | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+  // Generate unique session key for isolation
+  const generateSessionKey = () => {
+    const parts = [
+      contextLevel,
+      impactArea || 'null',
+      subArea || 'null', 
+      subAreaId || 'null',
+      taskId || 'null'
+    ];
+    return parts.join('-');
+  };
+
   // Auto scroll to bottom when new messages are added
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -62,7 +74,9 @@ export function useUnifiedAIChat({
     if (!user) return;
 
     try {
-      // Build query with strict context separation
+      // Build query with ultra-strict context separation using composite key
+      const sessionKey = generateSessionKey();
+      
       let query = supabase
         .from('chat_sessions')
         .select('*')
@@ -70,22 +84,18 @@ export function useUnifiedAIChat({
         .eq('business_id', currentBusiness.id)
         .eq('level', contextLevel);
 
-      // Strict separation based on context level
+      // Ultra-strict separation - exact value matching
       if (contextLevel === 'overview') {
-        // Impact area overview chats - only match impact area, no sub-area
         query = query.eq('impact_area', impactArea || null);
         query = query.is('specific_area', null);
         query = query.is('task_id', null);
       } else if (contextLevel === 'subarea') {
-        // Sub-area chats - match both impact area AND sub-area name
         query = query.eq('impact_area', impactArea || null);
         query = query.eq('specific_area', subArea || null);
         query = query.is('task_id', null);
       } else if (contextLevel === 'task') {
-        // Task-specific chats
         query = query.eq('task_id', taskId || null);
       } else if (contextLevel === 'home') {
-        // Home level chats
         query = query.is('impact_area', null);
         query = query.is('specific_area', null);
         query = query.is('task_id', null);
@@ -211,6 +221,11 @@ export function useUnifiedAIChat({
       };
 
       setMessages(prev => [...prev, assistantMessage]);
+      
+      // Force immediate session refresh for history updates
+      setTimeout(() => {
+        loadChatSession();
+      }, 100);
     } catch (error) {
       console.error('AI chat error:', error);
       
@@ -257,6 +272,7 @@ export function useUnifiedAIChat({
     scrollAreaRef,
     sendMessage,
     handleKeyPress,
-    resetChat
+    resetChat,
+    sessionId
   };
 }

@@ -13,7 +13,8 @@ import { TodoItem } from '@/components/todo-item';
 import { ImpactCard } from '@/components/impact-card';
 import { ImpactFilesSection } from '@/components/impact-files-section';
 import { ImpactFileMiniCard } from '@/components/impact-file-mini-card';
-import { EnhancedAIChatModal } from '@/components/enhanced-ai-chat-modal';
+import { ImpactAreaChatModal } from '@/components/impact-area-chat-modal';
+import { SubAreaChatModal } from '@/components/subarea-chat-modal';
 import { DroppableSubArea } from '@/components/droppable-sub-area';
 import { DroppableUnassignedArea } from '@/components/droppable-unassigned-area';
 import { DraggableTask } from '@/components/draggable-task';
@@ -55,8 +56,9 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
   const { currentBusiness } = useBusinessStore();
   const { impactSummaries, todos, loadImpactSummaries, loadTodos, updateTodoStatus, assignTaskToSubArea } = useAnalysisStore();
   const { subAreas, loadSubAreasByImpact, ensureDefaults, createSubArea } = useSubAreasStore();
-  const [showAIChat, setShowAIChat] = useState(false);
-  const [chatContext, setChatContext] = useState<{level: 'overview' | 'subarea' | 'task', subArea?: string, taskTitle?: string}>({level: 'overview'});
+  const [showImpactAreaChat, setShowImpactAreaChat] = useState(false);
+  const [showSubAreaChat, setShowSubAreaChat] = useState(false);
+  const [activeSubArea, setActiveSubArea] = useState<{name: string, id?: string} | null>(null);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [showAddAreaModal, setShowAddAreaModal] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -309,8 +311,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                         size="sm" 
                         className="w-full mt-4"
                         onClick={() => {
-                          setChatContext({level: 'overview'});
-                          setShowAIChat(true);
+                          setShowImpactAreaChat(true);
                         }}
                       >
                         <MessageSquare className="h-4 w-4 mr-2" />
@@ -323,7 +324,7 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                          {impactSummary && (
                            <ImpactCard
                              summary={impactSummary}
-                             onViewTasks={() => setShowAIChat(true)}
+                             onViewTasks={() => setShowImpactAreaChat(true)}
                            />
                          )}
                        </div>
@@ -392,8 +393,8 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                             onTaskClick={setExpandedTaskId}
                             onAIChatClick={(subAreaTitle) => {
                               const subAreaData = subAreas.find(sa => sa.title === subAreaTitle);
-                              setChatContext({level: 'subarea', subArea: subAreaTitle});
-                              setShowAIChat(true);
+                              setActiveSubArea({name: subAreaTitle, id: subAreaData?.id});
+                              setShowSubAreaChat(true);
                             }}
                             onTaskGenerated={handleTaskGenerated}
                             className="animate-fade-in hover-scale"
@@ -466,15 +467,23 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
         </div>
       </div>
       
-      <EnhancedAIChatModal 
-        isOpen={showAIChat}
-        onClose={() => setShowAIChat(false)}
+      {/* Impact Area Chat Modal */}
+      <ImpactAreaChatModal 
+        isOpen={showImpactAreaChat}
+        onClose={() => setShowImpactAreaChat(false)}
         impactArea={config.impactArea}
-        subArea={chatContext.subArea}
-        subAreaId={chatContext.subArea ? subAreas.find(sa => sa.title === chatContext.subArea)?.id : undefined}
-        taskTitle={chatContext.taskTitle}
-        contextLevel={chatContext.level}
       />
+      
+      {/* SubArea Chat Modal */}
+      {activeSubArea && (
+        <SubAreaChatModal 
+          isOpen={showSubAreaChat}
+          onClose={() => setShowSubAreaChat(false)}
+          impactArea={config.impactArea}
+          subArea={activeSubArea.name}
+          subAreaId={activeSubArea.id}
+        />
+      )}
       
       {/* Expandable Task Modal */}
       {expandedTaskId && (
