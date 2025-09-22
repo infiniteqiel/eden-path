@@ -4,7 +4,7 @@
  * Displays uploaded files in the data room.
  */
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,8 +28,6 @@ import {
 import { DataFile, FileKind } from '@/domain/data-contracts';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { taskFileMappingService } from '@/services/registry';
-import { useToast } from '@/hooks/use-toast';
 
 interface FileCardProps {
   file: DataFile;
@@ -94,44 +92,8 @@ const ocrStatusConfig = {
 };
 
 export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCardProps) {
-  const [mappingLabel, setMappingLabel] = useState<string>('Other Document');
-  const [isMapped, setIsMapped] = useState<boolean>(false);
-  const { toast } = useToast();
-  
   const FileIcon = getFileIcon(file.contentType);
   const OcrIcon = ocrStatusConfig[file.ocrStatus].icon;
-
-  // Load file mapping status
-  useEffect(() => {
-    const loadMappingStatus = async () => {
-      try {
-        const taskIds = await taskFileMappingService.getFileTasks(file.id);
-        const hasMapping = taskIds.length > 0;
-        setIsMapped(hasMapping);
-        setMappingLabel(hasMapping ? 'Mapped' : 'Unmapped');
-      } catch (error) {
-        console.error('Failed to load file mapping status:', error);
-        setMappingLabel(fileKindLabels[file.kind]);
-      }
-    };
-
-    loadMappingStatus();
-  }, [file.id, file.kind]);
-
-  const handleDelete = async () => {
-    if (isMapped) {
-      toast({
-        title: "Cannot delete mapped file",
-        description: "This file is mapped to tasks and cannot be deleted. Unmap it first.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    if (onDelete) {
-      onDelete();
-    }
-  };
   
   return (
     <Card className={cn("file-card", className)}>
@@ -148,11 +110,8 @@ export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCa
               <h4 className="font-medium text-sm leading-tight truncate">
                 {file.originalName}
               </h4>
-              <Badge 
-                variant={isMapped ? "default" : "secondary"} 
-                className="mt-1 text-xs"
-              >
-                {mappingLabel}
+              <Badge variant="secondary" className="mt-1 text-xs">
+                {fileKindLabels[file.kind]}
               </Badge>
             </div>
 
@@ -180,11 +139,7 @@ export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCa
                   </DropdownMenuItem>
                 )}
                 {onDelete && (
-                  <DropdownMenuItem 
-                    onClick={handleDelete} 
-                    className={cn("text-destructive", isMapped && "opacity-50 cursor-not-allowed")}
-                    disabled={isMapped}
-                  >
+                  <DropdownMenuItem onClick={onDelete} className="text-destructive">
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete
                   </DropdownMenuItem>

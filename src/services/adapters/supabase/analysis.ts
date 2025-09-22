@@ -105,8 +105,7 @@ export const listTodos = async (businessId: string): Promise<Todo[]> => {
     ownerUserId: row.owner_user_id,
     dueDate: row.due_date,
     createdAt: row.created_at,
-    subAreaId: row.sub_area_id,
-    isImpactLocked: row.is_impact_locked || false
+    subAreaId: row.sub_area_id
   }));
 };
 
@@ -184,26 +183,20 @@ export const assignTaskToSubArea = async (todoId: string, subAreaId: string | nu
     ownerUserId: data.owner_user_id,
     dueDate: data.due_date,
     createdAt: data.created_at,
-    isImpactLocked: data.is_impact_locked || false
+    subAreaId: data.sub_area_id
   };
 };
 
-export const updateTaskImpactArea = async (todoId: string, impactArea: ImpactArea, isLocked?: boolean): Promise<Todo> => {
+export const updateTaskImpactArea = async (todoId: string, impactArea: ImpactArea): Promise<Todo> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
 
-  const updateData: any = { 
-    impact: impactArea,
-    updated_at: new Date().toISOString()
-  };
-  
-  if (isLocked !== undefined) {
-    updateData.is_impact_locked = isLocked;
-  }
-
   const { data, error } = await supabase
     .from('todos')
-    .update(updateData)
+    .update({ 
+      impact: impactArea,
+      updated_at: new Date().toISOString()
+    })
     .eq('id', todoId)
     .eq('user_id', user.id)
     .select()
@@ -226,8 +219,7 @@ export const updateTaskImpactArea = async (todoId: string, impactArea: ImpactAre
     ownerUserId: data.owner_user_id,
     dueDate: data.due_date,
     createdAt: data.created_at,
-    subAreaId: data.sub_area_id,
-    isImpactLocked: data.is_impact_locked || false
+    subAreaId: data.sub_area_id
   };
 };
 
