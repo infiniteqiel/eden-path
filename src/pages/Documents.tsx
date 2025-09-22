@@ -398,10 +398,12 @@ const Documents = () => {
                                          title="Click to open mapped task"
                                        >
                                          <FileText className="h-3 w-3 text-muted-foreground shrink-0" />
-                                         <div className="flex-1 min-w-0">
-                                           <span className="text-xs truncate block">{file.originalName}</span>
-                                           {getFileMappingLabel(file)}
-                                         </div>
+                                            <div className="flex-1 min-w-0">
+                                              <span className="text-xs truncate block">{file.originalName}</span>
+                                              <div className="text-xs">
+                                                {getFileMappingLabel(file)}
+                                              </div>
+                                            </div>
                                        </div>
                                      ))}
                                   </div>

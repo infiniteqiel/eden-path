@@ -5,14 +5,15 @@
  * Expands/collapses and stores conversation history
  */
 
-import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Maximize2, Minimize2, Eye } from 'lucide-react';
+import { useState } from 'react';
+import { MessageCircle, Send, Minimize2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { ImpactSummary, Todo } from '@/domain/data-contracts';
+import { useUnifiedAIChat } from '@/hooks/use-unified-ai-chat';
 
 interface ChatMessage {
   id: string;
@@ -29,48 +30,25 @@ interface BroadChatProps {
 
 export function BroadChat({ className, impactSummaries = [], todos = [] }: BroadChatProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-
-  // Auto scroll to bottom when new messages are added
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }
-  }, [messages]);
+  
+  const {
+    messages,
+    inputValue,
+    setInputValue,
+    isLoading,
+    scrollAreaRef,
+    sendMessage,
+    handleKeyPress
+  } = useUnifiedAIChat({
+    contextLevel: 'home',
+    initialMessage: "Hello! I'm your B Corp consultant. I can provide comprehensive business analysis, help with document review, and guide you through the entire certification process. How can I assist you today?"
+  });
 
   const handleSendMessage = () => {
-    if (!inputValue.trim()) return;
-
-    const userMessage: ChatMessage = {
-      id: `msg-${Date.now()}`,
-      content: inputValue,
-      role: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    setInputValue('');
-    setIsLoading(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage: ChatMessage = {
-        id: `msg-${Date.now()}-ai`,
-        content: "I'm here to help with your B Corp journey! I can provide insights on your business progress, analyze documents, and guide you through certification requirements. What would you like to discuss?",
-        role: 'assistant',
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1500);
+    sendMessage();
   };
 
   const handleBirdsEyeAnalysis = () => {
-    setIsLoading(true);
-    
     // Generate analysis based on live data
     const totalTodos = todos.length;
     const completedTodos = todos.filter(t => t.status === 'done').length;
@@ -99,25 +77,9 @@ export function BroadChat({ className, impactSummaries = [], todos = [] }: Broad
       analysisContent += "• Great progress! You're well on your way to B Corp readiness\n";
     }
     
-    const analysisMessage: ChatMessage = {
-      id: `analysis-${Date.now()}`,
-      content: analysisContent,
-      role: 'assistant',
-      timestamp: new Date()
-    };
-    
-    setTimeout(() => {
-      setMessages(prev => [...prev, analysisMessage]);
-      setIsLoading(false);
-    }, 2000);
+    sendMessage(analysisContent);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
 
   if (!isExpanded) {
     return (

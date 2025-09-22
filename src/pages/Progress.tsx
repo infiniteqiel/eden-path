@@ -308,7 +308,7 @@ const Progress = () => {
         </div>
       </div>
 
-      {/* Tasks Modal */}
+      {/* Tasks Modal - Use standard TodoItem components */}
       <CompletedTasksModal
         isOpen={showTasksModal.isOpen}
         onClose={() => setShowTasksModal({ isOpen: false })}
