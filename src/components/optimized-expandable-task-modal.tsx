@@ -13,7 +13,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { TodoItem } from '@/components/todo-item';
 import { AIChatIcon } from '@/components/ai-chat-icon';
 import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
-import { ChatInterface } from '@/components/common/chat-interface';
+import { TaskChatPanel } from '@/components/task-chat-panel';
 import { FileList } from '@/components/file-list';
 import { ImpactAreaSelector } from '@/components/impact-area-selector';
 import { Todo, DataFile, ImpactArea } from '@/domain/data-contracts';
@@ -342,15 +342,10 @@ export function OptimizedExpandableTaskModal({
                     </div>
                     
                     <div className="flex-1 min-h-0">
-                      <ChatInterface
-                        initialMessage={initialMessage}
-                        contextType="task"
-                        contextData={{
-                          taskTitle: currentTodo.title,
-                          impactArea: currentTodo.impact
-                        }}
-                        placeholder={`Ask about "${currentTodo.title}"...`}
-                        height="h-full"
+                      <TaskChatPanel 
+                        taskId={currentTodo.id}
+                        taskTitle={currentTodo.title}
+                        impactArea={currentTodo.impact}
                       />
                     </div>
                   </div>

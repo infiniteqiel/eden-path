@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppSidebar } from '@/components/app-sidebar';
 import { TodoItem } from '@/components/todo-item';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -28,6 +29,7 @@ const Tasks = () => {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterPriority, setFilterPriority] = useState<string>('all');
   const [expandedTask, setExpandedTask] = useState<Todo | null>(null);
+  const [evidenceUploadTodo, setEvidenceUploadTodo] = useState<Todo | null>(null);
   const [isResetting, setIsResetting] = React.useState(false);
 
   useEffect(() => {
@@ -222,6 +224,7 @@ const Tasks = () => {
                                 <TodoItem
                                   todo={todo}
                                   onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
+                                  onUploadEvidence={() => setEvidenceUploadTodo(todo)}
                                   showImpact
                                 />
                               </div>
@@ -246,6 +249,7 @@ const Tasks = () => {
                                 <TodoItem
                                   todo={todo}
                                   onToggleStatus={(newStatus) => handleTodoToggle(todo.id, newStatus)}
+                                  onUploadEvidence={() => setEvidenceUploadTodo(todo)}
                                 />
                               </div>
                             ))}
@@ -332,6 +336,15 @@ const Tasks = () => {
             }
             setExpandedTask(null);
           }}
+        />
+      )}
+
+      {/* Evidence Upload Modal */}
+      {evidenceUploadTodo && (
+        <EvidenceUploadModal
+          isOpen={!!evidenceUploadTodo}
+          onClose={() => setEvidenceUploadTodo(null)}
+          todo={evidenceUploadTodo}
         />
       )}
     </SidebarProvider>

@@ -48,18 +48,81 @@ export function useUnifiedAIChat({
     }
   }, [messages]);
 
-  // Initialize with welcome message
+  // Load chat session and history
   useEffect(() => {
-    if (initialMessage) {
-      const welcomeMessage: ChatMessage = {
-        id: 'welcome',
-        content: initialMessage,
-        role: 'assistant',
-        timestamp: new Date()
-      };
-      setMessages([welcomeMessage]);
+    loadChatSession();
+  }, [contextLevel, impactArea, subArea, taskId, currentBusiness]);
+
+  const loadChatSession = async () => {
+    if (!currentBusiness) return;
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    try {
+      // Find or create session
+      const { data: existingSession } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('business_id', currentBusiness.id)
+        .eq('level', contextLevel)
+        .eq('impact_area', impactArea || '')
+        .eq('specific_area', subArea || '')
+        .eq('task_id', taskId || '')
+        .maybeSingle();
+
+      if (existingSession) {
+        setSessionId(existingSession.id);
+        
+        // Load messages
+        const { data: messages } = await supabase
+          .from('chat_messages')
+          .select('*')
+          .eq('session_id', existingSession.id)
+          .order('created_at', { ascending: true });
+
+        if (messages && messages.length > 0) {
+          const chatMessages: ChatMessage[] = messages.map(msg => ({
+            id: msg.id,
+            content: msg.content,
+            role: msg.role as 'user' | 'assistant',
+            timestamp: new Date(msg.created_at)
+          }));
+          setMessages(chatMessages);
+        } else if (initialMessage) {
+          // Add initial message if no history exists
+          const welcomeMessage: ChatMessage = {
+            id: 'welcome',
+            content: initialMessage,
+            role: 'assistant',
+            timestamp: new Date()
+          };
+          setMessages([welcomeMessage]);
+        }
+      } else if (initialMessage) {
+        // New session - show initial message
+        const welcomeMessage: ChatMessage = {
+          id: 'welcome',
+          content: initialMessage,
+          role: 'assistant',
+          timestamp: new Date()
+        };
+        setMessages([welcomeMessage]);
+      }
+    } catch (error) {
+      console.error('Failed to load chat session:', error);
+      if (initialMessage) {
+        const welcomeMessage: ChatMessage = {
+          id: 'welcome',
+          content: initialMessage,
+          role: 'assistant',
+          timestamp: new Date()
+        };
+        setMessages([welcomeMessage]);
+      }
     }
-  }, [initialMessage]);
+  };
 
   const getInitialMessage = () => {
     switch (contextLevel) {

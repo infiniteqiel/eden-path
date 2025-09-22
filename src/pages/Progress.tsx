@@ -10,6 +10,7 @@ import { AppSidebar } from '@/components/app-sidebar';
 import { ImpactCard } from '@/components/impact-card';
 import { CompletedTasksModal } from '@/components/completed-tasks-modal';
 import { ExpandableTaskModal } from '@/components/expandable-task-modal';
+import { EvidenceUploadModal } from '@/components/evidence-upload-modal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress as ProgressBar } from '@/components/ui/progress';
@@ -27,6 +28,7 @@ const Progress = () => {
   const [isResetting, setIsResetting] = useState(false);
   const [showTasksModal, setShowTasksModal] = useState<{ isOpen: boolean; impactArea?: string }>({ isOpen: false });
   const [selectedTask, setSelectedTask] = useState<Todo | null>(null);
+  const [evidenceUploadTodo, setEvidenceUploadTodo] = useState<Todo | null>(null);
 
   useEffect(() => {
     if (currentBusiness) {
@@ -326,6 +328,15 @@ const Progress = () => {
           isOpen={!!selectedTask}
           onClose={() => setSelectedTask(null)}
           todo={selectedTask}
+        />
+      )}
+
+      {/* Evidence Upload Modal */}
+      {evidenceUploadTodo && (
+        <EvidenceUploadModal
+          isOpen={!!evidenceUploadTodo}
+          onClose={() => setEvidenceUploadTodo(null)}
+          todo={evidenceUploadTodo}
         />
       )}
     </SidebarProvider>

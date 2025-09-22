@@ -137,7 +137,7 @@ export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCa
     if (isMapped) {
       return (
         <Badge variant="default" className="text-xs bg-green-100 text-green-800 border-green-200">
-          Mapped
+          {file.impactArea || 'Mapped'}
         </Badge>
       );
     } else {
@@ -166,7 +166,7 @@ export function FileCard({ file, onOpen, onRename, onDelete, className }: FileCa
               </h4>
               <div className="flex gap-1 mt-1">
                 <Badge variant="secondary" className="text-xs">
-                  {fileKindLabels[file.kind]}
+                  {isMapped && file.impactArea ? file.impactArea : fileKindLabels[file.kind]}
                 </Badge>
                 {getFileMappingLabel()}
               </div>
