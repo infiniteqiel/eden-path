@@ -37,6 +37,11 @@ const Dashboard = () => {
   const [companyModalOpen, setCompanyModalOpen] = React.useState(false);
   const [selectedTodo, setSelectedTodo] = React.useState<Todo | null>(null);
   
+  // Debug modal state
+  React.useEffect(() => {
+    console.log('Dashboard companyModalOpen state changed:', companyModalOpen);
+  }, [companyModalOpen]);
+  
   const [isResetting, setIsResetting] = React.useState(false);
   
   const { businesses, currentBusiness, loadBusinesses, selectBusiness } = useBusinessStore();
@@ -117,7 +122,10 @@ const Dashboard = () => {
                 title="Welcome to bcstart.ai"
                 description="Let's get started by setting up your first business profile."
                 ctaLabel="Create Business"
-                onCta={() => setCompanyModalOpen(true)}
+                onCta={() => {
+                  console.log('Create Business button clicked');
+                  setCompanyModalOpen(true);
+                }}
               />
             </main>
           </div>
@@ -419,7 +427,10 @@ const Dashboard = () => {
         
         <CompanyCreationModal
           open={companyModalOpen}
-          onClose={() => setCompanyModalOpen(false)}
+          onClose={() => {
+            console.log('CompanyCreationModal closing');
+            setCompanyModalOpen(false);
+          }}
         />
       </SidebarProvider>
     );

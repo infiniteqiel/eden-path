@@ -23,7 +23,7 @@ const SignIn = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate('/dashboard');
+      navigate('/');
     }
   }, [user, navigate]);
   
@@ -47,7 +47,7 @@ const SignIn = () => {
         title: 'Welcome back!',
         description: 'You have been signed in successfully.',
       });
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       // Error is handled by the store
     }

@@ -4,7 +4,7 @@
  * Modal for creating a new company with basic details
  */
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -34,6 +34,10 @@ interface CompanyCreationModalProps {
 }
 
 export function CompanyCreationModal({ open, onClose }: CompanyCreationModalProps) {
+  // Debug modal props
+  useEffect(() => {
+    console.log('CompanyCreationModal props - open:', open);
+  }, [open]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
