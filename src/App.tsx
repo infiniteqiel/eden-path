@@ -26,31 +26,32 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthGuard>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<EnhancedIndex />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/auth/signup" element={<SignUp />} />
-            <Route path="/auth/signin" element={<SignIn />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/company-profile" element={<CompanyProfile />} />
-            <Route path="/documents" element={<Documents />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/impact/governance" element={<Governance />} />
-            <Route path="/impact/workers" element={<Workers />} />
-            <Route path="/impact/community" element={<Community />} />
-            <Route path="/impact/environment" element={<Environment />} />
-            <Route path="/impact/customers" element={<Customers />} />
-            <Route path="/impact/other" element={<Other />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthGuard>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<EnhancedIndex />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/auth/signup" element={<SignUp />} />
+          <Route path="/auth/signin" element={<SignIn />} />
+          
+          {/* Protected routes */}
+          <Route path="/dashboard" element={<AuthGuard><Dashboard /></AuthGuard>} />
+          <Route path="/company-profile" element={<AuthGuard><CompanyProfile /></AuthGuard>} />
+          <Route path="/documents" element={<AuthGuard><Documents /></AuthGuard>} />
+          <Route path="/tasks" element={<AuthGuard><Tasks /></AuthGuard>} />
+          <Route path="/progress" element={<AuthGuard><Progress /></AuthGuard>} />
+          <Route path="/impact/governance" element={<AuthGuard><Governance /></AuthGuard>} />
+          <Route path="/impact/workers" element={<AuthGuard><Workers /></AuthGuard>} />
+          <Route path="/impact/community" element={<AuthGuard><Community /></AuthGuard>} />
+          <Route path="/impact/environment" element={<AuthGuard><Environment /></AuthGuard>} />
+          <Route path="/impact/customers" element={<AuthGuard><Customers /></AuthGuard>} />
+          <Route path="/impact/other" element={<AuthGuard><Other /></AuthGuard>} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );
