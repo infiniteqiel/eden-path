@@ -40,7 +40,7 @@ const SignIn = () => {
         title: 'Welcome back!',
         description: 'You have been signed in successfully.',
       });
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       // Error is handled by the store
     }
