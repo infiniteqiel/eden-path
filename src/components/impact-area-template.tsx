@@ -301,22 +301,10 @@ export function ImpactAreaTemplate({ config }: ImpactAreaTemplateProps) {
                         </div>
                       </div>
                       
-                       <Progress 
+                      <Progress 
                         value={impactSummary?.pct || 0} 
                         className="mt-4" 
                       />
-                      
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="w-full mt-4"
-                        onClick={() => {
-                          setShowImpactAreaChat(true);
-                        }}
-                      >
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        AI Analysis Chat - {config.impactArea} Specialist
-                      </Button>
                     </div>
                     
                      <div className="space-y-4">
