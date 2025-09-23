@@ -335,7 +335,7 @@ const Dashboard = () => {
                             Top priority items to advance your B Corp readiness
                           </p>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2" style={{ display: 'none' }}>
                           <Button
                             variant="outline"
                             size="sm"
